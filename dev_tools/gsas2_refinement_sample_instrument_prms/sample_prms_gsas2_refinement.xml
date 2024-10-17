@@ -1,0 +1,69 @@
+<tool id="sample_prms_gsas2" name="GSASII Sample and Instrument Parameters Refinement" profile="22.05" version="0">
+    <description>Tool for GSASII Rietveld refinement of powder diffraction data with settings for refinement of sample and instrument parameters</description>
+    <requirements></requirements>
+    <command detect_errors="exit_code"><![CDATA[
+        which conda &&
+        conda init &&
+        source ~/.bashrc &&
+        conda activate GSASII &&
+        mkdir app &&
+        cd app/ &&
+        touch $output &&
+        mkdir portal &&
+        ln -s $project gsas_project.gpx &&
+
+        python $__tool_directory__/gsas2_sample_instrument_refinement.py
+                --project-filename gsas_project.gpx
+                --sample-refinements $samp_refine
+                --instrument-refinements $inst_refine
+                --output-directory /portal
+        > >(tee -a $output) 2> >(tee -a $output >&2)
+    ]]></command>
+    <inputs>
+        <param name="project" type="data" format="Binary" label="GSASII projectfile"/>
+        <!--instrument parameters-->
+        <section id="instprms" name="Instrument Parameters">
+            <param name="inst_refine" type="select" label="instrument parameters to refine" multiple="true">
+                <option value="Lam" >lam</option>
+                <option value="Zero" >zero</option> 
+                <option value="U" >U</option> 
+                <option value="V" >V</option> 
+                <option value="W" >W</option> 
+                <option value="X" >X</option> 
+                <option value="Y" >Y</option> 
+                <option value="Z" >Z</option>
+                <option value="SH/L" >SH/L</option> 
+            </param> 
+            <param name="Zero" type="float" label="zero"/>
+            <param name="U" type="float" label="U"/>
+            <param name="V" type="float" label="V"/>
+            <param name="W" type="float" label="W"/>
+            <param name="X" type="float" label="X"/>
+            <param name="Y" type="float" label="Y"/>
+            <param name="Z" type="float" label="Z"/>
+            <param name="SH/L" type="float" label="SH/L"/>
+        </section>
+        <!--sample parameters-->
+        <section id="sampprms" name="Sample Parameters">
+            <param name="samp_refine" type="select" label="Sample parameters to refine" multiple="true">
+                <option value="Scale" >Histogram Scale Factor</option>
+                <option value="DisplaceX" >Sample X displ. perp. to beam</option>
+                <option value="DisplaceY" >Sample Y displ. prll. to beam</option>
+                <option value="Absorption" >Sample absorption</option>
+            </param>
+            <param name="HistSF" type="float"  label="histogram scale factor"/>
+            <param name="Xdisp" type="float"  label="Sample X displ. perp. to beam"/>
+            <param name="Ydisp" type="float"  label="Sample Y displ. prll. to beam"/>
+            <param name="SampAbs" type="float"  label="Sample absorption"/>
+        </section>
+    </inputs>
+    <outputs>
+        <data format="txt" name="output" label="GSAS2 console output"></data>
+        <collection type="list" name="output_collection1" label="GSAS2 refinement output">
+            <discover_datasets format="binary" pattern="__designation__" directory="app/portal" visible="true"/>
+        </collection>
+    </outputs>
+    <help>
+        A tool to run a GSAS2 Rietveld refinement.
+    </help>
+</tool>

@@ -1,0 +1,143 @@
+ 
+######################################################################
+data_gsas2_refinement_refined
+
+# phase info for garnet follows
+_pd_phase_name  garnet
+_cell_length_a  12.1869
+_cell_length_b  12.1869
+_cell_length_c  12.1869
+_cell_angle_alpha  90.0000
+_cell_angle_beta  90.0000
+_cell_angle_gamma  90.0000
+_cell_volume  1810.00
+_symmetry_cell_setting  cubic
+_symmetry_space_group_name_H-M  "I a 3 d"
+loop_
+    _space_group_symop_id
+    _space_group_symop_operation_xyz
+     1  x,y,z
+     2  z,x,y
+     3  y,z,x
+     4  1/2+x,y,1/2-z
+     5  1/2-z,1/2+x,y
+     6  y,1/2-z,1/2+x
+     7  -z,1/2+x,1/2-y
+     8  1/2-y,-z,1/2+x
+     9  1/2+y,1/2-z,-x
+    10  -x,1/2+y,1/2-z
+    11  1/2-z,-x,1/2+y
+    12  1/2+x,1/2-y,-z
+    13  1/4+y,1/4+x,1/4+z
+    14  1/4+z,1/4+y,1/4+x
+    15  1/4+x,1/4+z,1/4+y
+    16  3/4+y,1/4+x,1/4-z
+    17  1/4-z,3/4+y,1/4+x
+    18  1/4+x,1/4-z,3/4+y
+    19  3/4-z,3/4+y,1/4-x
+    20  1/4-x,3/4-z,3/4+y
+    21  3/4+x,1/4-z,3/4-y
+    22  3/4-y,3/4+x,1/4-z
+    23  1/4-z,3/4-y,3/4+x
+    24  3/4+y,1/4-x,3/4-z
+    25  -x,-y,-z
+    26  -z,-x,-y
+    27  -y,-z,-x
+    28  1/2-x,-y,1/2+z
+    29  1/2+z,1/2-x,-y
+    30  -y,1/2+z,1/2-x
+    31  z,1/2-x,1/2+y
+    32  1/2+y,z,1/2-x
+    33  1/2-y,1/2+z,x
+    34  x,1/2-y,1/2+z
+    35  1/2+z,x,1/2-y
+    36  1/2-x,1/2+y,z
+    37  3/4-y,3/4-x,3/4-z
+    38  3/4-z,3/4-y,3/4-x
+    39  3/4-x,3/4-z,3/4-y
+    40  1/4-y,3/4-x,3/4+z
+    41  3/4+z,1/4-y,3/4-x
+    42  3/4-x,3/4+z,1/4-y
+    43  1/4+z,1/4-y,3/4+x
+    44  3/4+x,1/4+z,1/4-y
+    45  1/4-x,3/4+z,1/4+y
+    46  1/4+y,1/4-x,3/4+z
+    47  3/4+z,1/4+y,1/4-x
+    48  1/4-y,3/4+x,1/4+z
+    49  1/2+x,1/2+y,1/2+z
+    50  1/2+z,1/2+x,1/2+y
+    51  1/2+y,1/2+z,1/2+x
+    52  x,1/2+y,-z
+    53  -z,x,1/2+y
+    54  1/2+y,-z,x
+    55  1/2-z,x,-y
+    56  -y,1/2-z,x
+    57  y,-z,1/2-x
+    58  1/2-x,y,-z
+    59  -z,1/2-x,y
+    60  x,-y,1/2-z
+    61  3/4+y,3/4+x,3/4+z
+    62  3/4+z,3/4+y,3/4+x
+    63  3/4+x,3/4+z,3/4+y
+    64  1/4+y,3/4+x,3/4-z
+    65  3/4-z,1/4+y,3/4+x
+    66  3/4+x,3/4-z,1/4+y
+    67  1/4-z,1/4+y,3/4-x
+    68  3/4-x,1/4-z,1/4+y
+    69  1/4+x,3/4-z,1/4-y
+    70  1/4-y,1/4+x,3/4-z
+    71  3/4-z,1/4-y,1/4+x
+    72  1/4+y,3/4-x,1/4-z
+    73  1/2-x,1/2-y,1/2-z
+    74  1/2-z,1/2-x,1/2-y
+    75  1/2-y,1/2-z,1/2-x
+    76  -x,1/2-y,z
+    77  z,-x,1/2-y
+    78  1/2-y,z,-x
+    79  1/2+z,-x,y
+    80  y,1/2+z,-x
+    81  -y,z,1/2+x
+    82  1/2+x,-y,z
+    83  z,1/2+x,-y
+    84  -x,y,1/2+z
+    85  1/4-y,1/4-x,1/4-z
+    86  1/4-z,1/4-y,1/4-x
+    87  1/4-x,1/4-z,1/4-y
+    88  3/4-y,1/4-x,1/4+z
+    89  1/4+z,3/4-y,1/4-x
+    90  1/4-x,1/4+z,3/4-y
+    91  3/4+z,3/4-y,1/4+x
+    92  1/4+x,3/4+z,3/4-y
+    93  3/4-x,1/4+z,3/4+y
+    94  3/4+y,3/4-x,1/4+z
+    95  1/4+z,3/4+y,3/4-x
+    96  3/4-y,1/4+x,3/4+z
+
+# ATOMIC COORDINATES AND DISPLACEMENT PARAMETERS
+loop_ 
+   _atom_site_label
+   _atom_site_type_symbol
+   _atom_site_fract_x
+   _atom_site_fract_y
+   _atom_site_fract_z
+   _atom_site_occupancy
+   _atom_site_adp_type
+   _atom_site_U_iso_or_equiv
+   _atom_site_site_symmetry_multiplicity
+Y1     Y    0.12500     0.00000     0.25000     1.0000     Uiso 0.0100     24  
+Fe2    Fe   0.00000     0.00000     0.00000     0.620(6)   Uiso 0.0100     16  
+Al3    Al   0.00000     0.00000     0.00000     0.380(6)   Uiso 0.0100     16  
+Al4    Al   0.37500     0.00000     0.25000     0.661(6)   Uiso 0.0100     24  
+Fe5    Fe   0.37500     0.00000     0.25000     0.339(6)   Uiso 0.0100     24  
+O6     O    -0.03000    0.05000     0.15000     1.0000     Uiso 0.0100     96  
+
+loop_  _atom_type_symbol _atom_type_number_in_cell
+  Al      21.943
+  Fe      18.057
+  O       96
+  Y       24
+
+# Note that Z affects _cell_formula_sum and _weight
+_cell_formula_units_Z  24
+_chemical_formula_sum  "Al0.914 Fe0.752 O4 Y"
+_chemical_formula_weight  219.59

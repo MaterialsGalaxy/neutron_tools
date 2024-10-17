@@ -1,0 +1,219 @@
+********************************************************************************
+   General Structure Analysis System-II Crystal Structure Refinement
+              by Robert B. Von Dreele & Brian H. Toby
+                Argonne National Laboratory(C), 2010
+ This product includes software developed by the UChicago Argonne, LLC,
+            as Operator of Argonne National Laboratory.
+                          Please cite:
+   B.H. Toby & R.B. Von Dreele, J. Appl. Cryst. 46, 544-549 (2013)
+********************************************************************************
+ Least squares controls:
+ Refinement type: analytic Hessian
+ Maximum number of cycles: 5
+ Regularize hydrogens (if any): False
+ Initial shift factor: 1.000
+
+ Phases:
+
+ Phase name: garnet
+=======================================================================================================================================
+
+ X-ray scattering factors:
+   Symbol     fa                                      fb                                      fc
+---------------------------------------------------------------------------------------------------
+ Y         17.77600  10.29460   5.72629   3.26588   1.40290  12.80060   0.12560 104.35400   1.91213
+ Fe        11.76950   7.35730   3.52220   2.30450   4.76110   0.30720  15.35350  76.88050   1.03690
+ Al         6.42020   1.90020   1.59360   1.96460   3.03870   0.74260  31.54720  85.08860   1.11510
+ O          3.04850   2.28680   1.54630   0.86700  13.27710   5.70110   0.32390  32.90890   0.25080
+
+ Electron scattering factors:
+   Symbol     fa                                                fb
+---------------------------------------------------------------------------------------------------
+ Y          0.32340   1.27370   3.21150   4.05630   3.79620   0.12440   1.19480   7.27560  34.14300 111.20790
+ Fe         0.19290   0.82390   1.86890   2.36940   1.90600   0.10870   1.08060   4.76370  22.85000  76.73090
+ Al         0.11650   0.55040   1.01790   2.62950   1.57110   0.12950   1.26190   6.82420  28.45770  88.47500
+ O          0.03650   0.17290   0.58050   0.88140   0.31210   0.06520   0.61840   2.94490   9.62980  28.21940
+
+ Neutron scattering factors:
+   Symbol   isotope       mass       b       resonant terms
+---------------------------------------------------------------------------------------------------
+ Y       Nat. Abund.     88.907    0.775
+ Fe      Nat. Abund.     55.847    0.945
+ Al      Nat. Abund.     26.982    0.345
+ O       Nat. Abund.     15.999    0.581
+
+ Space Group: I a 3 d
+ The lattice is centrosymmetric I-centered cubic
+ The Laue symmetry is m3m
+ The lattice point group is m3m
+ Multiplicity of a general site is 96
+ The inversion center is located at 0,0,0
+ 
+ The equivalent positions are:
+
+ (0,0,0; 1/2,1/2,1/2)+
+
+ ( 1)     X,     Y,     Z 
+ ( 2)     Z,     X,     Y 
+ ( 3)     Y,     Z,     X 
+ ( 4) 1/2+X,     Y, 1/2-Z 
+ ( 5) 1/2-Z, 1/2+X,     Y 
+ ( 6)     Y, 1/2-Z, 1/2+X 
+ ( 7)    -Z, 1/2+X, 1/2-Y 
+ ( 8) 1/2-Y,    -Z, 1/2+X 
+ ( 9) 1/2+Y, 1/2-Z,    -X 
+ (10)    -X, 1/2+Y, 1/2-Z 
+ (11) 1/2-Z,    -X, 1/2+Y 
+ (12) 1/2+X, 1/2-Y,    -Z 
+ (13) 1/4+Y, 1/4+X, 1/4+Z 
+ (14) 1/4+Z, 1/4+Y, 1/4+X 
+ (15) 1/4+X, 1/4+Z, 1/4+Y 
+ (16) 3/4+Y, 1/4+X, 1/4-Z 
+ (17) 1/4-Z, 3/4+Y, 1/4+X 
+ (18) 1/4+X, 1/4-Z, 3/4+Y 
+ (19) 3/4-Z, 3/4+Y, 1/4-X 
+ (20) 1/4-X, 3/4-Z, 3/4+Y 
+ (21) 3/4+X, 1/4-Z, 3/4-Y 
+ (22) 3/4-Y, 3/4+X, 1/4-Z 
+ (23) 1/4-Z, 3/4-Y, 3/4+X 
+ (24) 3/4+Y, 1/4-X, 3/4-Z 
+
+ Atoms:
+   name    type  refine?   x         y         z      frac site sym  mult I/A   Uiso     U11     U22     U33     U12     U13     U23
+---------------------------------------------------------------------------------------------------------------------------------------
+     Y1      Y          0.12500   0.00000   0.25000   1.000 222(x)   24    I 0.01000                                                
+    Fe2     Fe      F   0.00000   0.00000   0.00000   0.610-3(111)   16    I 0.01000                                                
+    Al3     Al      F   0.00000   0.00000   0.00000   0.390-3(111)   16    I 0.01000                                                
+    Al4     Al      F   0.37500   0.00000   0.25000   0.667  -4(x)   24    I 0.01000                                                
+    Fe5     Fe      F   0.37500   0.00000   0.25000   0.333  -4(x)   24    I 0.01000                                                
+     O6      O         -0.03000   0.05000   0.15000   1.000      1   96    I 0.01000                                                
+
+ Unit cell: a = 12.18644 b = 12.18644 c = 12.18644 alpha = 90.000 beta = 90.000 gamma = 90.000 volume = 1809.802 Refine? True
+
+ Phase: garnet in histogram: PWDR garnet.raw Bank 1
+=======================================================================================================================================
+ Phase fraction  :          1 Refine? False
+ Extinction coeff:     0.0000 Refine? False
+ March-Dollase PO:     1.0000 Refine? False Axis: 0 0 1
+
+ Size model    : isotropic equatorial:       1.000 Refine? False
+	 LG mixing coeff.:       1.0000 Refine? False
+
+ Mustrain model: isotropic equatorial:      1000.0 Refine? False
+	 LG mixing coeff.:      1.0000 Refine? False
+
+ Hydrostatic/elastic strain:
+ names :         D11          eA
+ values:           0           0
+ refine:       False       False
+ Layer Displacement:      0.000 Refine? False
+
+ Histogram: PWDR garnet.raw Bank 1 histogram Id: 0
+=======================================================================================================================================
+ Instrument type: Debye-Scherrer
+ Histogram limits:    24.00 deg to   157.85 deg
+
+ Sample Parameters:
+ Goniometer omega = 0.00, chi = 0.00, phi = 0.00
+ name  :         Scale    Absorption     DisplaceX     DisplaceY
+ value :     3479.0485        0.0000      424.1781     -154.5637
+ refine:          True         False          True          True
+
+ Instrument Parameters:
+ name  :     Azimuth         Lam    Polariz.        SH/L           U           V           W           X           Y
+ value :    0.000000    1.909000    0.000000    0.002000  354.031000 -760.404000  651.592000    0.000000    0.000000
+ refine:                   False       False       False        True        True        True       False       False
+
+ name  :           Z        Zero
+ value :    0.000000    0.000000
+ refine:       False       False
+
+ Background function: chebyschev-1 Refine? True
+ Coefficients:    133.285   -22.976    16.787
+ Fixed background file: ; mult: 1.000  Refine? False
+
+ Refinement results:
+---------------------------------------------------------------------------------------------------------------------------------------
+ Number of function calls: 7 No. of observations: 2678 No. of parameters: 12 User rejected: 0 Sp. gp. extinct: 0
+ Refinement time =    0.283s,    0.094s/cycle, for 3 cycles
+ wR =    8.73%, chi**2 =      28584.6, GOF =   3.27
+----------------------------------------------------------------------------------------------------------------------------------
+Parameters generated by constraints
+
+ name  :          0::A0      ::constr0      ::constr1
+ value :        0.00673       -0.17019       -0.22797
+ sig   :        0.00000        0.00888        0.00808 
+
+ Phases:
+ Result for phase: garnet
+=======================================================================================================================================
+ Reciprocal metric tensor: 
+  names :            A11            A22            A33            A12            A13            A23
+  values:    0.006733097    0.006733097    0.006733097    0.000000000    0.000000000    0.000000000
+  esds  :    0.000000315                                                                           
+ New unit cell:
+  names :           a           b           c       alpha        beta       gamma      Volume
+  values:   12.186881   12.186881   12.186881     90.0000     90.0000     90.0000    1809.996
+  esds  :    0.000285                                                                   0.127
+
+ Atoms:
+   name      x         y         z      frac   Uiso     U11     U22     U33     U12     U13     U23
+---------------------------------------------------------------------------------------------------------------------------------------
+     Y1      Y:
+ values:   0.12500   0.00000   0.25000   1.000 0.01000
+ sig   :                                               
+    Fe2     Fe:
+ values:   0.00000   0.00000   0.00000   0.620 0.01000
+ sig   :                                [0.006]        
+    Al3     Al:
+ values:   0.00000   0.00000   0.00000   0.380 0.01000
+ sig   :                                [0.006]        
+    Al4     Al:
+ values:   0.37500   0.00000   0.25000   0.661 0.01000
+ sig   :                                [0.006]        
+    Fe5     Fe:
+ values:   0.37500   0.00000   0.25000   0.339 0.01000
+ sig   :                                [0.006]        
+     O6      O:
+ values:  -0.03000   0.05000   0.15000   1.000 0.01000
+ sig   :                                               
+
+ Density: 4.8350 g/cm**3
+
+ Phase: garnet in histogram: PWDR garnet.raw Bank 1
+=======================================================================================================================================
+ Final refinement RF, RF^2 = 6.04%, 10.93% on 89 reflections
+ Durbin-Watson statistic = 0.134
+ Bragg intensity sum = 1.34e+06
+
+ Histogram: PWDR garnet.raw Bank 1 histogram Id: 0
+=======================================================================================================================================
+ PWDR histogram weight factor = 1.000
+ Final refinement wR = 8.73% on 2678 observations in this histogram
+ Other residuals: R = 7.16%, R-bkg = 8.07%, wR-bkg = 8.73% wRmin = 2.67%
+ Instrument type: Debye-Scherrer
+
+ Resonant neutron scattering lengths:
+ Element:        Y       Fe       Al        O
+ b'     :    0.000    0.000    0.000    0.000
+ b"     :    0.000    0.000    0.000    0.000
+
+ Sample Parameters:
+ names :         Scale    Absorption     DisplaceX     DisplaceY
+ values:     3393.3095        0.0000      410.8355     -155.1424
+ sig   :       13.8045                      9.1174        7.9250
+
+ Instrument Parameters:
+ names :         Lam    Polariz.        SH/L           U           V           W           X           Y           Z
+ value :    1.909000    0.000000    0.002000  243.457073 -632.720202  579.768950    0.000000    0.000000    0.000000
+ sig   :                                        7.248129   17.174315    9.765249                                    
+
+ Instrument Parameters:
+ names :        Zero
+ value :    0.000000
+ sig   :            
+
+ Background function: chebyschev-1
+ value :        137       -20     17.14
+ sig   :     0.6414     0.805    0.8114
+ Background sums: empirical 3.52e+05, Debye 0, peaks 0, Total 3.52e+05
