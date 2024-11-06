@@ -3,7 +3,7 @@ FROM rocker/shiny
 # Add user an change working directory and user
 
 WORKDIR /home/app
-RUN sudo apt-get update && apt-get install -y python3-pip net-tools
+RUN sudo apt-get update && apt-get install -y python3-pip net-tools w3m
 
 # Install requirements
 COPY requirements.txt .
