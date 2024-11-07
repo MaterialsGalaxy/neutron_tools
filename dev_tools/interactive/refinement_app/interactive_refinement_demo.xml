@@ -1,0 +1,40 @@
+<tool id="interactive_refinement" tool_type="interactive" name="interactive refinement demo" version="0.0.1">
+    <description>Interactive tool for GSASII Rietveld refinement of neutron powder diffraction data</description>
+    <requirements>
+        <container type="docker">milanscd/interactive_gsas2_refinement_demo:latest</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Interactive_refinement" requires_domain="True">
+            <port>8765</port>
+            <url>/</url>
+        </entry_point>
+    </entry_points>
+    <environment_variables>
+        <environment_variable name="HISTORY_ID" strip="True">${__app__.security.encode_id($file_output.history_id)}</environment_variable>
+        <environment_variable name="REMOTE_HOST">${__app__.config.galaxy_infrastructure_url}</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="DEBUG">true</environment_variable>
+        <environment_variable name="DISABLE_AUTH">true</environment_variable>
+        <environment_variable name="API_KEY" inject="api_key" />
+    </environment_variables>
+
+    <command><![CDATA[
+        cp '$infile' /srv/shiny-server/infile.txt &&
+        /usr/bin/shiny-server.sh
+    ]]>
+    </command>
+    <inputs>
+        <param name="infile" type="data" format="Binary" label="GSASII project"/>
+    </inputs>
+    <outputs>
+        <data name="file_output" format="txt" />
+    </outputs>
+    <tests>
+    </tests>
+    <help>
+<![CDATA[
+
+]]>
+    </help>
+</tool>

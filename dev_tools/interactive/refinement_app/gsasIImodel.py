@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/home/mkscd/miniconda3/envs/GSASII/GSAS-II/GSASII")
+sys.path.append("/srv/shiny-server/GSASII")
 import GSASIIscriptable as G2sc  # type: ignore
 test_proj_dir = "YAG.gpx"
 
