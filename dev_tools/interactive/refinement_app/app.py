@@ -9,7 +9,10 @@ from gsasIImodel import (
     instparams,
     sampreflist,
     sampleparams,
+    saveParameters,
 )
+import gxhistory
+
 
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
 
@@ -58,19 +61,32 @@ ui.input_action_button("submit", "submit")
 @render.text()
 @reactive.event(input.submit)
 def submitout():
-    if input.submit() > 0:
+
+    # collect inputs and add them to the model
+
+    if input.submit() == 1:
         sampreflist = input.samp_selection()
         instreflist = input.inst_selection()
 
         for param in sampleparams:
-            sampleparams[param] = getattr(input, param)()
+            sampleparams[param][0] = getattr(input, param)()
 
         for param in instparams:
-            instparams[param] = getattr(input, param)()
+            instparams[param][0] = getattr(input, param)()
+
+        # print out the new refinement parameters
+
         result = "Refining sample parameters: {sref} \n\
                   with values {svals} \n\
                   Refining instrument parameters {iref} \n\
                   with values is {ivals}"\
                   .format(sref=sampreflist, svals=sampleparams,
                           iref=instreflist, ivals=instparams)
+
+        # save the parameters to the GSAS project file
+        # and submit to galaxy history
+
+        saveParameters("output.gpx", instreflist, instparams,
+                       sampreflist, sampleparams)
+        gxhistory.put("output.gpx")
         return result

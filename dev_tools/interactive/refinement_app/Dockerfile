@@ -27,7 +27,7 @@ RUN sed -i -e '1ipython /usr/bin/python3;\' /etc/shiny-server/shiny-server.conf
 
 RUN mkdir -p $(dirname "${LOG_PATH}")
 EXPOSE $PORT
-COPY app.py gsasIImodel.py GSASII YAG.gpx /srv/shiny-server/
+COPY app.py gsasIImodel.py gxhistory.py GSASII YAG.gpx /srv/shiny-server/
 
 COPY shiny-server.sh /usr/bin/shiny-server.sh
 RUN chmod 777 /usr/bin/shiny-server.sh

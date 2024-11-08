@@ -20,7 +20,7 @@
     </environment_variables>
 
     <command><![CDATA[
-        cp '$infile' /srv/shiny-server/infile.txt &&
+        cp '$infile' /srv/shiny-server/infile.gpx &&
         /usr/bin/shiny-server.sh
     ]]>
     </command>
