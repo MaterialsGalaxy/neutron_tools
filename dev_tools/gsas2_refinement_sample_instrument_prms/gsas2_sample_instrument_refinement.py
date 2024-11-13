@@ -7,6 +7,8 @@ if __name__ == "__main__":
     parser.add_argument("-f", "--project-filename", help="Name of the GSASII project file to load (*.gpx)", type=str)
     parser.add_argument("-s", "--sample-refinements", help="sample parameters GSASII will refine", type=str)
     parser.add_argument("-i", "--instrument-refinements", help="instrument parameters GSASII will refine", type=str)
+    parser.add_argument("-b", "--instrument-values", help="instrument parameter values to set", nargs='+', type=float)
+    parser.add_argument("-v", "--sample-values", help="sample parameter values to set", nargs='+', type=float)
     parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
     parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
     parser.add_argument("-n", "--num-cycles", help="Number of refinement cycles", type=int)
@@ -25,6 +27,8 @@ if __name__ == "__main__":
         args.project_filename,
         args.sample_refinements,
         args.instrument_refinements,
+        args.instrument_values,
+        args.sample_values,
         args.output_stem_name,
         args.output_directory,
         **kwargs,

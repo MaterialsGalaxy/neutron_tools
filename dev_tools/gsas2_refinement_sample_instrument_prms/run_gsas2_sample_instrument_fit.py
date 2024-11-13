@@ -19,6 +19,8 @@ def run_gsas2_fit(
     project_fn,
     samp_refs,
     inst_refs,
+    inst_vals,
+    samp_vals,
     output_stem_fn,
     output_path,
     num_cycles=5,
@@ -33,6 +35,10 @@ def run_gsas2_fit(
         sample parameters to refine
     inst_refs: str
         isntrument parameters to refine
+    inst_vals: list [float]
+        instrument parameter values to set
+    samp_vals: list [float]
+        sample parameter values to set
     output_stem_fn: str
         output stem filename.
     output_path: str
@@ -88,6 +94,8 @@ def run_gsas2_fit(
     # for h in gpx.histograms():
     #    h.setHistEntryValue(['Sample Parameters', 'DisplaceX'], 0.001)
     # can also use h.getHistEntryList(keyname='Sample Parameters') to get a list of the values
+
+    # set instrument and sample values 
 
     #  instrument and sample refinement steps by default will apply to all phases and histograms
     samp_ref_list = samp_refs.split(',')

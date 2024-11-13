@@ -16,6 +16,8 @@
                 --project-filename gsas_project.gpx
                 --sample-refinements $samp_refine
                 --instrument-refinements $inst_refine
+                --instrument-values $Zero $U $V $W $X $Y $Z
+                --sample-values $HistSF $Xdisp $Ydisp $SampAbs
                 --output-directory /portal
         > >(tee -a $output) 2> >(tee -a $output >&2)
     ]]></command>
@@ -34,14 +36,14 @@
                 <option value="Z" >Z</option>
                 <option value="SH/L" >SH/L</option> 
             </param> 
-            <param name="Zero" type="float" label="zero"/>
-            <param name="U" type="float" label="U"/>
-            <param name="V" type="float" label="V"/>
-            <param name="W" type="float" label="W"/>
-            <param name="X" type="float" label="X"/>
-            <param name="Y" type="float" label="Y"/>
-            <param name="Z" type="float" label="Z"/>
-            <param name="SH/L" type="float" label="SH/L"/>
+            <param name="Zero" type="float" label="zero" value="0.0" optional="true"/>
+            <param name="U" type="float" label="U" value="0.0" optional="true"/>
+            <param name="V" type="float" label="V" value="0.0" optional="true"/>
+            <param name="W" type="float" label="W" value="0.0" optional="true"/>
+            <param name="X" type="float" label="X" value="0.0" optional="true"/>
+            <param name="Y" type="float" label="Y" value="0.0" optional="true"/>
+            <param name="Z" type="float" label="Z" value="0.0" optional="true"/>
+            <param name="SH/L" type="float" label="SH/L" value="0.0" optional="true"/>
         </section>
         <!--sample parameters-->
         <section id="sampprms" name="Sample Parameters">
@@ -51,10 +53,10 @@
                 <option value="DisplaceY" >Sample Y displ. prll. to beam</option>
                 <option value="Absorption" >Sample absorption</option>
             </param>
-            <param name="HistSF" type="float"  label="histogram scale factor"/>
-            <param name="Xdisp" type="float"  label="Sample X displ. perp. to beam"/>
-            <param name="Ydisp" type="float"  label="Sample Y displ. prll. to beam"/>
-            <param name="SampAbs" type="float"  label="Sample absorption"/>
+            <param name="HistSF" type="float"  label="histogram scale factor"  value="0.0" optional="true"/>
+            <param name="Xdisp" type="float"  label="Sample X displ. perp. to beam" value="0.0" optional="true"/>
+            <param name="Ydisp" type="float"  label="Sample Y displ. prll. to beam" value="0.0" optional="true"/>
+            <param name="SampAbs" type="float"  label="Sample absorption" value="0.0" optional="true"/>
         </section>
     </inputs>
     <outputs>
