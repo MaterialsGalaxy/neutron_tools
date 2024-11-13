@@ -96,6 +96,60 @@ def run_gsas2_fit(
     # can also use h.getHistEntryList(keyname='Sample Parameters') to get a list of the values
 
     # set instrument and sample values 
+    # get the histogram (for a single powder data file the id is 0)
+    h = gpx.histograms()[0]
+
+    # get the sample parameters we want to change and their values
+    sampleparams = {
+        "Scale": h.getHistEntryValue(['Sample Parameters', 'Scale']),
+        "DisplaceX": h.getHistEntryValue(['Sample Parameters', 'DisplaceX']),
+        "DisplaceY": h.getHistEntryValue(['Sample Parameters', 'DisplaceY']),
+        "Absorption": h.getHistEntryValue(['Sample Parameters', 'Absorption']),
+    }
+    print(samp_vals, "\n", inst_vals, "\n")
+    # set the values in a dictionary
+    i = 0
+    for param in sampleparams:
+        if samp_vals[i] != 0.0:
+            sampleparams[param][0] = samp_vals[i]
+        i += 1
+
+    print(h.getHistEntryValue(['Sample Parameters']), "\n")
+    # set the sample parameters in the project file.
+    for param in sampleparams:
+        h.setHistEntryValue(['Sample Parameters', param], sampleparams[param])
+    print(h.getHistEntryValue(['Sample Parameters']), "\n")
+
+    # get the instrument parameters dictionary
+    instdict = h.getHistEntryValue(['Instrument Parameters'])[0]
+
+    instparams = {
+        "Lam": instdict['Lam'],
+        "Zero": instdict['Zero'],
+        "U": instdict['U'],
+        "V": instdict['V'],
+        "W": instdict['W'],
+        "X": instdict['X'],
+        "Y": instdict['Y'],
+        "Z": instdict['Z'],
+        # "SH/L": instdict['SH/L'],
+    }
+    i = 0
+    for param in instparams:
+        if inst_vals[i] != 0.0:
+            instparams[param][1] = inst_vals[i]
+        i += 1
+
+    print(h.getHistEntryValue(['Instrument Parameters'])[0], "\n")
+    # set the instrument parameters in the project file
+    instdictfull = h.getHistEntryValue(['Instrument Parameters'])
+    for param in instparams:
+        instdictfull[0][param] = instparams[param]
+    h.setHistEntryValue(['Instrument Parameters'],
+                        instdictfull)
+
+    print(h.getHistEntryValue(['Instrument Parameters'])[0], "\n")
+    
 
     #  instrument and sample refinement steps by default will apply to all phases and histograms
     samp_ref_list = samp_refs.split(',')
