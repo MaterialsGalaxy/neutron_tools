@@ -49,7 +49,7 @@ def get_galaxy_connection(history_id=None, obj=True):
                                             galaxy_port, app_path.strip())
     # url = built_galaxy_url.rstrip('/')
     # url = os.environ['GALAXY_URL'].rstrip('/')
-    url = 'http://host-172-16-113-42.nubes.stfc.ac.uk/'
+    url = 'http://host-172-16-101-76.nubes.stfc.ac.uk/'
     gi = GalaxyInstance(url=url, key=key)
     # gi.histories.get_histories(history_id)
     return gi
