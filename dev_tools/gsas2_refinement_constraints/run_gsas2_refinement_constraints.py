@@ -21,18 +21,22 @@ import GSASIIscriptable as G2sc  # type: ignore
 
 
 def run_gsas2_fit(
-    structure_fn,
-    gsa_fn,
-    prm_fn,
+    project_fn,
+    eqn_var_list,
+    eqn_coef_list,
+    eqn_tot,
+    equiv_var_list,
+    equiv_coef_list,
     output_stem_fn,
-    stype,
-    bank,
-    xmin,
-    xmax,
     output_path,
     num_cycles=5,
-    init_vals: Union[None, Dict[str, Any]] = None,
 ):
+    print(eqn_var_list, "\n")
+    print(eqn_coef_list, "\n")
+    print(eqn_tot, "\n")
+    print(equiv_var_list, "\n")
+    print(equiv_coef_list, "\n")
+
     """
     Parameters
     ----------

@@ -1,43 +1,52 @@
 import argparse
 
-from gsas2_refinement_constraints.run_gsas2_refinement_constraints import run_gsas2_fit
+from run_gsas2_refinement_constraints import run_gsas2_fit
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--cif-filename", help="Name of CIF file to load (*.cif)", type=str)
-    parser.add_argument("-f", "--gsas-filename", help="Name of gsas file to load (*.gsa) ", type=str)
-    parser.add_argument("-i", "--instrument-params-filename", help="Name of instrument parameters file to load (*.prm)", type=str)
+    parser.add_argument("-f", "--project-filename", help="Name of the GSASII project file to load (*.gpx)", type=str)
+    parser.add_argument("-v", "--equation-variables", help="equation constraint variables list", type=str)
+    parser.add_argument("-c", "--equation-coefficients", help="equation constraint coefficient list", type=str)
+    parser.add_argument("-t", "--equation-totals", help="equation constriant total", type=float)
+    parser.add_argument("-i", "--equivalence-variables", help="equivalence constraint variable list", type=str)
+    parser.add_argument("-e", "--equivalence-coefficients", help="optional equivalence constraints coefficient list", type=str)
     parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
     parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
-    parser.add_argument("-s", "--scatter-type", help='Scatter type: ["N", "X"]', choices=["N", "X"], type=str)
-    parser.add_argument("-b", "--bank-id", help="Index of the bank to use", type=str)
-    parser.add_argument("-l", "--xmin", help="Xmin", type=str)
-    parser.add_argument("-r", "--xmax", help="Xmax", type=str)
-    parser.add_argument("-n", "--num-cycles", help="Number of refinement cycles", type=int)
-    parser.add_argument("-v", "--initial-values", help="Initial values for refinement", type=str)
+    parser.add_argument("-n", "--num-cycles", help="Number of refinement cycles", type=int, default=5)
     args = parser.parse_args()
 
-    bank_id = int(args.bank_id)
-    left_bound = float(args.xmin)
-    right_bound = float(args.xmax)
+    # format string inputs into lists
+    if args.equation_variables is not None:
+        args.equation_variables = [s.strip() for s in args.equation_variables.split(",")]
+
+    if args.equation_coefficients is not None:
+        args.equation_coefficients = [float(s) for s in args.equation_coefficients.split(",")]
+    else:
+        args.equation_coefficients = [1]*len(args.equation_variables)
+
+    if args.equivalence_variables is not None:
+        args.equivalence_variables = [s.strip() for s in args.equivalence_variables.split(",")]
+
+    if args.equivalence_coefficients is not None:
+        args.equivalence_coefficients = [float(s) for s in args.equivalence_coefficients.split(",")]
+    else:
+        args.equivalence_coefficients = [1] * len(args.equivalence_variables)
 
     # Add key-word arguments
     kwargs = dict()
     if args.num_cycles:
         kwargs["num_cycles"] = args.num_cycles
-    if args.initial_values:
-        kwargs["init_vals"] = args.initial_values
+
 
     # Run refinement
     run_gsas2_fit(
-        args.cif_filename,
-        args.gsas_filename,
-        args.instrument_params_filename,
+        args.project_filename,
+        args.equation_variables,
+        args.equation_coefficients,
+        args.equation_totals,
+        args.equivalence_variables,
+        args.equivalence_coefficients,
         args.output_stem_name,
-        args.scatter_type,
-        bank_id,
-        left_bound,
-        right_bound,
         args.output_directory,
         **kwargs,
     )

@@ -11,8 +11,13 @@
         touch $output &&
         mkdir portal &&
         ln -s $project gsas_project.gpx &&
-
         python $__tool_directory__/gsas2_refinement_constraints.py
+                --project-filename gsas_project.gpx
+                --equation-variables "${eqnConstraints[0].eqnVars}"
+                --equation-coefficients "${eqnConstraints[0].eqnCoefs}"
+                --equation-totals ${eqnConstraints[0].eqnTotal}
+                --equivalence-variables "${equivConstraints[0].equivVars}"
+                --equivalence-coefficients "${equivConstraints[0].equivCoefs}"
                 --output-directory /portal      
         > >(tee -a $output) 2> >(tee -a $output >&2)
     ]]></command>
