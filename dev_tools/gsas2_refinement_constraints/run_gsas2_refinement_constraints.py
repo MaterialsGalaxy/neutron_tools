@@ -87,33 +87,34 @@ def run_gsas2_fit(
 
     print(proj_path)
 
-    if os.path.exists(proj_path):
-        os.remove(proj_path)
-    gpx = G2sc.G2Project(newgpx=proj_path)
-
+    # load from input project save to new name and directory
+    gpx = G2sc.G2Project(gpxfile=project_fn, newgpx=proj_path)
+    gpx.save(proj_path)
     # check if the project got created
     if os.path.exists(proj_path):
         print("created project at path:", proj_path)
     else:
         print("no project created at path", proj_path)
-    """
-    Here the project does get created even though
-    the output prints the second statement
-    something is wrong with the output paths in general
-    """
 
-    cell_i = gpx.phase("structure").get_cell()
+
+    cell_i = gpx.phases()[0].get_cell()
 
     # step 3: increase # of cycles to improve convergence
     gpx.data["Controls"]["data"]["max cyc"] = num_cycles
 
+    # add equation constraints
 
+    gpx.add_EqnConstr(eqn_tot, eqn_var_list, multlist=eqn_coef_list)
+
+    # add equivalence constraints
+
+    gpx.add_EquivConstr(equiv_var_list, multlist=equiv_coef_list)
 
     # before fit, save project file first.
     # Then in the future, the refined project file will update this one.
     gpx.save(os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.gpx"))
 
-    gpx.do_refinements(dictList)
+    gpx.refine()
     print("================")
 
     # save results data
@@ -126,19 +127,10 @@ def run_gsas2_fit(
     bkg = np.array(gpx.histogram(0).getdata("Background"))
 
     refs = gpx.histogram(0).reflections()
-    ref_list = refs["structure"]["RefList"]
+    ref_list = refs[gpx.phases()[0].name]["RefList"]
 
-    # output_cif_fn = os.path.join(os.getcwd(), 'data/bragg_gsasii/', output_stem_fn + "_refined.cif")
     output_cif_fn = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.cif")
-    gpx.phase("structure").export_CIF(output_cif_fn)
-    cell_r = gpx.phase("structure").get_cell()
-
-    # header = "Rw = {} \nx           ycalc           y           dy           bkg".format(rw)
-    # np.savetxt(f"{output_stem_fn}bank{str(bank)}.dat",
-    #            np.transpose([x, ycalc, y, dy, bkg]),
-    #            fmt = '%f', delimiter=' ', header = header)
-    # df = pd.DataFrame(
-    #     {"rw": rw, "x": x, "y": y, "ycalc": ycalc, "dy": dy, "bkg": bkg})
-    # df.update(cell)
+    gpx.phases()[0].export_CIF(output_cif_fn)
+    cell_r = gpx.phases()[0].get_cell()
 
     return rw, x, y, ycalc, dy, bkg, cell_i, cell_r, ref_list

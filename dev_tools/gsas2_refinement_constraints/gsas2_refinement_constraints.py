@@ -30,13 +30,12 @@ if __name__ == "__main__":
     if args.equivalence_coefficients is not None:
         args.equivalence_coefficients = [float(s) for s in args.equivalence_coefficients.split(",")]
     else:
-        args.equivalence_coefficients = [1] * len(args.equivalence_variables)
+        args.equivalence_coefficients = [1.0] * len(args.equivalence_variables)
 
     # Add key-word arguments
     kwargs = dict()
     if args.num_cycles:
         kwargs["num_cycles"] = args.num_cycles
-
 
     # Run refinement
     run_gsas2_fit(
