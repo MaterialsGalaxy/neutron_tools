@@ -1,4 +1,4 @@
-<tool id="upload_gsas2" name="GSASII Refinement Stage 1" profile="22.05" version="0">
+<tool id="constraints_gsas2" name="GSASII Refinement Constraints" profile="22.05" version="0">
     <description>Tool to upload files for neutron powder diffraction analysis in GSASII and perform an initial Rietveld refinement</description>
     <requirements></requirements>
     <command detect_errors="exit_code"><![CDATA[
@@ -12,7 +12,7 @@
         mkdir portal &&
         ln -s $project gsas_project.gpx &&
 
-        python $__tool_directory__/gsas2_refinement-constraints.py
+        python $__tool_directory__/gsas2_refinement_constraints.py
                 --output-directory /portal      
         > >(tee -a $output) 2> >(tee -a $output >&2)
     ]]></command>
