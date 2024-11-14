@@ -72,7 +72,7 @@ def submitout():
             sampleparams[param][0] = getattr(input, param)()
 
         for param in instparams:
-            instparams[param][0] = getattr(input, param)()
+            instparams[param][1] = getattr(input, param)()
 
         # print out the new refinement parameters
 

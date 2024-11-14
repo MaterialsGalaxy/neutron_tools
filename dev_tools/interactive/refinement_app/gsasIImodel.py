@@ -82,7 +82,7 @@ def saveParameters(gpxfile,
         instdictfull[0][param] = instparams[param]
 
     h.setHistEntryValue(['Instrument Parameters'],
-                        [instdictfull, {}])
+                        instdictfull)
 
     # set new sample parameters and refinements
 
