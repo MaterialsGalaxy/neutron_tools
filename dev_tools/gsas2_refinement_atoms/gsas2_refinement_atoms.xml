@@ -1,0 +1,42 @@
+<tool id="atoms_gsas2" name="GSASII Refinement: Atoms" profile="22.05" version="0">
+    <description>Tool to set atom refinement flags for Rietveld refinement in GSASII for neutron powder diffraction analysis</description>
+    <requirements></requirements>
+    <command detect_errors="exit_code"><![CDATA[
+        which conda &&
+        conda init &&
+        source ~/.bashrc &&
+        conda activate GSASII &&
+        mkdir app &&
+        cd app/ &&
+        touch $output &&
+        mkdir portal &&
+        ln -s $project gsas_project.gpx &&
+        python $__tool_directory__/gsas2_refinement_atoms.py
+                --project-filename gsas_project.gpx
+                --atom-labels "${atoms[0].label}"
+                --atom-refinements "${atoms[0].refine}"
+                --output-directory /portal      
+        > >(tee -a $output) 2> >(tee -a $output >&2)
+    ]]></command>
+    <inputs>
+        <param name="project" type="data" format="Binary" label="GSASII project file"/>
+        <repeat name="atoms" title="Atoms">
+            <param name="label" type="text" label="atom label" />
+            <param name="refine" type="select" label="refinements" multiple="true">
+                <option value="X" >X</option>
+                <option value="F" >F</option> 
+                <option value="U" >U</option> 
+            </param>
+        </repeat>
+
+    </inputs>
+    <outputs>
+        <data format="txt" name="output" label="GSAS2 console output"></data>
+        <collection type="list" name="output_collection1" label="GSAS2 refinement output">
+            <discover_datasets format="binary" pattern="__designation__" directory="app/portal" visible="true"/>
+        </collection>
+    </outputs>
+    <help>
+        A tool to run a GSAS2 Rietveld refinement.
+    </help>
+</tool>
