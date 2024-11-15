@@ -13,8 +13,8 @@
         ln -s $project gsas_project.gpx &&
         python $__tool_directory__/gsas2_refinement_atoms.py
                 --project-filename gsas_project.gpx
-                --atom-labels "${atoms[0].label}"
-                --atom-refinements "${atoms[0].refine}"
+                --atom-labels #for $i, $a in enumerate($atoms)# '${atoms[i].label}' #end for#
+                --atom-refinements #for $i, $a in enumerate($atoms)# '${atoms[i].refine}' #end for#
                 --output-directory /portal      
         > >(tee -a $output) 2> >(tee -a $output >&2)
     ]]></command>
