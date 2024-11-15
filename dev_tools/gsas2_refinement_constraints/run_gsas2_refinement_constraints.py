@@ -103,12 +103,12 @@ def run_gsas2_fit(
     gpx.data["Controls"]["data"]["max cyc"] = num_cycles
 
     # add equation constraints
-
-    gpx.add_EqnConstr(eqn_tot, eqn_var_list, multlist=eqn_coef_list)
+    for i in range(len(eqn_var_list)):
+        gpx.add_EqnConstr(eqn_tot[i], eqn_var_list[i], multlist=eqn_coef_list[i])
 
     # add equivalence constraints
-
-    gpx.add_EquivConstr(equiv_var_list, multlist=equiv_coef_list)
+    for i in range(len(equiv_var_list)):
+        gpx.add_EquivConstr(equiv_var_list[i], multlist=equiv_coef_list[i])
 
     # before fit, save project file first.
     # Then in the future, the refined project file will update this one.

@@ -13,11 +13,11 @@
         ln -s $project gsas_project.gpx &&
         python $__tool_directory__/gsas2_refinement_constraints.py
                 --project-filename gsas_project.gpx
-                --equation-variables "${eqnConstraints[0].eqnVars}"
-                --equation-coefficients "${eqnConstraints[0].eqnCoefs}"
-                --equation-totals ${eqnConstraints[0].eqnTotal}
-                --equivalence-variables "${equivConstraints[0].equivVars}"
-                --equivalence-coefficients "${equivConstraints[0].equivCoefs}"
+                --equation-variables #for $v in $eqnConstraints # '${v.eqnVars}' #end for#
+                --equation-coefficients #for $c in $eqnConstraints # '${c.eqnCoefs}' #end for#
+                --equation-totals #for $t in $eqnConstraints # ${t.eqnTotal} #end for# 
+                --equivalence-variables #for $v in $equivConstraints # '${v.equivVars}' #end for#
+                --equivalence-coefficients #for $c in $equivConstraints # '${c.equivCoefs}' #end for#
                 --output-directory /portal      
         > >(tee -a $output) 2> >(tee -a $output >&2)
     ]]></command>
@@ -25,8 +25,8 @@
         <param name="project" type="data" format="Binary" label="GSASII project file"/>
         <repeat name="eqnConstraints" title="Equation Constraints">
             <param name="eqnVars" type="text" label="constraint variables list" />
-            <param name = "eqnCoefs" type="text" label="constraint coefficient list" />
-            <param name = "eqnTotal" type="float" label="equation total" />
+            <param name="eqnCoefs" type="text" label="constraint coefficient list" />
+            <param name="eqnTotal" type="float" label="equation total" />
         </repeat>
 
         <repeat name="equivConstraints" title="Equivalence Constraints" >
