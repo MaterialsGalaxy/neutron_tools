@@ -1,6 +1,6 @@
 import argparse
 
-from run_gsas2_fit import run_gsas2_fit
+from run_gsas2_refinement_upload import run_gsas2_fit
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

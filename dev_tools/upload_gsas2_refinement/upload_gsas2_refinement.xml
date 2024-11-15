@@ -14,7 +14,7 @@
         ln -s $gsas_file powder.raw &&
         ln -s $prm_file instrument.prm &&
 
-        python $__tool_directory__/gsas2_refinement.py
+        python $__tool_directory__/gsas2_refinement_upload.py
                 --cif-filename structure.cif
                 --gsas-filename powder.raw
                 --instrument-params-filename instrument.prm

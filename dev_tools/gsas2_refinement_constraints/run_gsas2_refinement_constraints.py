@@ -1,11 +1,5 @@
 import os
 import sys
-from typing import (
-    Any,
-    Dict,
-    Union,
-)
-
 import numpy as np
 
 """
@@ -15,8 +9,8 @@ locally i added:
 in the tool xml commands to get this to work
 """
 # import G2script as G2sc
-sys.path.append("/home/mkscd/miniconda3/envs/GSASII/GSAS-II/GSASII")  # needed to "find" GSAS-II modules
-# sys.path.append('/home/mkscd/miniconda3/envs/GSASII/bin') # needed to "find" GSAS-II modules
+sys.path.append("/home/mkscd/miniconda3/envs/GSASII/GSAS-II/GSASII")
+# needed to "find" GSAS-II modules
 import GSASIIscriptable as G2sc  # type: ignore
 
 
@@ -96,7 +90,6 @@ def run_gsas2_fit(
     else:
         print("no project created at path", proj_path)
 
-
     cell_i = gpx.phases()[0].get_cell()
 
     # step 3: increase # of cycles to improve convergence
@@ -104,7 +97,8 @@ def run_gsas2_fit(
 
     # add equation constraints
     for i in range(len(eqn_var_list)):
-        gpx.add_EqnConstr(eqn_tot[i], eqn_var_list[i], multlist=eqn_coef_list[i])
+        gpx.add_EqnConstr(eqn_tot[i], eqn_var_list[i],
+                          multlist=eqn_coef_list[i])
 
     # add equivalence constraints
     for i in range(len(equiv_var_list)):
@@ -112,7 +106,8 @@ def run_gsas2_fit(
 
     # before fit, save project file first.
     # Then in the future, the refined project file will update this one.
-    gpx.save(os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.gpx"))
+    gpx.save(os.path.join(os.getcwd(),
+                          "portal/", output_stem_fn + "_refined.gpx"))
 
     gpx.refine()
     print("================")
@@ -129,7 +124,8 @@ def run_gsas2_fit(
     refs = gpx.histogram(0).reflections()
     ref_list = refs[gpx.phases()[0].name]["RefList"]
 
-    output_cif_fn = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.cif")
+    output_cif_fn = os.path.join(os.getcwd(),
+                                 "portal/", output_stem_fn + "_refined.cif")
     gpx.phases()[0].export_CIF(output_cif_fn)
     cell_r = gpx.phases()[0].get_cell()
 

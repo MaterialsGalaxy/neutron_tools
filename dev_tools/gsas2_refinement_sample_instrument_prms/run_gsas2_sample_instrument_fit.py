@@ -10,8 +10,8 @@ locally i added:
 in the tool xml commands to get this to work
 """
 # import G2script as G2sc
-sys.path.append("/home/mkscd/miniconda3/envs/GSASII/GSAS-II/GSASII")  # needed to "find" GSAS-II modules
-# sys.path.append('/home/mkscd/miniconda3/envs/GSASII/bin') # needed to "find" GSAS-II modules
+sys.path.append("/home/mkscd/miniconda3/envs/GSASII/GSAS-II/GSASII")
+# needed to "find" GSAS-II modules
 import GSASIIscriptable as G2sc  # type: ignore
 
 
@@ -66,7 +66,8 @@ def run_gsas2_fit(
 
     # start GSAS-II refinement
     # create a new project file for refinement
-    proj_path = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_initial.gpx")
+    proj_path = os.path.join(os.getcwd(), "portal/",
+                             output_stem_fn + "_initial.gpx")
 
     print(proj_path)
 
@@ -90,12 +91,7 @@ def run_gsas2_fit(
     # step 1: increase # of cycles to improve convergence
     gpx.data["Controls"]["data"]["max cyc"] = num_cycles
 
-    # set initial values
-    # for h in gpx.histograms():
-    #    h.setHistEntryValue(['Sample Parameters', 'DisplaceX'], 0.001)
-    # can also use h.getHistEntryList(keyname='Sample Parameters') to get a list of the values
-
-    # set instrument and sample values 
+    # set instrument and sample values
     # get the histogram (for a single powder data file the id is 0)
     h = gpx.histograms()[0]
 
@@ -149,27 +145,16 @@ def run_gsas2_fit(
                         instdictfull)
 
     print(h.getHistEntryValue(['Instrument Parameters'])[0], "\n")
-    
 
-    #  instrument and sample refinement steps by default will apply to all phases and histograms
+    # sample refinement steps by default will apply
+    # to all phases and histograms
     samp_ref_list = samp_refs.split(',')
-    """
-    samplerefdict = {
-        "set": {
-            "Sample Parameters": [
-                "DisplaceX",
-                "DisplaceY",
-                "Scale",
-                "Absorption"
-            ]
-        }
-    }
-    """
     samp_ref_dict = {
         "set": {"Sample Parameters": samp_ref_list},
         "call": HistStats,
     }
-    # instrument refinement steps by default will apply to all phases and histograms
+    # instrument refinement steps by default will apply
+    # to all phases and histograms
     inst_ref_list = inst_refs.split(',')
     inst_ref_dict = {
         "set": {"Instrument Parameters": inst_ref_list},
@@ -207,8 +192,10 @@ def run_gsas2_fit(
 
     }
     """
-    # before fit, save project file first. Then in the future, the refined project file will update this one.
-    gpx.save(os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.gpx"))
+    # before fit, save project file first.
+    # Then in the future, the refined project file will update this one.
+    gpx.save(os.path.join(os.getcwd(),
+                          "portal/", output_stem_fn + "_refined.gpx"))
 
     gpx.do_refinements(dictList)
     print("================")
@@ -225,7 +212,8 @@ def run_gsas2_fit(
     refs = gpx.histogram(0).reflections()
     ref_list = refs[gpx.phases()[0].name]["RefList"]
 
-    output_cif_fn = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.cif")
+    output_cif_fn = os.path.join(os.getcwd(),
+                                 "portal/", output_stem_fn + "_refined.cif")
     gpx.phases()[0].export_CIF(output_cif_fn)
     cell_r = gpx.phases()[0].get_cell()
 
