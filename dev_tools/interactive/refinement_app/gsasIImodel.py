@@ -1,6 +1,26 @@
 import sys
-sys.path.append("/srv/shiny-server/GSASII")
+import os
+import numpy as np
+# sys.path.append("/srv/shiny-server/GSASII")
+sys.path.append("/home/mkscd/miniconda3/envs/GSASII/GSAS-II/GSASII")
 import GSASIIscriptable as G2sc  # type: ignore
+
+
+def hist_export(gpx_file):
+    gpx = G2sc.G2Project(gpx_file)
+    x = np.array(gpx.histogram(0).getdata("X"))
+    y = np.array(gpx.histogram(0).getdata("Yobs"))
+    ycalc = np.array(gpx.histogram(0).getdata("Ycalc"))
+    dy = np.array(gpx.histogram(0).getdata("Residual"))
+    bkg = np.array(gpx.histogram(0).getdata("Background"))
+
+    return x, y, ycalc, dy, bkg
+    # for i, h in enumerate(gpx.histograms()):
+    # hfil = os.path.splitext(gpx_file)[0]+'_'+str(i)  # file to write
+    # print('\t', h.name, hfil+'.csv')
+    # h.Export(hfil, '.csv')
+
+
 inputgpxfile = "infile.gpx"
 
 gpx = G2sc.G2Project(gpxfile=inputgpxfile, newgpx="output.gpx")
