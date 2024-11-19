@@ -24,7 +24,7 @@ if __name__ == "__main__":
     right_bound = float(args.xmax)
 
     # Add key-word arguments
-    kwargs = dict()
+    kwargs = {}
     if args.num_cycles:
         kwargs["num_cycles"] = args.num_cycles
     if args.initial_values:

@@ -1,5 +1,6 @@
 import os
 import sys
+
 import numpy as np
 
 """
@@ -66,8 +67,7 @@ def run_gsas2_fit(
     # start GSAS-II refinement
     # create a project file
 
-    proj_path = os.path.join(os.getcwd(), "portal/",
-                             output_stem_fn + "_initial.gpx")
+    proj_path = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_initial.gpx")
 
     print(proj_path)
 
@@ -91,12 +91,11 @@ def run_gsas2_fit(
 
     # create refinement dictionary
 
-    refdict = {"set": {'Atoms': atom_dict}}
+    refdict = {"set": {"Atoms": atom_dict}}
 
     # before fit, save project file first.
     # Then in the future, the refined project file will update this one.
-    gpx.save(os.path.join(os.getcwd(),
-                          "portal/", output_stem_fn + "_refined.gpx"))
+    gpx.save(os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.gpx"))
 
     gpx.do_refinements([refdict])
     print("================")
@@ -113,8 +112,7 @@ def run_gsas2_fit(
     refs = gpx.histogram(0).reflections()
     ref_list = refs[gpx.phases()[0].name]["RefList"]
 
-    output_cif_fn = os.path.join(os.getcwd(),
-                                 "portal/", output_stem_fn + "_refined.cif")
+    output_cif_fn = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.cif")
     gpx.phases()[0].export_CIF(output_cif_fn)
     cell_r = gpx.phases()[0].get_cell()
 

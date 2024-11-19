@@ -6,10 +6,20 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--project-filename", help="Name of the GSASII project file to load (*.gpx)", type=str)
     parser.add_argument("-v", "--equation-variables", help="equation constraint variables list", type=str, nargs="+")
-    parser.add_argument("-c", "--equation-coefficients", help="equation constraint coefficient list", type=str, nargs="+")
+    parser.add_argument(
+        "-c", "--equation-coefficients", help="equation constraint coefficient list", type=str, nargs="+"
+    )
     parser.add_argument("-t", "--equation-totals", help="equation constriant total", type=float, nargs="+")
-    parser.add_argument("-i", "--equivalence-variables", help="equivalence constraint variable list", type=str, nargs="+")
-    parser.add_argument("-e", "--equivalence-coefficients", help="optional equivalence constraints coefficient list", type=str, nargs="+")
+    parser.add_argument(
+        "-i", "--equivalence-variables", help="equivalence constraint variable list", type=str, nargs="+"
+    )
+    parser.add_argument(
+        "-e",
+        "--equivalence-coefficients",
+        help="optional equivalence constraints coefficient list",
+        type=str,
+        nargs="+",
+    )
     parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
     parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
     parser.add_argument("-n", "--num-cycles", help="Number of refinement cycles", type=int, default=5)
@@ -25,7 +35,7 @@ if __name__ == "__main__":
             args.equation_coefficients[i] = [float(s) for s in args.equation_coefficients[i].split(",")]
     else:
         for i in range(len(args.equation_variables)):
-            args.equation_coefficients[i] = [1]*len(args.equation_variables[i])
+            args.equation_coefficients[i] = [1] * len(args.equation_variables[i])
 
     if args.equivalence_variables is not None:
         for i in range(len(args.equivalence_variables)):
@@ -39,7 +49,7 @@ if __name__ == "__main__":
             args.equivalence_coefficients[i] = [1.0] * len(args.equivalence_variables[i])
 
     # Add key-word arguments
-    kwargs = dict()
+    kwargs = {}
     if args.num_cycles:
         kwargs["num_cycles"] = args.num_cycles
 

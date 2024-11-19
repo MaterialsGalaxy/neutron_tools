@@ -78,8 +78,7 @@ def run_gsas2_fit(
     # start GSAS-II refinement
     # create a project file
 
-    proj_path = os.path.join(os.getcwd(),
-                             "portal/", output_stem_fn + "_initial.gpx")
+    proj_path = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_initial.gpx")
 
     print(proj_path)
 
@@ -99,8 +98,7 @@ def run_gsas2_fit(
         print("heee!!!")
         # debugging print statements
         print(bank)
-        hist1 = gpx.add_powder_histogram(gsa_fn,
-                                         prm_fn, databank=bank, instbank=bank)
+        hist1 = gpx.add_powder_histogram(gsa_fn, prm_fn, databank=bank, instbank=bank)
         print("now!")
         hist1.set_refinements({"Limits": [xmin, xmax]})
     if stype == "X":
@@ -112,8 +110,7 @@ def run_gsas2_fit(
     hists.append(hist1)
 
     # step 2: add a phase and link it to the previous histograms
-    _ = gpx.add_phase(structure_fn,
-                      phasename="structure", fmthint="CIF", histograms=hists)
+    _ = gpx.add_phase(structure_fn, phasename="structure", fmthint="CIF", histograms=hists)
     print("phase loaded")
     cell_i = gpx.phase("structure").get_cell()
 
@@ -132,15 +129,12 @@ def run_gsas2_fit(
         num_coeffs = init_vals["bkg"]["NumCoeffs"]
         coeffs = init_vals["bkg"]["Coeffs"]
         refdict2 = {
-            "set": {"Background":
-                    {"type": bkg_type, "no. coeffs": num_coeffs,
-                     "coeffs": coeffs, "refine": True}},
+            "set": {"Background": {"type": bkg_type, "no. coeffs": num_coeffs, "coeffs": coeffs, "refine": True}},
             "call": HistStats,
         }
     else:
         refdict2 = {
-            "set": {"Background":
-                    {"type": "chebyschev", "no. coeffs": 6, "refine": True}},
+            "set": {"Background": {"type": "chebyschev", "no. coeffs": 6, "refine": True}},
             "call": HistStats,
         }
     # refinement step 3: refine lattice parameter and Uiso refinement (Phase)
@@ -153,8 +147,7 @@ def run_gsas2_fit(
 
     # before fit, save project file first.
     # Then in the future, the refined project file will update this one.
-    gpx.save(os.path.join(os.getcwd(),
-                          "portal/", output_stem_fn + "_refined.gpx"))
+    gpx.save(os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.gpx"))
 
     gpx.do_refinements(dictList)
     print("================")
@@ -171,8 +164,7 @@ def run_gsas2_fit(
     refs = gpx.histogram(0).reflections()
     ref_list = refs["structure"]["RefList"]
 
-    output_cif_fn = os.path.join(os.getcwd(),
-                                 "portal/", output_stem_fn + "_refined.cif")
+    output_cif_fn = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.cif")
     gpx.phase("structure").export_CIF(output_cif_fn)
     cell_r = gpx.phase("structure").get_cell()
 

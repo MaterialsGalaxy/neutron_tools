@@ -6,7 +6,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--cif-filename", help="Name of CIF file to load (*.cif)", type=str)
     parser.add_argument("-f", "--gsas-filename", help="Name of gsas file to load (*.gsa) ", type=str)
-    parser.add_argument("-i", "--instrument-params-filename", help="Name of instrument parameters file to load (*.prm)", type=str)
+    parser.add_argument(
+        "-i", "--instrument-params-filename", help="Name of instrument parameters file to load (*.prm)", type=str
+    )
     parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
     parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
     parser.add_argument("-s", "--scatter-type", help='Scatter type: ["N", "X"]', choices=["N", "X"], type=str)
