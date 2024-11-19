@@ -9,7 +9,11 @@ if __name__ == "__main__":
 
     parser.add_argument("-s", "--sample-refinements", help="sample parameters GSASII will refine", type=str)
     parser.add_argument("-i", "--instrument-refinements", help="instrument parameters GSASII will refine", type=str)
+    parser.add_argument(
+        "-a", "--instrument-parameters", help="instrument parameter key names to set", nargs="+", type=str
+    )
     parser.add_argument("-b", "--instrument-values", help="instrument parameter values to set", nargs="+", type=float)
+    parser.add_argument("-c", "--sample-parameters", help="sample parameter key names to set", nargs="+", type=str)
     parser.add_argument("-v", "--sample-values", help="sample parameter values to set", nargs="+", type=float)
     parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
     parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
@@ -30,7 +34,9 @@ if __name__ == "__main__":
         args.histogram_type,
         args.sample_refinements,
         args.instrument_refinements,
+        args.instrument_parameters,
         args.instrument_values,
+        args.sample_parameters,
         args.sample_values,
         args.output_stem_name,
         args.output_directory,

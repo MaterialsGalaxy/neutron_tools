@@ -21,7 +21,9 @@ def run_gsas2_fit(
     hist_type,
     samp_refs,
     inst_refs,
+    inst_params,
     inst_vals,
+    samp_params,
     samp_vals,
     output_stem_fn,
     output_path,
@@ -36,11 +38,15 @@ def run_gsas2_fit(
     hist_type: str
         GSASII histogram type
     samp_refs: str
-        sample parameters to refine
+        comma separated sample parameters to refine
     inst_refs: str
-        isntrument parameters to refine
+        comma separated instrument parameters to refine
+    inst_params: list [str]
+        instrument parameter key names for setting values.
     inst_vals: list [float]
         instrument parameter values to set
+    samp_params: list [float]
+        sample parameter key names for setting values.
     samp_vals: list [float]
         sample parameter values to set
     output_stem_fn: str
@@ -93,82 +99,39 @@ def run_gsas2_fit(
 
     # step 1: increase # of cycles to improve convergence
     gpx.data["Controls"]["data"]["max cyc"] = num_cycles
+    """
+    setting the instrument and sample parameter values is split into steps.
+    step 1: get the previous values in a dictionary
+    step 2: change only the selected parameters in the dictionary
+    step 3 : set the dictionary values back into the project histogram.
+    """
 
-    # set instrument and sample values
     # get the histogram (for a single powder data file the id is 0)
     h = gpx.histograms()[0]
+    # new way of setting
+    print(h.getHistEntryValue(["Sample Parameters"]), "\n")
+    samp_dict = dict(zip(samp_params, samp_vals))
+    samp_dict_full = h.getHistEntryValue(["Sample Parameters"])
 
-    # get the sample parameters we want to change and their values
-    sampleparams = {
-        "Scale": h.getHistEntryValue(["Sample Parameters", "Scale"]),
-        "DisplaceX": h.getHistEntryValue(["Sample Parameters", "DisplaceX"]),
-        "DisplaceY": h.getHistEntryValue(["Sample Parameters", "DisplaceY"]),
-        "Absorption": h.getHistEntryValue(["Sample Parameters", "Absorption"]),
-    }
-    print(samp_vals, "\n", inst_vals, "\n")
-    # set the values in a dictionary
-    i = 0
-    for param in sampleparams:
-        if samp_vals[i] != 0.0:
-            sampleparams[param][0] = samp_vals[i]
-        i += 1
+    for param in samp_dict:
+        if samp_dict[param] != 0.0:  # check for unset parameters
+            samp_dict_full[param][0] = samp_dict[param]
 
-    print(h.getHistEntryValue(["Instrument Parameters"]), "\n")
-    # set the sample parameters in the project file.
-    for param in sampleparams:
-        h.setHistEntryValue(["Sample Parameters", param], sampleparams[param])
+    h.setHistEntryValue(["Sample Parameters"], samp_dict_full)
+
     print(h.getHistEntryValue(["Sample Parameters"]), "\n")
 
-    # get the instrument parameters dictionary
-    instdict = h.getHistEntryValue(["Instrument Parameters"])[0]
-
-    if hist_type == "PNC":
-        instparams = {
-            "Lam": instdict["Lam"],
-            "Zero": instdict["Zero"],
-            "U": instdict["U"],
-            "V": instdict["V"],
-            "W": instdict["W"],
-            "X": instdict["X"],
-            "Y": instdict["Y"],
-            "Z": instdict["Z"],
-            # "SH/L": instdict['SH/L'],
-        }
-        # $2_theta $fltPath $Azimuth $difA $difB $difC $beta_0 $beta_1 $beta_q $sig_0 $sig_1 $sig_2 $sig_q $X $Y $Z $Zerot $alpha
-    elif hist_type == "PNT":
-        instparams = {
-            "2-theta": instdict["2-theta"],
-            "fltPath": instdict["fltPath"],
-            "Azimuth": instdict["Azimuth"],
-            "difA": instdict["difA"],
-            "difB": instdict["difB"],
-            "difC": instdict["difC"],
-            "beta-0": instdict["beta-0"],
-            "beta-1": instdict["beta-1"],
-            "beta-q": instdict["beta-q"],
-            "sig-0": instdict["sig-0"],
-            "sig-1": instdict["sig-1"],
-            "sig-q": instdict["sig-q"],
-            "X": instdict["X"],
-            "Y": instdict["Y"],
-            # "Z": instdict["Z"],
-            "Zero": instdict["Zero"],
-            "alpha": instdict["alpha"],
-        }
-    else:
-        raise ValueError('Expected histogram type PNT or PNC got "', hist_type, '" instead')
-    i = 0
-    for param in instparams:
-        if inst_vals[i] != 0.0:
-            instparams[param][1] = inst_vals[i]
-        i += 1
-
+    # new way of setting instrument parameters
     print(h.getHistEntryValue(["Instrument Parameters"])[0], "\n")
-    # set the instrument parameters in the project file
-    instdictfull = h.getHistEntryValue(["Instrument Parameters"])
-    for param in instparams:
-        instdictfull[0][param] = instparams[param]
-    h.setHistEntryValue(["Instrument Parameters"], instdictfull)
+
+    inst_dict = dict(zip(inst_params, inst_vals))
+    inst_dict_full = h.getHistEntryValue(["Instrument Parameters"])
+
+    for param in inst_dict:
+        if inst_dict[param] != 0.0:  # check for unset parameters
+            inst_dict_full[0][param][1] = inst_dict[param]
+
+    h.setHistEntryValue(["Instrument Parameters"], inst_dict_full)
 
     print(h.getHistEntryValue(["Instrument Parameters"])[0], "\n")
 
@@ -179,6 +142,7 @@ def run_gsas2_fit(
         "set": {"Sample Parameters": samp_ref_list},
         "call": HistStats,
     }
+
     # instrument refinement steps by default will apply
     # to all phases and histograms
     inst_ref_list = inst_refs.split(",")
@@ -186,38 +150,9 @@ def run_gsas2_fit(
         "set": {"Instrument Parameters": inst_ref_list},
         "call": HistStats,
     }
-    dictList = [samp_ref_dict, inst_ref_dict]
-    """
-    instrumentrefdict = {
-        "set": {
-            "Instrument Parameters":[
-                'U',
-                'V',
-                'W',
-                'X',
-                'Y',
-                'Z',
-                'SH/L',
-                'alpha',
-                'beta-0',
-                'beta-1',
-                'beta-q',
-                'sig-0',
-                'sig-1',
-                'sig-2',
-                'sig-q',
-                'difA',
-                'difB',
-                'difC',
-                'Zero',
-                'SH/L',
-                'Polariz.',
-                'Lam'
-            ]
-        }
 
-    }
-    """
+    dictList = [samp_ref_dict, inst_ref_dict]
+
     # before fit, save project file first.
     # Then in the future, the refined project file will update this one.
     gpx.save(os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.gpx"))

@@ -14,8 +14,10 @@
                 --project-filename gsas_project.gpx
                 --sample-refinements $samp_refine
                 --histogram-type $hist.type
-                --instrument-refinements #if $hist.type == "PNT"# $hist.TOF_inst_refine #else# $hist.CW_inst_refine #end if# 
+                --instrument-refinements #if $hist.type == "PNT"# $hist.TOF_inst_refine #else# $hist.CW_inst_refine #end if#
+                --instrument-parameters #if $hist.type == "PNC"# "Lam" "Zero" "U" "V" "W" "X" "Y" "Z" #else# "2-theta" "fltPath" "Azimuth" "difA" "difB" "difC" "beta-0" "beta-1" "beta-q" "sig-0" "sig-1" "sig-2" "sig-q" "X" "Y" "Zero" "alpha" #end if#   
                 --instrument-values #if $hist.type == "PNC"# $hist.Lam $hist.Zero $hist.U $hist.V $hist.W $hist.X $hist.Y $hist.Z #else# $hist.theta $hist.fltPath $hist.Azimuth $hist.difA $hist.difB $hist.difC $hist.beta_0 $hist.beta_1 $hist.beta_q $hist.sig_0 $hist.sig_1 $hist.sig_2 $hist.sig_q $hist.Xt $hist.Yt $hist.Zerot $hist.alpha #end if# 
+                --sample-parameters "Scale" "DisplaceX" "DisplaceY" "Absorption"
                 --sample-values $HistSF $Xdisp $Ydisp $SampAbs
                 --output-directory /portal
         > >(tee -a $output) 2> >(tee -a $output >&2)
