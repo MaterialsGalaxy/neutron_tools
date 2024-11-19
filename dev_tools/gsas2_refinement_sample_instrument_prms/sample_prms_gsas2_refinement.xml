@@ -2,21 +2,20 @@
     <description>Tool for GSASII Rietveld refinement of powder diffraction data with settings for refinement of sample and instrument parameters</description>
     <requirements></requirements>
     <command detect_errors="exit_code"><![CDATA[
-        which conda &&
         conda init &&
-        source ~/.bashrc &&
+        source ../home/.bashrc &&
         conda activate GSASII &&
         mkdir app &&
         cd app/ &&
         touch $output &&
         mkdir portal &&
         ln -s $project gsas_project.gpx &&
-
         python $__tool_directory__/gsas2_sample_instrument_refinement.py
                 --project-filename gsas_project.gpx
                 --sample-refinements $samp_refine
-                --instrument-refinements $inst_refine
-                --instrument-values $Lam $Zero $U $V $W $X $Y $Z
+                --histogram-type $hist.type
+                --instrument-refinements #if $hist.type == "PNT"# $hist.TOF_inst_refine #else# $hist.CW_inst_refine #end if# 
+                --instrument-values #if $hist.type == "PNC"# $hist.Lam $hist.Zero $hist.U $hist.V $hist.W $hist.X $hist.Y $hist.Z #else# $hist.theta $hist.fltPath $hist.Azimuth $hist.difA $hist.difB $hist.difC $hist.beta_0 $hist.beta_1 $hist.beta_q $hist.sig_0 $hist.sig_1 $hist.sig_2 $hist.sig_q $hist.Xt $hist.Yt $hist.Zerot $hist.alpha #end if# 
                 --sample-values $HistSF $Xdisp $Ydisp $SampAbs
                 --output-directory /portal
         > >(tee -a $output) 2> >(tee -a $output >&2)
@@ -25,26 +24,76 @@
         <param name="project" type="data" format="Binary" label="GSASII projectfile"/>
         <!--instrument parameters-->
         <section id="instprms" name="Instrument Parameters">
-            <param name="inst_refine" type="select" label="instrument parameters to refine" multiple="true">
-                <option value="Lam" >lam</option>
-                <option value="Zero" >zero</option> 
-                <option value="U" >U</option> 
-                <option value="V" >V</option> 
-                <option value="W" >W</option> 
-                <option value="X" >X</option> 
-                <option value="Y" >Y</option> 
-                <option value="Z" >Z</option>
-                <option value="SH/L" >SH/L</option> 
-            </param>
-            <param name="Lam" type="float" label="Lam" value="0.0" optional="true"/>
-            <param name="Zero" type="float" label="zero" value="0.0" optional="true"/>
-            <param name="U" type="float" label="U" value="0.0" optional="true"/>
-            <param name="V" type="float" label="V" value="0.0" optional="true"/>
-            <param name="W" type="float" label="W" value="0.0" optional="true"/>
-            <param name="X" type="float" label="X" value="0.0" optional="true"/>
-            <param name="Y" type="float" label="Y" value="0.0" optional="true"/>
-            <param name="Z" type="float" label="Z" value="0.0" optional="true"/>
-           <!-- <param name="SH/L" type="float" label="SH/L" value="0.0" optional="true"/> -->
+            <conditional name="hist">
+                <param name="type" type="select" label="Constant wavelength or Time of Flight?" >
+                    <option value="PNT">Time of flight</option>
+                    <option value="PNC">Constant wavelength</option>
+                </param>
+                <when value="PNC">
+                    <param name="CW_inst_refine" type="select" label="instrument parameters to refine" multiple="true">
+                        <option value="Lam" >Lam</option>
+                        <option value="Zero" >Zero</option> 
+                        <option value="U" >U</option> 
+                        <option value="V" >V</option> 
+                        <option value="W" >W</option> 
+                        <option value="X" >X</option> 
+                        <option value="Y" >Y</option> 
+                        <option value="Z" >Z</option>
+                        <option value="SH/L" >SH/L</option> 
+                    </param>
+                    <param name="Lam" type="float" label="Lam" value="0.0" optional="true"/>
+                    <param name="Zero" type="float" label="Zero" value="0.0" optional="true"/>
+                    <param name="U" type="float" label="U" value="0.0" optional="true"/>
+                    <param name="V" type="float" label="V" value="0.0" optional="true"/>
+                    <param name="W" type="float" label="W" value="0.0" optional="true"/>
+                    <param name="X" type="float" label="X" value="0.0" optional="true"/>
+                    <param name="Y" type="float" label="Y" value="0.0" optional="true"/>
+                    <param name="Z" type="float" label="Z" value="0.0" optional="true"/>
+                    <!-- <param name="SH/L" type="float" label="SH/L" value="0.0" optional="true"/> -->
+                </when>
+                <when value="PNT">
+                    <param name="TOF_inst_refine" type="select" label="instrument parameters to refine" multiple="true">
+                        <option value="difA" >difA</option>
+                        <option value="difB" >difB</option> 
+                        <option value="difC" >difC</option> 
+                        <option value="Zero" >Zero</option> 
+                        <option value="alpha" >alpha</option> 
+                        <option value="beta-0" >beta-0</option> 
+                        <option value="beta-1" >beta-1</option> 
+                        <option value="beta-q" >beta-q</option>
+                        <option value="sig-0" >sig-0</option> 
+                        <option value="sig-1" >sig-0</option> 
+                        <option value="sig-2" >sig-0</option> 
+                        <option value="sig-q" >sig-0</option> 
+                        <option value="X" >X</option> 
+                        <option value="Y" >Y</option> 
+                        <option value="Z" >Z</option>  
+                    </param>
+                    <param name="theta" type="float" label="2-theta" value="0.0" optional="true"/>
+                    <param name="fltPath" type="float" label="fltPath" value="0.0" optional="true"/>
+                    <param name="Azimuth" type="float" label="Azimuth" value="0.0" optional="true"/>
+                    <param name="difA" type="float" label="difA" value="0.0" optional="true"/>
+                    <param name="difB" type="float" label="difB" value="0.0" optional="true"/>
+                    <param name="difC" type="float" label="difC" value="0.0" optional="true"/>
+
+                    <param name="beta_0" type="float" label="beta-0" value="0.0" optional="true"/>
+                    <param name="beta_1" type="float" label="beta-1" value="0.0" optional="true"/>
+                    <param name="beta_q" type="float" label="beta-q" value="0.0" optional="true"/>
+
+                    <param name="sig_0" type="float" label="sig-0" value="0.0" optional="true"/>
+                    <param name="sig_1" type="float" label="sig-1" value="0.0" optional="true"/>
+                    <param name="sig_2" type="float" label="sig-2" value="0.0" optional="true"/>
+                    <param name="sig_q" type="float" label="sig-q" value="0.0" optional="true"/>
+
+
+                    <param name="Xt" type="float" label="X" value="0.0" optional="true"/>
+                    <param name="Yt" type="float" label="Y" value="0.0" optional="true"/>
+                   <!-- <param name="Zt" type="float" label="Z" value="0.0" optional="true"/> -->     
+
+                    <param name="Zerot" type="float" label="zero" value="0.0" optional="true"/>     
+                    <param name="alpha" type="float" label="alpha" value="0.0" optional="true"/>  
+                </when>
+        </conditional>
         </section>
         <!--sample parameters-->
         <section id="sampprms" name="Sample Parameters">

@@ -1,5 +1,6 @@
 import os
 import sys
+
 # from typing import Union, Dict, Any
 import numpy as np
 
@@ -17,6 +18,7 @@ import GSASIIscriptable as G2sc  # type: ignore
 
 def run_gsas2_fit(
     project_fn,
+    hist_type,
     samp_refs,
     inst_refs,
     inst_vals,
@@ -31,6 +33,8 @@ def run_gsas2_fit(
     ----------
     project_fn: str
         GSASII gpx project filename
+    hist_type: str
+        GSASII histogram type
     samp_refs: str
         sample parameters to refine
     inst_refs: str
@@ -66,8 +70,7 @@ def run_gsas2_fit(
 
     # start GSAS-II refinement
     # create a new project file for refinement
-    proj_path = os.path.join(os.getcwd(), "portal/",
-                             output_stem_fn + "_initial.gpx")
+    proj_path = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_initial.gpx")
 
     print(proj_path)
 
@@ -97,10 +100,10 @@ def run_gsas2_fit(
 
     # get the sample parameters we want to change and their values
     sampleparams = {
-        "Scale": h.getHistEntryValue(['Sample Parameters', 'Scale']),
-        "DisplaceX": h.getHistEntryValue(['Sample Parameters', 'DisplaceX']),
-        "DisplaceY": h.getHistEntryValue(['Sample Parameters', 'DisplaceY']),
-        "Absorption": h.getHistEntryValue(['Sample Parameters', 'Absorption']),
+        "Scale": h.getHistEntryValue(["Sample Parameters", "Scale"]),
+        "DisplaceX": h.getHistEntryValue(["Sample Parameters", "DisplaceX"]),
+        "DisplaceY": h.getHistEntryValue(["Sample Parameters", "DisplaceY"]),
+        "Absorption": h.getHistEntryValue(["Sample Parameters", "Absorption"]),
     }
     print(samp_vals, "\n", inst_vals, "\n")
     # set the values in a dictionary
@@ -110,52 +113,75 @@ def run_gsas2_fit(
             sampleparams[param][0] = samp_vals[i]
         i += 1
 
-    print(h.getHistEntryValue(['Sample Parameters']), "\n")
+    print(h.getHistEntryValue(["Instrument Parameters"]), "\n")
     # set the sample parameters in the project file.
     for param in sampleparams:
-        h.setHistEntryValue(['Sample Parameters', param], sampleparams[param])
-    print(h.getHistEntryValue(['Sample Parameters']), "\n")
+        h.setHistEntryValue(["Sample Parameters", param], sampleparams[param])
+    print(h.getHistEntryValue(["Sample Parameters"]), "\n")
 
     # get the instrument parameters dictionary
-    instdict = h.getHistEntryValue(['Instrument Parameters'])[0]
+    instdict = h.getHistEntryValue(["Instrument Parameters"])[0]
 
-    instparams = {
-        "Lam": instdict['Lam'],
-        "Zero": instdict['Zero'],
-        "U": instdict['U'],
-        "V": instdict['V'],
-        "W": instdict['W'],
-        "X": instdict['X'],
-        "Y": instdict['Y'],
-        "Z": instdict['Z'],
-        # "SH/L": instdict['SH/L'],
-    }
+    if hist_type == "PNC":
+        instparams = {
+            "Lam": instdict["Lam"],
+            "Zero": instdict["Zero"],
+            "U": instdict["U"],
+            "V": instdict["V"],
+            "W": instdict["W"],
+            "X": instdict["X"],
+            "Y": instdict["Y"],
+            "Z": instdict["Z"],
+            # "SH/L": instdict['SH/L'],
+        }
+        # $2_theta $fltPath $Azimuth $difA $difB $difC $beta_0 $beta_1 $beta_q $sig_0 $sig_1 $sig_2 $sig_q $X $Y $Z $Zerot $alpha
+    elif hist_type == "PNT":
+        instparams = {
+            "2-theta": instdict["2-theta"],
+            "fltPath": instdict["fltPath"],
+            "Azimuth": instdict["Azimuth"],
+            "difA": instdict["difA"],
+            "difB": instdict["difB"],
+            "difC": instdict["difC"],
+            "beta-0": instdict["beta-0"],
+            "beta-1": instdict["beta-1"],
+            "beta-q": instdict["beta-q"],
+            "sig-0": instdict["sig-0"],
+            "sig-1": instdict["sig-1"],
+            "sig-q": instdict["sig-q"],
+            "X": instdict["X"],
+            "Y": instdict["Y"],
+            # "Z": instdict["Z"],
+            "Zero": instdict["Zero"],
+            "alpha": instdict["alpha"],
+        }
+    else:
+        raise ValueError('Expected histogram type PNT or PNC got "', hist_type, '" instead')
     i = 0
     for param in instparams:
         if inst_vals[i] != 0.0:
             instparams[param][1] = inst_vals[i]
         i += 1
 
-    print(h.getHistEntryValue(['Instrument Parameters'])[0], "\n")
+    print(h.getHistEntryValue(["Instrument Parameters"])[0], "\n")
     # set the instrument parameters in the project file
-    instdictfull = h.getHistEntryValue(['Instrument Parameters'])
+    instdictfull = h.getHistEntryValue(["Instrument Parameters"])
     for param in instparams:
         instdictfull[0][param] = instparams[param]
-    h.setHistEntryValue(['Instrument Parameters'],
-                        instdictfull)
+    h.setHistEntryValue(["Instrument Parameters"], instdictfull)
 
-    print(h.getHistEntryValue(['Instrument Parameters'])[0], "\n")
+    print(h.getHistEntryValue(["Instrument Parameters"])[0], "\n")
 
     # sample refinement steps by default will apply
     # to all phases and histograms
-    samp_ref_list = samp_refs.split(',')
+    samp_ref_list = samp_refs.split(",")
     samp_ref_dict = {
         "set": {"Sample Parameters": samp_ref_list},
         "call": HistStats,
     }
     # instrument refinement steps by default will apply
     # to all phases and histograms
-    inst_ref_list = inst_refs.split(',')
+    inst_ref_list = inst_refs.split(",")
     inst_ref_dict = {
         "set": {"Instrument Parameters": inst_ref_list},
         "call": HistStats,
@@ -194,8 +220,7 @@ def run_gsas2_fit(
     """
     # before fit, save project file first.
     # Then in the future, the refined project file will update this one.
-    gpx.save(os.path.join(os.getcwd(),
-                          "portal/", output_stem_fn + "_refined.gpx"))
+    gpx.save(os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.gpx"))
 
     gpx.do_refinements(dictList)
     print("================")
@@ -212,8 +237,7 @@ def run_gsas2_fit(
     refs = gpx.histogram(0).reflections()
     ref_list = refs[gpx.phases()[0].name]["RefList"]
 
-    output_cif_fn = os.path.join(os.getcwd(),
-                                 "portal/", output_stem_fn + "_refined.cif")
+    output_cif_fn = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.cif")
     gpx.phases()[0].export_CIF(output_cif_fn)
     cell_r = gpx.phases()[0].get_cell()
 
