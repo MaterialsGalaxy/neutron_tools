@@ -21,9 +21,9 @@ ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
 
 with ui.navset_card_pill(id="tab"):
     with ui.nav_panel("powder data"):
-        @render.plot(alt="A histogram")  
+        @render.plot(alt="A histogram")
         def plot():
-            plt.scatter(x,y, c='blue')
+            plt.scatter(x, y, c='blue')
             plt.plot(x, ycalc, c='green')
             plt.plot(x, bkg, c='red')
             plt.title("Powder histogram")
@@ -49,8 +49,8 @@ with ui.sidebar(bg="#f8f8f8"):
     ui.input_selectize(
         "inst_selection",
         "Select instrument parameters to refine:",
-        {"Lam": "Lam", "Zero": "Zero", "U": "U", "V": "V", "X": "X", "Y": "Y",
-            "Z": "Z"},
+        {"Lam": "Lam", "Zero": "Zero", "U": "U", "V": "V", "W": "W",
+         "X": "X", "Y": "Y", "Z": "Z"},
         multiple=True,
         selected=instreflist,
     )
@@ -65,7 +65,6 @@ with ui.sidebar(bg="#f8f8f8"):
     ui.input_numeric("Z", "Z", instparams["Z"][0])
     # ui.input_numeric("SHL", "SH/L", instparams["SH/L"][0])
 
-
     ui.input_selectize(
         "samp_selection",
         "Select sample parameters to refine:",
@@ -77,16 +76,15 @@ with ui.sidebar(bg="#f8f8f8"):
     )
 
     ui.input_numeric("Scale", "histogram scale factor",
-                    sampleparams["Scale"][0])
+                     sampleparams["Scale"][0])
     ui.input_numeric("DisplaceX", "Sample X displ. perp. to beam",
-                    sampleparams["DisplaceX"][0])
+                     sampleparams["DisplaceX"][0])
     ui.input_numeric("DisplaceY", "Sample Y displ. prll. to beam",
-                    sampleparams["DisplaceY"][0])
+                     sampleparams["DisplaceY"][0])
     ui.input_numeric("Absorption", "Sample Absorption",
-                    sampleparams["Absorption"][0])
+                     sampleparams["Absorption"][0])
 
     ui.input_action_button("submit", "submit")
-
 
     @render.text()
     @reactive.event(input.submit)
@@ -117,6 +115,6 @@ with ui.sidebar(bg="#f8f8f8"):
             # and submit to galaxy history
 
             saveParameters("output.gpx", instreflist, instparams,
-                        sampreflist, sampleparams)
+                           sampreflist, sampleparams)
             gxhistory.put("output.gpx")
             return result
