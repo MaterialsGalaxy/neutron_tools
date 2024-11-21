@@ -1,4 +1,5 @@
 from bioblend.galaxy import GalaxyInstance
+
 import subprocess
 import logging
 import os
@@ -69,3 +70,13 @@ def put(filename, file_type='auto', history_id=None):
     # history = gi.histories.get(history_id)
     # history.upload_file(filename, file_type=file_type)
     gi.tools.upload_file(filename, history_id)
+
+
+def updateHist():
+    history_id = os.environ['HISTORY_ID']
+    gi = get_galaxy_connection(history_id=history_id)
+    history = gi.histories.show_history(history_id=history_id, contents=True,
+                                        deleted=False, visible=True,
+                                        types=['dataset'],
+                                        keys=['Id', 'Hid', 'Name'])
+    return history
