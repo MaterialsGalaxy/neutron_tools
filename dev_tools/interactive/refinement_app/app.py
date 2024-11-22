@@ -5,27 +5,36 @@ from shiny import reactive, render
 # import sys
 import os
 from gsasIImodel import (
-    instreflist,
-    instparams,
-    sampreflist,
-    sampleparams,
     saveParameters,
     hist_export,
-    inputgpxfile,
+    gsas_load_gpx,
 )
 import gxhistory
 
-x, y, ycalc, dy, bkg = hist_export(inputgpxfile)
+instreflist = reactive.value()
+instparams = reactive.value()
+sampreflist = reactive.value()
+sampleparams = reactive.value()
+inputgpxfile = reactive.value()
+
+x = reactive.value()
+y = reactive.value()
+ycalc = reactive.value()
+dy = reactive.value()
+bkg = reactive.value()
+
 
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
 
 with ui.navset_card_pill(id="tab"):
     with ui.nav_panel("powder data"):
+
         @render.plot(alt="A histogram")
+        @reactive.event(input.loadgpx)
         def plot():
-            plt.scatter(x, y, c='blue')
-            plt.plot(x, ycalc, c='green')
-            plt.plot(x, bkg, c='red')
+            plt.scatter(x(), y(), c='blue')
+            plt.plot(x(), ycalc(), c='green')
+            plt.plot(x(), bkg(), c='red')
             plt.title("Powder histogram")
             plt.xlabel("2 Theta")
             plt.ylabel("intensity")
@@ -59,7 +68,7 @@ with ui.navset_card_pill(id="tab"):
         ui.input_action_button("loadgpx", "Load project")
 
 
-        @render.text()
+        @reactive.effect
         @reactive.event(input.loadgpx)
         def loadproject():
             if input.selectgpx() != "init":
@@ -68,9 +77,41 @@ with ui.navset_card_pill(id="tab"):
                 fp = os.path.join(location, fn)
                 gxhistory.getproject(input.selectgpx(), fp)
                 # gsasIImodel.loadgpx(fp) load gxp into ui
-                return fp
-            else:
-                return "no project selected"
+                irl, ip, srl, sp = gsas_load_gpx(fp)
+                instreflist.set(irl)
+                instparams.set(ip)
+                sampreflist.set(srl)
+                sampleparams.set(sp)
+                inputgpxfile.set(fp)
+
+                tx, ty, tycalc, tdy, tbkg = hist_export(inputgpxfile())
+                x.set(tx)
+                y.set(ty)
+                ycalc.set(tycalc)
+                dy.set(tdy)
+                bkg.set(tbkg)
+
+                ui.update_selectize("inst_selection", selected=instreflist())
+                ui.update_selectize("samp_selection", selected=instreflist())
+
+                ui.update_numeric("Lam", value=instparams()["Lam"][0])
+                ui.update_numeric("Zero", value=instparams()["Zero"][0])
+                ui.update_numeric("U", value=instparams()["U"][0])
+                ui.update_numeric("V", value=instparams()["V"][0])
+                ui.update_numeric("W", value=instparams()["W"][0])
+                ui.update_numeric("X", value=instparams()["X"][0])
+                ui.update_numeric("Y", value=instparams()["Y"][0])
+                ui.update_numeric("Z", value=instparams()["Z"][0])
+
+                ui.update_numeric("Scale", value=sampleparams()["Scale"][0])
+                ui.update_numeric("DisplaceX",
+                                  value=sampleparams()["DisplaceX"][0])
+                ui.update_numeric("DisplaceY",
+                                  value=sampleparams()["DisplaceY"][0])
+                ui.update_numeric("Absorption",
+                                  value=sampleparams()["Absorption"][0])
+
+
 
     with ui.nav_panel("C"):
         "Panel C content"
@@ -92,17 +133,17 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
         {"Lam": "Lam", "Zero": "Zero", "U": "U", "V": "V", "W": "W",
          "X": "X", "Y": "Y", "Z": "Z"},
         multiple=True,
-        selected=instreflist,
+        selected=None,
     )
 
-    ui.input_numeric("Lam", "Lam", instparams["Lam"][0])
-    ui.input_numeric("Zero", "Zero", instparams["Zero"][0])
-    ui.input_numeric("U", "U", instparams["U"][0])
-    ui.input_numeric("V", "V", instparams["V"][0])
-    ui.input_numeric("W", "W", instparams["W"][0])
-    ui.input_numeric("X", "X", instparams["X"][0])
-    ui.input_numeric("Y", "Y", instparams["Y"][0])
-    ui.input_numeric("Z", "Z", instparams["Z"][0])
+    ui.input_numeric("Lam", "Lam", 0)
+    ui.input_numeric("Zero", "Zero", 0)
+    ui.input_numeric("U", "U", 0)
+    ui.input_numeric("V", "V", 0)
+    ui.input_numeric("W", "W", 0)
+    ui.input_numeric("X", "X", 0)
+    ui.input_numeric("Y", "Y", 0)
+    ui.input_numeric("Z", "Z", 0)
     # ui.input_numeric("SHL", "SH/L", instparams["SH/L"][0])
 
     ui.input_selectize(
@@ -112,49 +153,57 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
             "DisplaceY": "Sample Y displ. prll. to beam",
             "Absorption": "Sample Absorption"},
         multiple=True,
-        selected=sampreflist,
+        selected=None,
     )
 
     ui.input_numeric("Scale", "histogram scale factor",
-                     sampleparams["Scale"][0])
+                     0)
     ui.input_numeric("DisplaceX", "Sample X displ. perp. to beam",
-                     sampleparams["DisplaceX"][0])
+                     0)
     ui.input_numeric("DisplaceY", "Sample Y displ. prll. to beam",
-                     sampleparams["DisplaceY"][0])
+                     0)
     ui.input_numeric("Absorption", "Sample Absorption",
-                     sampleparams["Absorption"][0])
+                     0)
 
     ui.input_action_button("submit", "submit")
 
-    @render.text()
+    @reactive.effect
     @reactive.event(input.submit)
     def submitout():
 
         # collect inputs and add them to the model
 
-        if input.submit() == 1:
-            sampreflist = input.samp_selection()
-            instreflist = input.inst_selection()
+        sampreflist.set(input.samp_selection())
+        instreflist.set(input.inst_selection())
+        sp = sampleparams().copy()
+        ip = instparams().copy()
 
-            for param in sampleparams:
-                sampleparams[param][0] = getattr(input, param)()
+        for param in sp:
+            sp[param][0] = getattr(input, param)()
 
-            for param in instparams:
-                instparams[param][1] = getattr(input, param)()
+        for param in ip:
+            ip[param][1] = getattr(input, param)()
 
-            # print out the new refinement parameters
+        sampleparams.set(sp)
+        instparams.set(ip)
 
-            result = "Refining sample parameters: {sref} \n\
-                    with values {svals} \n\
-                    Refining instrument parameters {iref} \n\
-                    with values is {ivals}"\
-                    .format(sref=sampreflist, svals=sampleparams,
-                            iref=instreflist, ivals=instparams)
+        # save the parameters to the GSAS project file
+        # and submit to galaxy history
 
-            # save the parameters to the GSAS project file
-            # and submit to galaxy history
+        saveParameters("output.gpx", instreflist(), instparams(),
+                       sampreflist(), sampleparams())
+        gxhistory.put("output.gpx")
 
-            saveParameters("output.gpx", instreflist, instparams,
-                           sampreflist, sampleparams)
-            gxhistory.put("output.gpx")
-            return result
+
+    @render.text
+    @reactive.event(input.submit)
+    def submit_text():
+        # print out the new refinement parameters
+
+        result = "Refining sample parameters: {sref} \n\
+                with values {svals} \n\
+                Refining instrument parameters {iref} \n\
+                with values is {ivals}"\
+                .format(sref=sampreflist(), svals=sampleparams(),
+                        iref=instreflist(), ivals=instparams())
+        return result

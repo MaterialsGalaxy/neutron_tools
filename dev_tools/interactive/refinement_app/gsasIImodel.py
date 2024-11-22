@@ -23,53 +23,55 @@ def hist_export(gpx_file):
 
 inputgpxfile = "infile.gpx"
 
-gpx = G2sc.G2Project(gpxfile=inputgpxfile, newgpx="output.gpx")
-gpx.save()
-# get the sample and instrument parameters from previous refinement in
-# dictionaries.
 
-# h.getHistEntryValue(['Sample Parameters', 'Type'], 'Bragg-Brentano')
-histnum = len(gpx.histograms())
-h = gpx.histograms()[0]
+def gsas_load_gpx(inputgpxfile):
+    gpx = G2sc.G2Project(gpxfile=inputgpxfile, newgpx="output.gpx")
+    gpx.save()
+    # get the sample and instrument parameters from previous refinement in
+    # dictionaries.
 
-sampleparams = {
-    "Scale": h.getHistEntryValue(['Sample Parameters', 'Scale']),
-    "DisplaceX": h.getHistEntryValue(['Sample Parameters', 'DisplaceX']),
-    "DisplaceY": h.getHistEntryValue(['Sample Parameters', 'DisplaceY']),
-    "Absorption": h.getHistEntryValue(['Sample Parameters', 'Absorption']),
-}
-sampreflist = []
-instreflist = []
+    # h.getHistEntryValue(['Sample Parameters', 'Type'], 'Bragg-Brentano')
+    histnum = len(gpx.histograms())
+    h = gpx.histograms()[0]
 
-for param in sampleparams:
-    if sampleparams[param][1] is True:
-        sampreflist.append(param)
-print(h.getHistEntryValue(['Instrument Parameters'])[0]['Lam'])
-print(h.getHistEntryValue(['Instrument Parameters']))
+    sampleparams = {
+        "Scale": h.getHistEntryValue(['Sample Parameters', 'Scale']),
+        "DisplaceX": h.getHistEntryValue(['Sample Parameters', 'DisplaceX']),
+        "DisplaceY": h.getHistEntryValue(['Sample Parameters', 'DisplaceY']),
+        "Absorption": h.getHistEntryValue(['Sample Parameters', 'Absorption']),
+    }
+    sampreflist = []
+    instreflist = []
 
-instdict = h.getHistEntryValue(['Instrument Parameters'])[0]
-# print tests
-# getinstdict = h.getHistEntryValue(['Instrument Parameters'])
-# print(getinstdict, "\n")
-# print(getinstdict["Zero"], "\n")
+    for param in sampleparams:
+        if sampleparams[param][1] is True:
+            sampreflist.append(param)
+    print(h.getHistEntryValue(['Instrument Parameters'])[0]['Lam'])
+    print(h.getHistEntryValue(['Instrument Parameters']))
 
+    instdict = h.getHistEntryValue(['Instrument Parameters'])[0]
+    # print tests
+    # getinstdict = h.getHistEntryValue(['Instrument Parameters'])
+    # print(getinstdict, "\n")
+    # print(getinstdict["Zero"], "\n")
 
-instparams = {
-    "Lam": instdict['Lam'],
-    "Zero": instdict['Zero'],
-    "U": instdict['U'],
-    "V": instdict['V'],
-    "W": instdict['W'],
-    "X": instdict['X'],
-    "Y": instdict['Y'],
-    "Z": instdict['Z'],
-    # "SH/L": instdict['SH/L'],
-}
-print(instparams)
+    instparams = {
+        "Lam": instdict['Lam'],
+        "Zero": instdict['Zero'],
+        "U": instdict['U'],
+        "V": instdict['V'],
+        "W": instdict['W'],
+        "X": instdict['X'],
+        "Y": instdict['Y'],
+        "Z": instdict['Z'],
+        # "SH/L": instdict['SH/L'],
+    }
+    print(instparams)
 
-for param in instparams:
-    if instparams[param][1] is True:
-        instreflist.append(param)
+    for param in instparams:
+        if instparams[param][1] is True:
+            instreflist.append(param)
+    return instreflist, instparams, sampreflist, sampleparams
 
 
 # define function to write to gpx project
@@ -112,5 +114,4 @@ def saveParameters(gpxfile,
         h.setHistEntryValue(['Sample Parameters', param], sampleparams[param])
     gpx.save()
 # instrument parameters is actually a list of dictionaries.
-#  each dictionary is for each bank id i believe.
-# or the list in the values refers to the value for each bank id
+# only concerned with [0]
