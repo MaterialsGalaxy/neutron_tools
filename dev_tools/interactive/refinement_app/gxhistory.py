@@ -1,5 +1,5 @@
 from bioblend.galaxy import GalaxyInstance
-
+import pandas as pd
 import subprocess
 import logging
 import os
@@ -79,4 +79,6 @@ def updateHist():
                                         deleted=False, visible=True,
                                         types=['dataset'],
                                         keys=['Id', 'Hid', 'Name'])
-    return history
+    histframe = pd.DataFrame(history)
+    histtable = histframe[["hid", "name", "id"]]
+    return histtable

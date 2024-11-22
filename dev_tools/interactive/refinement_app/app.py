@@ -18,6 +18,8 @@ import gxhistory
 
 x, y, ycalc, dy, bkg = hist_export(inputgpxfile)
 
+
+
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
 
 
@@ -35,13 +37,20 @@ with ui.navset_card_pill(id="tab"):
     with ui.nav_panel("B"):
         ui.input_action_button("updatehist", "update history")
 
+
         @render.data_frame
         @reactive.event(input.updatehist)
+        def renderupdatehistory():
+            return render.DataTable(histdata())
+
+
+        @reactive.effect
+        @reactive.event(input.updatehist)
         def updatehistory():
-            histcontents = gxhistory.updateHist()
-            histframe = pd.DataFrame(histcontents)
-            histtable = histframe[["hid", "name", "id"]]
-            return render.DataTable(histtable)
+            histtable = gxhistory.updateHist()
+            histdata.set(histtable)
+
+        histdata = reactive.value()
 
     with ui.nav_panel("C"):
         "Panel C content"
