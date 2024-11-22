@@ -26,30 +26,31 @@ def _get_ip():
 
 
 def get_galaxy_connection(history_id=None, obj=True):
-    history_id = history_id or os.environ['HISTORY_ID']
+    # history_id = history_id or os.environ['HISTORY_ID']
     key = os.environ['API_KEY']
-
-    # Customised/Raw galaxy_url
+    """
+    Customised/Raw galaxy_url
     galaxy_ip = _get_ip()
-    # Failover, fully auto-detected URL
-    # Remove trailing slashes
+    Failover, fully auto-detected URL
+    Remove trailing slashes
     app_path = os.environ['GALAXY_URL'].rstrip('/')
-    # Remove protocol+host:port if included
+    Remove protocol+host:port if included
     app_path = ''.join(app_path.split('/')[3:])
 
     if 'GALAXY_WEB_PORT' not in os.environ:
-        # We've failed to detect a port in the config we were given by
-        # galaxy, so we won't be able to construct a valid URL
+        We've failed to detect a port in the config we were given by
+        galaxy, so we won't be able to construct a valid URL
         raise Exception("No port")
     else:
-        # We should be able to find a port to connect to galaxy on via this
-        # conf var: galaxy_paster_port
+        We should be able to find a port to connect to galaxy on via this
+        conf var: galaxy_paster_port
         galaxy_port = os.environ['GALAXY_WEB_PORT']
 
     built_galaxy_url = 'http://%s:%s/%s' % (galaxy_ip.strip(),
                                             galaxy_port, app_path.strip())
-    # url = built_galaxy_url.rstrip('/')
-    # url = os.environ['GALAXY_URL'].rstrip('/')
+    url = built_galaxy_url.rstrip('/')
+    url = os.environ['GALAXY_URL'].rstrip('/')
+    """
     url = 'http://host-172-16-101-76.nubes.stfc.ac.uk/'
     gi = GalaxyInstance(url=url, key=key)
     # gi.histories.get_histories(history_id)
@@ -82,3 +83,10 @@ def updateHist():
     histframe = pd.DataFrame(history)
     histtable = histframe[["hid", "name", "id"]]
     return histtable
+
+
+def getproject(dataset_id, filep):
+    history_id = os.environ['HISTORY_ID']
+    gi = get_galaxy_connection(history_id=history_id)
+    gi.datasets.download_dataset(dataset_id=dataset_id, file_path=filep,
+                                 use_default_filename=False)

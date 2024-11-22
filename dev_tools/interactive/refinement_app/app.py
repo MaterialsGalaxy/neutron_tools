@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
 # import numpy as np
-import pandas as pd
 from shiny.express import ui, input
 from shiny import reactive, render
 # import sys
-# import os
+import os
 from gsasIImodel import (
     instreflist,
     instparams,
@@ -18,10 +17,7 @@ import gxhistory
 
 x, y, ycalc, dy, bkg = hist_export(inputgpxfile)
 
-
-
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
-
 
 with ui.navset_card_pill(id="tab"):
     with ui.nav_panel("powder data"):
@@ -49,8 +45,32 @@ with ui.navset_card_pill(id="tab"):
         def updatehistory():
             histtable = gxhistory.updateHist()
             histdata.set(histtable)
+            choicedict = dict([(i, fn) for i, fn in zip(histtable['id'],
+                                                        histtable['name'])])
+            select_gpx_choices.set(choicedict)  # dictionary with {ID:name}
+            ui.update_select("selectgpx", choices=select_gpx_choices())
 
         histdata = reactive.value()
+        gpx_choices = {"init":
+                       "update the history before loading a new project"}
+        select_gpx_choices = reactive.value(gpx_choices)
+
+        ui.input_select("selectgpx", "load GSASII project:", gpx_choices)
+        ui.input_action_button("loadgpx", "Load project")
+
+
+        @render.text()
+        @reactive.event(input.loadgpx)
+        def loadproject():
+            if input.selectgpx() != "init":
+                fn = select_gpx_choices()[input.selectgpx()]
+                location = "/var/shiny-server/shiny_test/work/"
+                fp = os.path.join(location, fn)
+                gxhistory.getproject(input.selectgpx(), fp)
+                # gsasIImodel.loadgpx(fp) load gxp into ui
+                return fp
+            else:
+                return "no project selected"
 
     with ui.nav_panel("C"):
         "Panel C content"
@@ -70,7 +90,7 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
         "inst_selection",
         "Select instrument parameters to refine:",
         {"Lam": "Lam", "Zero": "Zero", "U": "U", "V": "V", "W": "W",
-        "X": "X", "Y": "Y", "Z": "Z"},
+         "X": "X", "Y": "Y", "Z": "Z"},
         multiple=True,
         selected=instreflist,
     )
@@ -96,13 +116,13 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
     )
 
     ui.input_numeric("Scale", "histogram scale factor",
-                    sampleparams["Scale"][0])
+                     sampleparams["Scale"][0])
     ui.input_numeric("DisplaceX", "Sample X displ. perp. to beam",
-                    sampleparams["DisplaceX"][0])
+                     sampleparams["DisplaceX"][0])
     ui.input_numeric("DisplaceY", "Sample Y displ. prll. to beam",
-                    sampleparams["DisplaceY"][0])
+                     sampleparams["DisplaceY"][0])
     ui.input_numeric("Absorption", "Sample Absorption",
-                    sampleparams["Absorption"][0])
+                     sampleparams["Absorption"][0])
 
     ui.input_action_button("submit", "submit")
 
@@ -135,6 +155,6 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
             # and submit to galaxy history
 
             saveParameters("output.gpx", instreflist, instparams,
-                        sampreflist, sampleparams)
+                           sampreflist, sampleparams)
             gxhistory.put("output.gpx")
             return result
