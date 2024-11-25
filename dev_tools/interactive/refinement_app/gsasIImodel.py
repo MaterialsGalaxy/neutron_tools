@@ -21,7 +21,7 @@ def hist_export(gpx_file):
     # h.Export(hfil, '.csv')
 
 
-inputgpxfile = "infile.gpx"
+#inputgpxfile = "infile.gpx"
 
 
 def gsas_load_gpx(inputgpxfile):
@@ -31,7 +31,7 @@ def gsas_load_gpx(inputgpxfile):
     # dictionaries.
 
     # h.getHistEntryValue(['Sample Parameters', 'Type'], 'Bragg-Brentano')
-    histnum = len(gpx.histograms())
+    # histnum = len(gpx.histograms())
     h = gpx.histograms()[0]
 
     sampleparams = {
@@ -69,7 +69,7 @@ def gsas_load_gpx(inputgpxfile):
     print(instparams)
 
     for param in instparams:
-        if instparams[param][1] is True:
+        if instparams[param][2] is True:
             instreflist.append(param)
     return instreflist, instparams, sampreflist, sampleparams
 
@@ -96,7 +96,8 @@ def saveParameters(gpxfile,
     # set new instrument parameters
 
     instdictfull = h.getHistEntryValue(['Instrument Parameters'])
-
+    for param in instreflist:
+        instparams[param][2] = True
     for param in instparams:
         print(instparams, "\n")
         print(param, "\n")
