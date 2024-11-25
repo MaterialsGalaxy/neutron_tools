@@ -52,24 +52,25 @@ def updatehistory():
 
 
 def loadproject(app_input):
-    print("loadproject triggered")
     id = app_input.selectgpx()
-    fn = select_gpx_choices()[id]
-    location = "/var/shiny-server/shiny_test/work/"
-    fp = os.path.join(location, fn)
-    gxhistory.getproject(id, fp)
-    irl, ip, srl, sp = gsas_load_gpx(fp)
-    instreflist.set(irl)
-    instparams.set(ip)
-    sampreflist.set(srl)
-    sampleparams.set(sp)
-    inputgpxfile.set(fp)
-    tx, ty, tycalc, tdy, tbkg = hist_export(inputgpxfile())
-    x.set(tx)
-    y.set(ty)
-    ycalc.set(tycalc)
-    dy.set(tdy)
-    bkg.set(tbkg)
+    if id != "init":
+        fn = select_gpx_choices()[id]
+        location = "/var/shiny-server/shiny_test/work/"
+        fp = os.path.join(location, fn)
+        gxhistory.getproject(id, fp)
+        irl, ip, srl, sp = gsas_load_gpx(fp)
+        instreflist.set(irl)
+        instparams.set(ip)
+        sampreflist.set(srl)
+        sampleparams.set(sp)
+        inputgpxfile.set(fp)
+        tx, ty, tycalc, tdy, tbkg = hist_export(inputgpxfile())
+        x.set(tx)
+        y.set(ty)
+        ycalc.set(tycalc)
+        dy.set(tdy)
+        bkg.set(tbkg)
+        update_gpx_ui()
 
 
 def update_gpx_ui():
@@ -111,3 +112,13 @@ def submitout(app_input):
     saveParameters("output.gpx", instreflist(), instparams(),
                    sampreflist(), sampleparams())
     gxhistory.put("output.gpx")
+
+
+def submit_message():
+    result = "Refining sample parameters: {sref} \n\
+             with values {svals} \n\
+             Refining instrument parameters {iref} \n\
+             with values is {ivals}"\
+            .format(sref=sampreflist(), svals=sampleparams(),
+                    iref=instreflist(), ivals=instparams())
+    return result

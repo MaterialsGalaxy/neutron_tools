@@ -21,9 +21,6 @@ def hist_export(gpx_file):
     # h.Export(hfil, '.csv')
 
 
-#inputgpxfile = "infile.gpx"
-
-
 def gsas_load_gpx(inputgpxfile):
     gpx = G2sc.G2Project(gpxfile=inputgpxfile, newgpx="output.gpx")
     gpx.save()

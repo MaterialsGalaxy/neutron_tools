@@ -2,18 +2,13 @@
 from shiny.express import ui, input
 from shiny import reactive, render
 from viewmodel import (
-    instreflist,
-    instparams,
-    sampreflist,
-    sampleparams,
     histdata,
     gpx_choices,
     plot_powder,
     updatehistory,
     loadproject,
-    update_gpx_ui,
     submitout,
-    select_gpx_choices,
+    submit_message,
 )
 
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
@@ -35,7 +30,6 @@ with ui.navset_card_pill(id="tab"):
         @reactive.effect
         @reactive.event(input.updatehist)
         def app_updatehistory():
-            print("app_updatehistory triggered")
             updatehistory()
 
         @render.data_frame
@@ -47,12 +41,6 @@ with ui.navset_card_pill(id="tab"):
         @reactive.event(input.loadgpx)
         def app_loadproject():
             loadproject(input)
-            update_gpx_ui()
-
-        @render.text
-        @reactive.event(input.loadgpx)
-        def text_loadproject():
-            return "loading: " + select_gpx_choices()[input.selectgpx()]
 
     with ui.nav_menu("Other links"):
         with ui.nav_panel("D"):
@@ -114,11 +102,4 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
     @reactive.event(input.submit)
     def submit_text():
         # print out the new refinement parameters
-
-        result = "Refining sample parameters: {sref} \n\
-                with values {svals} \n\
-                Refining instrument parameters {iref} \n\
-                with values is {ivals}"\
-                .format(sref=sampreflist(), svals=sampleparams(),
-                        iref=instreflist(), ivals=instparams())
-        return result
+        return submit_message()
