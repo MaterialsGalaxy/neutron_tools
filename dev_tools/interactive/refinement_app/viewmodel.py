@@ -76,21 +76,10 @@ def loadproject(app_input):
 def update_gpx_ui():
     ui.update_selectize("inst_selection", selected=instreflist())
     ui.update_selectize("samp_selection", selected=sampreflist())
-    ui.update_numeric("Lam", value=instparams()["Lam"][1])
-    ui.update_numeric("Zero", value=instparams()["Zero"][1])
-    ui.update_numeric("U", value=instparams()["U"][1])
-    ui.update_numeric("V", value=instparams()["V"][1])
-    ui.update_numeric("W", value=instparams()["W"][1])
-    ui.update_numeric("X", value=instparams()["X"][1])
-    ui.update_numeric("Y", value=instparams()["Y"][1])
-    ui.update_numeric("Z", value=instparams()["Z"][1])
-    ui.update_numeric("Scale", value=sampleparams()["Scale"][0])
-    ui.update_numeric("DisplaceX",
-                      value=sampleparams()["DisplaceX"][0])
-    ui.update_numeric("DisplaceY",
-                      value=sampleparams()["DisplaceY"][0])
-    ui.update_numeric("Absorption",
-                      value=sampleparams()["Absorption"][0])
+    for param, val in instparams().items():
+        ui.update_numeric(param, value=val[1])
+    for param, val in sampleparams().items():
+        ui.update_numeric(param, value=val[0])
 
 
 def submitout(app_input):

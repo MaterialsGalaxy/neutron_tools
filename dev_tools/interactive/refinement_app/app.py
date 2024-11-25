@@ -53,43 +53,32 @@ with ui.navset_card_pill(id="tab"):
 
 
 with ui.sidebar(bg="#f8f8f8", position='left'):
+    inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U", "V": "V",
+                       "W": "W", "X": "X", "Y": "Y", "Z": "Z"}
     ui.input_selectize(
         "inst_selection",
         "Select instrument parameters to refine:",
-        {"Lam": "Lam", "Zero": "Zero", "U": "U", "V": "V", "W": "W",
-         "X": "X", "Y": "Y", "Z": "Z"},
+        inst_param_dict,
         multiple=True,
         selected=None,
     )
+    for param, label in inst_param_dict.items():
+        ui.input_numeric(param, label, 0)
 
-    ui.input_numeric("Lam", "Lam", 0)
-    ui.input_numeric("Zero", "Zero", 0)
-    ui.input_numeric("U", "U", 0)
-    ui.input_numeric("V", "V", 0)
-    ui.input_numeric("W", "W", 0)
-    ui.input_numeric("X", "X", 0)
-    ui.input_numeric("Y", "Y", 0)
-    ui.input_numeric("Z", "Z", 0)
-    # ui.input_numeric("SHL", "SH/L", instparams["SH/L"][0])
-
+    samp_param_dict = {"Scale": "Scale",
+                       "DisplaceX": "Sample X displ. perp. to beam",
+                       "DisplaceY": "Sample Y displ. prll. to beam",
+                       "Absorption": "Sample Absorption"}
     ui.input_selectize(
         "samp_selection",
         "Select sample parameters to refine:",
-        {"Scale": "Scale", "DisplaceX": "Sample X displ. perp. to beam",
-            "DisplaceY": "Sample Y displ. prll. to beam",
-            "Absorption": "Sample Absorption"},
+        samp_param_dict,
         multiple=True,
         selected=None,
     )
 
-    ui.input_numeric("Scale", "histogram scale factor",
-                     0)
-    ui.input_numeric("DisplaceX", "Sample X displ. perp. to beam",
-                     0)
-    ui.input_numeric("DisplaceY", "Sample Y displ. prll. to beam",
-                     0)
-    ui.input_numeric("Absorption", "Sample Absorption",
-                     0)
+    for param, label in samp_param_dict.items():
+        ui.input_numeric(param, label, 0)
 
     ui.input_action_button("submit", "submit")
 
