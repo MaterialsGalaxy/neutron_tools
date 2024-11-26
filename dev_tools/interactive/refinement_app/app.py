@@ -4,9 +4,11 @@ from shiny import reactive, render
 from viewmodel import (
     histdata,
     gpx_choices,
+    phase_choices,
     plot_powder,
     updatehistory,
     loadproject,
+    loadphase,
     submitout,
     submit_message,
 )
@@ -36,7 +38,7 @@ with ui.navset_card_pill(id="tab"):
 
     with ui.nav_panel("Project"):
         inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U", "V": "V",
-                    "W": "W", "X": "X", "Y": "Y", "Z": "Z"}
+                           "W": "W", "X": "X", "Y": "Y", "Z": "Z"}
         ui.input_selectize(
             "inst_selection",
             "Select instrument parameters to refine:",
@@ -48,15 +50,15 @@ with ui.navset_card_pill(id="tab"):
             ui.input_numeric(param, label, 0)
 
         samp_param_dict = {"Scale": "Scale",
-                        "DisplaceX": "Sample X displ. perp. to beam",
-                        "DisplaceY": "Sample Y displ. prll. to beam",
-                        "Absorption": "Sample Absorption"}
+                           "DisplaceX": "Sample X displ. perp. to beam",
+                           "DisplaceY": "Sample Y displ. prll. to beam",
+                           "Absorption": "Sample Absorption"}
         ui.input_selectize(
-            "samp_selection",
-            "Select sample parameters to refine:",
-            samp_param_dict,
-            multiple=True,
-            selected=None,
+                            "samp_selection",
+                            "Select sample parameters to refine:",
+                            samp_param_dict,
+                            multiple=True,
+                            selected=None,
         )
 
         for param, label in samp_param_dict.items():
@@ -89,8 +91,15 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
                     gpx_choices)
     ui.input_action_button("loadgpx", "Load project")
 
+    ui.input_select("selectphase", "Phase", phase_choices)
+
     @reactive.effect
     @reactive.event(input.loadgpx)
     def app_loadproject():
         id = input.selectgpx()
         loadproject(id)
+
+    @reactive.effect
+    @reactive.event(input.selectphase)
+    def app_loadphase():
+        loadphase()

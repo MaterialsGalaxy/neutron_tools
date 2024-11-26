@@ -32,6 +32,18 @@ gpx_choices = {"init":
                "update the history before loading a new project"}
 select_gpx_choices = reactive.value(gpx_choices)
 
+phase_choices = {"init":
+                 "Load a project before selecting a phase"}
+select_phase_choices = reactive.value(phase_choices)
+
+phases = reactive.value()
+hists = reactive.value()
+
+
+def loadphase():
+    # load the ui for phase data in the project tab
+    print(phases)
+
 
 def plot_powder():
     plt.scatter(x(), y(), c='blue')
@@ -59,6 +71,14 @@ def loadproject(id):
         fp = os.path.join(location, fn)
         gxhistory.getproject(id, fp)
         tgpx, irl, ip, srl, sp = gsas_load_gpx(fp)
+
+        phasenames = {}
+        for phase in tgpx.phases():
+            name = phase.name
+            phasenames[name] = name
+        select_phase_choices.set(phasenames)
+
+        hists.set(tgpx.histograms())
         gpx.set(tgpx)
         instreflist.set(irl)
         instparams.set(ip)
@@ -75,6 +95,7 @@ def loadproject(id):
 
 
 def update_gpx_ui():
+    ui.update_select("selectphase", choices=select_phase_choices())
     ui.update_selectize("inst_selection", selected=instreflist())
     ui.update_selectize("samp_selection", selected=sampreflist())
     for param, val in instparams().items():
