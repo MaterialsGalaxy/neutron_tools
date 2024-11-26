@@ -13,6 +13,7 @@ from gsasIImodel import (
 )
 import matplotlib.pyplot as plt
 
+gpx = reactive.value()
 instreflist = reactive.value()
 instparams = reactive.value()
 sampreflist = reactive.value()
@@ -51,20 +52,20 @@ def updatehistory():
     ui.update_select("selectgpx", choices=select_gpx_choices())
 
 
-def loadproject(app_input):
-    id = app_input.selectgpx()
+def loadproject(id):
     if id != "init":
         fn = select_gpx_choices()[id]
         location = "/var/shiny-server/shiny_test/work/"
         fp = os.path.join(location, fn)
         gxhistory.getproject(id, fp)
-        irl, ip, srl, sp = gsas_load_gpx(fp)
+        tgpx, irl, ip, srl, sp = gsas_load_gpx(fp)
+        gpx.set(tgpx)
         instreflist.set(irl)
         instparams.set(ip)
         sampreflist.set(srl)
         sampleparams.set(sp)
         inputgpxfile.set(fp)
-        tx, ty, tycalc, tdy, tbkg = hist_export(inputgpxfile())
+        tx, ty, tycalc, tdy, tbkg = hist_export(gpx())
         x.set(tx)
         y.set(ty)
         ycalc.set(tycalc)
@@ -98,7 +99,7 @@ def submitout(app_input):
     instparams.set(ip)
     # save the parameters to the GSAS project file
     # and submit to galaxy history
-    saveParameters("output.gpx", instreflist(), instparams(),
+    saveParameters(gpx(), instreflist(), instparams(),
                    sampreflist(), sampleparams())
     gxhistory.put("output.gpx")
 

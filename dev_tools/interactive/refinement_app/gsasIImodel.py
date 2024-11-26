@@ -6,8 +6,8 @@ sys.path.append("/home/mkscd/miniconda3/envs/GSASII/GSAS-II/GSASII")
 import GSASIIscriptable as G2sc  # type: ignore
 
 
-def hist_export(gpx_file):
-    gpx = G2sc.G2Project(gpx_file)
+def hist_export(gpx):
+    # gpx = G2sc.G2Project(gpx_file)
     x = np.array(gpx.histogram(0).getdata("X"))
     y = np.array(gpx.histogram(0).getdata("Yobs"))
     ycalc = np.array(gpx.histogram(0).getdata("Ycalc"))
@@ -68,11 +68,11 @@ def gsas_load_gpx(inputgpxfile):
     for param in instparams:
         if instparams[param][2] is True:
             instreflist.append(param)
-    return instreflist, instparams, sampreflist, sampleparams
+    return gpx, instreflist, instparams, sampreflist, sampleparams
 
 
 # define function to write to gpx project
-def saveParameters(gpxfile,
+def saveParameters(gpx,
                    instreflist,
                    instparams,
                    sampreflist,
@@ -80,7 +80,7 @@ def saveParameters(gpxfile,
     """
     saves new instrument and sample parameters to a chosen GSAS project file.
     """
-    gpx = G2sc.G2Project(gpxfile=gpxfile)
+    # gpx = G2sc.G2Project(gpxfile=gpxfile)
     h = gpx.histograms()[0]
 
     # set new instrument refinements.

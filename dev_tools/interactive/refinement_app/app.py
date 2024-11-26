@@ -40,7 +40,8 @@ with ui.navset_card_pill(id="tab"):
         @reactive.effect
         @reactive.event(input.loadgpx)
         def app_loadproject():
-            loadproject(input)
+            id = input.selectgpx()
+            loadproject(id)
 
     with ui.nav_menu("Other links"):
         with ui.nav_panel("D"):
