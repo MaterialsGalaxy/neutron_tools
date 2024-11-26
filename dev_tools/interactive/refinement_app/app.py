@@ -7,9 +7,11 @@ from viewmodel import (
     phase_choices,
     hist_choices,
     view_hist_choices,
+    view_proj_choices,
     plot_powder,
     updatehistory,
     loadproject,
+    viewproj,
     loadphase,
     loadhist,
     viewhist,
@@ -82,10 +84,16 @@ with ui.navset_card_pill(id="tab"):
             # print out the new refinement parameters
             return submit_message()
     with ui.nav_panel("Phase"):
-        @render.data_frame
-        @reactive.event(input.selectphase)
-        def renderatomtable():
-            return render.DataTable(atomdata(input.selectphase()))
+        with ui.navset_card_pill(id="phase_sections"):
+            with ui.nav_panel("general"):
+                "general"
+            with ui.nav_panel("data"):
+                "data"
+            with ui.nav_panel("atoms"):
+                @render.data_frame
+                @reactive.event(input.selectphase)
+                def renderatomtable():
+                    return render.DataTable(atomdata(input.selectphase()))
 
     with ui.nav_panel("Project"):
         "what else"
@@ -102,6 +110,7 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
     ui.input_select("selectgpx", "load GSASII project:",
                     gpx_choices)
     ui.input_action_button("loadgpx", "Load project")
+    ui.input_select("viewprojdata", "View project data", view_proj_choices)
 
     ui.input_select("selectphase", "Phase", phase_choices)
     ui.input_select("selecthist", "Histogram", hist_choices)
@@ -112,6 +121,11 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
     def app_loadproject():
         id = input.selectgpx()
         loadproject(id)
+
+    @reactive.effect
+    @reactive.event(input.viewprojdata)
+    def app_viewproj():
+        viewproj()
 
     @reactive.effect
     @reactive.event(input.selectphase)

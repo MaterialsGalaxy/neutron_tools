@@ -44,6 +44,10 @@ view_hist_choices = {"init":
                      "Load a project before selecting a histogram"}
 select_view_hist = reactive.value(view_hist_choices)
 
+view_proj_choices = {"Notebook": "Notebook", "Controls": "Controls",
+                     "Constraints": "Constraints", "Restraints": "Restraints",
+                     "Rigid bodies": "Rigid Bodies"}
+
 
 def atomdata(phasename):
     phase = gpx().phase(phasename)
@@ -100,6 +104,11 @@ def updatehistory():
                                                 histtable['name'])])
     select_gpx_choices.set(choicedict)  # dictionary with {ID:name}
     ui.update_select("selectgpx", choices=select_gpx_choices())
+
+
+def viewproj():
+    # view project data window
+    print(view_proj_choices)
 
 
 def loadproject(id):
