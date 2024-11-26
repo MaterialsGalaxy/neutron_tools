@@ -36,13 +36,34 @@ phase_choices = {"init":
                  "Load a project before selecting a phase"}
 select_phase_choices = reactive.value(phase_choices)
 
-phases = reactive.value()
-hists = reactive.value()
+hist_choices = {"init":
+                "Load a project before selecting a histogram"}
+select_hist_choices = reactive.value(hist_choices)
+view_hist_choices = {"init":
+                     "Load a project before selecting a histogram"}
+select_view_hist = reactive.value(view_hist_choices)
+
+
+def viewhist():
+    # view a specific subtree of the histogram in the histogram tab
+    print(select_view_hist())
+
+
+def loadhist(histname):
+    # load the ui for hist data in the project tab
+    # print(select_hist_choices())
+    if histname != "init":
+        data = gpx().histogram(histname).data
+        options = {}
+        for subheading in data:
+            options[subheading] = subheading
+        select_view_hist.set(options)
+        ui.update_select("viewhistdata", choices=select_view_hist())
 
 
 def loadphase():
     # load the ui for phase data in the project tab
-    print(phases)
+    print(select_phase_choices())
 
 
 def plot_powder():
@@ -78,7 +99,11 @@ def loadproject(id):
             phasenames[name] = name
         select_phase_choices.set(phasenames)
 
-        hists.set(tgpx.histograms())
+        histnames = {}
+        for hist in tgpx.histograms():
+            histnames[hist.name] = hist.name
+        select_hist_choices.set(histnames)
+
         gpx.set(tgpx)
         instreflist.set(irl)
         instparams.set(ip)
@@ -95,6 +120,7 @@ def loadproject(id):
 
 
 def update_gpx_ui():
+    ui.update_select("selecthist", choices=select_hist_choices())
     ui.update_select("selectphase", choices=select_phase_choices())
     ui.update_selectize("inst_selection", selected=instreflist())
     ui.update_selectize("samp_selection", selected=sampreflist())

@@ -5,10 +5,14 @@ from viewmodel import (
     histdata,
     gpx_choices,
     phase_choices,
+    hist_choices,
+    view_hist_choices,
     plot_powder,
     updatehistory,
     loadproject,
     loadphase,
+    loadhist,
+    viewhist,
     submitout,
     submit_message,
 )
@@ -92,6 +96,8 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
     ui.input_action_button("loadgpx", "Load project")
 
     ui.input_select("selectphase", "Phase", phase_choices)
+    ui.input_select("selecthist", "Histogram", hist_choices)
+    ui.input_select("viewhistdata", "View Histogram data", view_hist_choices)
 
     @reactive.effect
     @reactive.event(input.loadgpx)
@@ -103,3 +109,13 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
     @reactive.event(input.selectphase)
     def app_loadphase():
         loadphase()
+
+    @reactive.effect
+    @reactive.event(input.selecthist)
+    def app_loadhist():
+        loadhist(input.selecthist())
+
+    @reactive.effect
+    @reactive.event(input.viewhistdata)
+    def app_viewhist():
+        viewhist()
