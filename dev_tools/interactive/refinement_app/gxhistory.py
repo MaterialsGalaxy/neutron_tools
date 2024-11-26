@@ -80,9 +80,7 @@ def updateHist():
                                         deleted=False, visible=True,
                                         types=['dataset'],
                                         keys=['Id', 'Hid', 'Name'])
-    histframe = pd.DataFrame(history)
-    histtable = histframe[["hid", "name", "id"]]
-    return histtable
+    return history
 
 
 def getproject(dataset_id, filep):

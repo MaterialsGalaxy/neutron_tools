@@ -15,12 +15,13 @@ from viewmodel import (
     viewhist,
     submitout,
     submit_message,
+    atomdata,
 )
 
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
 
 with ui.navset_card_pill(id="tab"):
-    with ui.nav_panel("powder data"):
+    with ui.nav_panel("plots"):
 
         @render.plot(alt="A histogram")
         @reactive.event(input.loadgpx)
@@ -40,7 +41,7 @@ with ui.navset_card_pill(id="tab"):
         def renderupdatehistory():
             return render.DataTable(histdata())
 
-    with ui.nav_panel("Project"):
+    with ui.nav_panel("Powder data"):
         inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U", "V": "V",
                            "W": "W", "X": "X", "Y": "Y", "Z": "Z"}
         ui.input_selectize(
@@ -80,7 +81,14 @@ with ui.navset_card_pill(id="tab"):
         def submit_text():
             # print out the new refinement parameters
             return submit_message()
+    with ui.nav_panel("Phase"):
+        @render.data_frame
+        @reactive.event(input.selectphase)
+        def renderatomtable():
+            return render.DataTable(atomdata(input.selectphase()))
 
+    with ui.nav_panel("Project"):
+        "what else"
     with ui.nav_menu("Other links"):
         with ui.nav_panel("D"):
             "Page D content"

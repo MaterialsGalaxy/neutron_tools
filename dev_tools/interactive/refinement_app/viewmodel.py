@@ -4,6 +4,7 @@
 # these have to be passed as inputs to the function.
 from shiny.express import ui
 from shiny import reactive
+import pandas as pd
 import gxhistory
 import os
 from gsasIImodel import (
@@ -44,6 +45,20 @@ view_hist_choices = {"init":
 select_view_hist = reactive.value(view_hist_choices)
 
 
+def atomdata(phasename):
+    phase = gpx().phase(phasename)
+    atomcols = ["Name", "type", "refine", "x", "y", "z",
+                "frac", "multi", "Uiso"]
+    atomframe = pd.DataFrame(columns=atomcols)
+    for atom in phase.atoms():
+        atomvals = [atom.label, atom.type, atom.refinement_flags,
+                    atom.coordinates[0], atom.coordinates[1],
+                    atom.coordinates[2], atom.occupancy, atom.mult, atom.uiso]
+        atomrecord = dict(zip(atomcols, atomvals))
+        atomframe = atomframe._append(atomrecord, ignore_index=True)
+    return atomframe
+
+
 def viewhist():
     # view a specific subtree of the histogram in the histogram tab
     print(select_view_hist())
@@ -77,7 +92,9 @@ def plot_powder():
 
 def updatehistory():
     print("updatehistory triggered")
-    histtable = gxhistory.updateHist()
+    history = gxhistory.updateHist()
+    histframe = pd.DataFrame(history)
+    histtable = histframe[["hid", "name", "id"]]
     histdata.set(histtable)
     choicedict = dict([(i, fn) for i, fn in zip(histtable['id'],
                                                 histtable['name'])])
