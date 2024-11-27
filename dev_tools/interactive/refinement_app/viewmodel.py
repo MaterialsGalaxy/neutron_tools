@@ -11,6 +11,7 @@ from gsasIImodel import (
     saveParameters,
     hist_export,
     gsas_load_gpx,
+    load_phase_constraints,
 )
 import matplotlib.pyplot as plt
 
@@ -28,6 +29,7 @@ dy = reactive.value()
 bkg = reactive.value()
 
 histdata = reactive.value()
+constraints = reactive.value()
 
 gpx_choices = {"init":
                "update the history before loading a new project"}
@@ -47,6 +49,40 @@ select_view_hist = reactive.value(view_hist_choices)
 view_proj_choices = {"Notebook": "Notebook", "Controls": "Controls",
                      "Constraints": "Constraints", "Restraints": "Restraints",
                      "Rigid bodies": "Rigid Bodies"}
+
+
+def add_constr(ctype, df):
+    # add constraints to constraints list and to gpx
+    constr_vars = df["code"].tolist()
+    constr_coefs = df["coefficients"].tolist()
+    if ctype == "eqv":
+        constraints().append(["EQUIV", constr_vars, constr_coefs])
+        gpx().add_EquivConstr(constr_vars, multlist=constr_coefs)
+    elif ctype == "eqn":
+        constraints().append(["CONST", constr_vars, constr_coefs])
+        gpx().add_EqnConstr(1, constr_vars, multlist=constr_coefs)
+
+
+def build_constraints_df(phasename):
+    constraint_cols = ["code", "phase", "parameter", "atom"]
+    phase_constr_df = pd.DataFrame(columns=constraint_cols)
+    phase = gpx().phase(phasename)
+    parameters = ["Afrac", "AUiso"]
+    for param in parameters:
+        i = 0
+        for atom in phase.atoms():
+            code = str(phase.id)+"::"+param+":"+str(i)
+            i += 1
+            constraint_vals = [code, phasename, param, atom.label]
+            constraint_record = dict(zip(constraint_cols, constraint_vals))
+            phase_constr_df = phase_constr_df._append(constraint_record,
+                                                      ignore_index=True)
+    return phase_constr_df
+
+
+def showphaseconstr():
+    constraints = load_phase_constraints(gpx())
+    return constraints
 
 
 def saveatomtable(df, phasename):
@@ -151,6 +187,8 @@ def loadproject(id):
         ycalc.set(tycalc)
         dy.set(tdy)
         bkg.set(tbkg)
+
+        constraints.set([])
         update_gpx_ui()
 
 

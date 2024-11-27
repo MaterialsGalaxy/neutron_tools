@@ -6,6 +6,13 @@ sys.path.append("/home/mkscd/miniconda3/envs/GSASII/GSAS-II/GSASII")
 import GSASIIscriptable as G2sc  # type: ignore
 
 
+def load_phase_constraints(gpx):
+    # load the constraints previously added to the project
+    # seems to not be readable
+    phase_constraint_list = gpx.get_Constraints('Phase')
+    return phase_constraint_list
+
+
 def hist_export(gpx):
     # gpx = G2sc.G2Project(gpx_file)
     x = np.array(gpx.histogram(0).getdata("X"))

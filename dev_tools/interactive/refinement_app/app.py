@@ -18,6 +18,9 @@ from viewmodel import (
     submitout,
     atomdata,
     saveatomtable,
+    showphaseconstr,
+    build_constraints_df,
+    add_constr,
 )
 
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
@@ -89,7 +92,55 @@ with ui.navset_card_pill(id="tab"):
                     saveatomtable(data, input.selectphase())
 
     with ui.nav_panel("Project"):
-        "what else"
+        with ui.navset_card_pill(id="project_sections"):
+            with ui.nav_panel("Notebook"):
+                "Notebook"
+            with ui.nav_panel("Controls"):
+                "Controls"
+            with ui.nav_panel("Constraints"):
+
+                "Current Phase Constraints:"
+                @render.code
+                def app_showphaseconstr():
+                    return showphaseconstr()
+                with ui.layout_column_wrap():
+                    with ui.card():
+                        ui.card_header("Add new constraint")
+                        constraint_types = {"eqv": "equivalence",
+                                            "eqn": "equation"}
+                        ui.input_select("constr_type", "constraint type",
+                                        constraint_types)
+
+                        @render.data_frame
+                        def new_constr():
+                            codes = render_constr_table.data_view(selected=True)[['code']]
+                            codes['coefficients'] = 1
+                            return render.DataTable(codes, editable=True)
+
+                        ui.input_action_button("add_constr", "add constraint")
+
+                        @reactive.effect
+                        @reactive.event(input.add_constr)
+                        def app_add_constr():
+                            constr = new_constr.data_view()
+                            add_constr(input.constr_type(), constr)
+
+                    with ui.card():
+                        ui.card_header("select constraint parameters")
+
+                        @render.data_frame
+                        def render_constr_table():
+                            pn = input.selectphase()
+                            constr_df = build_constraints_df(pn)
+                            return render.DataTable(constr_df,
+                                                    selection_mode="rows",
+                                                    filters=True)
+
+            with ui.nav_panel("Restraints"):
+                "Restraints"
+            with ui.nav_panel("Rigid bodies"):
+                "Rigid bodies"
+
     with ui.nav_menu("Other links"):
         with ui.nav_panel("D"):
             "Page D content"
