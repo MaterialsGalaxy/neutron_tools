@@ -18,6 +18,7 @@ from viewmodel import (
     submitout,
     submit_message,
     atomdata,
+    saveatomtable,
 )
 
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
@@ -90,10 +91,21 @@ with ui.navset_card_pill(id="tab"):
             with ui.nav_panel("data"):
                 "data"
             with ui.nav_panel("atoms"):
+                ui.input_action_button("updateatoms", "update phase atoms")
+
                 @render.data_frame
-                @reactive.event(input.selectphase)
+                @reactive.event(input.updateatoms)
                 def renderatomtable():
-                    return render.DataTable(atomdata(input.selectphase()))
+                    return render.DataTable(atomdata(input.selectphase()),
+                                            editable=True)
+
+                ui.input_action_button("saveatoms", "Save atoms changes")
+
+                @reactive.effect
+                @reactive.event(input.saveatoms)
+                def app_saveatomtable():
+                    data = renderatomtable.data_view()
+                    saveatomtable(data, input.selectphase())
 
     with ui.nav_panel("Project"):
         "what else"

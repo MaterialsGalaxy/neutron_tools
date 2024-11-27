@@ -49,6 +49,15 @@ view_proj_choices = {"Notebook": "Notebook", "Controls": "Controls",
                      "Rigid bodies": "Rigid Bodies"}
 
 
+def saveatomtable(df, phasename):
+    # saves the atom table edits from ui input.
+    # save to gpx.
+    phase = gpx().phase(phasename)
+    for atom in phase.atoms():
+        atomrecord = df.loc[df['Name'] == atom.label]
+        atom.refinement_flags = atomrecord.iloc[0]['refine']
+
+
 def atomdata(phasename):
     phase = gpx().phase(phasename)
     atomcols = ["Name", "type", "refine", "x", "y", "z",
