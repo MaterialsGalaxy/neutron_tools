@@ -16,7 +16,6 @@ from viewmodel import (
     loadhist,
     viewhist,
     submitout,
-    submit_message,
     atomdata,
     saveatomtable,
 )
@@ -32,12 +31,6 @@ with ui.navset_card_pill(id="tab"):
             plot_powder()
 
     with ui.nav_panel("History"):
-        ui.input_action_button("updatehist", "update history")
-
-        @reactive.effect
-        @reactive.event(input.updatehist)
-        def app_updatehistory():
-            updatehistory()
 
         @render.data_frame
         @reactive.event(input.updatehist)
@@ -72,18 +65,6 @@ with ui.navset_card_pill(id="tab"):
         for param, label in samp_param_dict.items():
             ui.input_numeric(param, label, 0)
 
-        ui.input_action_button("submit", "submit")
-
-        @reactive.effect
-        @reactive.event(input.submit)
-        def ui_submitout():
-            submitout(input)
-
-        @render.text
-        @reactive.event(input.submit)
-        def submit_text():
-            # print out the new refinement parameters
-            return submit_message()
     with ui.nav_panel("Phase"):
         with ui.navset_card_pill(id="phase_sections"):
             with ui.nav_panel("general"):
@@ -119,6 +100,9 @@ with ui.navset_card_pill(id="tab"):
             ui.a("Shiny", href="https://shiny.posit.co", target="_blank")
 
 with ui.sidebar(bg="#f8f8f8", position='left'):
+
+    ui.input_action_button("updatehist", "update history")
+
     ui.input_select("selectgpx", "load GSASII project:",
                     gpx_choices)
     ui.input_action_button("loadgpx", "Load project")
@@ -127,6 +111,13 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
     ui.input_select("selectphase", "Phase", phase_choices)
     ui.input_select("selecthist", "Histogram", hist_choices)
     ui.input_select("viewhistdata", "View Histogram data", view_hist_choices)
+
+    ui.input_action_button("submit", "submit")
+
+    @reactive.effect
+    @reactive.event(input.updatehist)
+    def app_updatehistory():
+        updatehistory()
 
     @reactive.effect
     @reactive.event(input.loadgpx)
@@ -153,3 +144,8 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
     @reactive.event(input.viewhistdata)
     def app_viewhist():
         viewhist()
+
+    @reactive.effect
+    @reactive.event(input.submit)
+    def ui_submitout():
+        submitout(input)
