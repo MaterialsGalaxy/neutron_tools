@@ -21,60 +21,51 @@ from viewmodel import (
     showphaseconstr,
     build_constraints_df,
     add_constr,
+    updatenav,
 )
 
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
 
-with ui.navset_card_pill(id="tab"):
-    with ui.nav_panel("plots"):
+with ui.navset_hidden(id="tab"):
 
-        @render.plot(alt="A histogram")
-        @reactive.event(input.loadgpx)
-        def plot():
-            plot_powder()
+    with ui.nav_menu("Powder data"):
+        with ui.nav_panel("Sample Parameters", value="Sample Parameters"):
+            samp_param_dict = {"Scale": "Scale",
+                               "DisplaceX": "Sample X displ. perp. to beam",
+                               "DisplaceY": "Sample Y displ. prll. to beam",
+                               "Absorption": "Sample Absorption"}
+            ui.input_selectize(
+                                "samp_selection",
+                                "Select sample parameters to refine:",
+                                samp_param_dict,
+                                multiple=True,
+                                selected=None,
+            )
 
-    with ui.nav_panel("History"):
+            for param, label in samp_param_dict.items():
+                ui.input_numeric(param, label, 0)
 
-        @render.data_frame
-        @reactive.event(input.updatehist)
-        def renderupdatehistory():
-            return render.DataTable(histdata())
+        with ui.nav_panel("Instrument Parameters", value="Instrument Parameters"):
+            inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U",
+                               "V": "V", "W": "W", "X": "X", "Y": "Y",
+                               "Z": "Z"}
+            ui.input_selectize(
+                "inst_selection",
+                "Select instrument parameters to refine:",
+                inst_param_dict,
+                multiple=True,
+                selected=None,
+            )
+            for param, label in inst_param_dict.items():
+                ui.input_numeric(param, label, 0)
 
-    with ui.nav_panel("Powder data"):
-        inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U", "V": "V",
-                           "W": "W", "X": "X", "Y": "Y", "Z": "Z"}
-        ui.input_selectize(
-            "inst_selection",
-            "Select instrument parameters to refine:",
-            inst_param_dict,
-            multiple=True,
-            selected=None,
-        )
-        for param, label in inst_param_dict.items():
-            ui.input_numeric(param, label, 0)
-
-        samp_param_dict = {"Scale": "Scale",
-                           "DisplaceX": "Sample X displ. perp. to beam",
-                           "DisplaceY": "Sample Y displ. prll. to beam",
-                           "Absorption": "Sample Absorption"}
-        ui.input_selectize(
-                            "samp_selection",
-                            "Select sample parameters to refine:",
-                            samp_param_dict,
-                            multiple=True,
-                            selected=None,
-        )
-
-        for param, label in samp_param_dict.items():
-            ui.input_numeric(param, label, 0)
-
-    with ui.nav_panel("Phase"):
-        with ui.navset_card_pill(id="phase_sections"):
-            with ui.nav_panel("general"):
+    with ui.nav_panel("Phase", value="Phase"):
+        with ui.navset_pill(id="phases"):
+            with ui.nav_panel("general", value="phasegen"):
                 "general"
-            with ui.nav_panel("data"):
+            with ui.nav_panel("data", value="phasedata"):
                 "data"
-            with ui.nav_panel("atoms"):
+            with ui.nav_panel("atoms", value="atoms"):
                 ui.input_action_button("updateatoms", "update phase atoms")
 
                 @render.data_frame
@@ -91,55 +82,55 @@ with ui.navset_card_pill(id="tab"):
                     data = renderatomtable.data_view()
                     saveatomtable(data, input.selectphase())
 
-    with ui.nav_panel("Project"):
-        with ui.navset_card_pill(id="project_sections"):
-            with ui.nav_panel("Notebook"):
-                "Notebook"
-            with ui.nav_panel("Controls"):
-                "Controls"
-            with ui.nav_panel("Constraints"):
+    with ui.nav_menu("Project"):
+        with ui.nav_panel("Notebook", value="Notebook"):
+            "Notebook"
+        with ui.nav_panel("Controls", value="Controls"):
+            "Controls"
+        with ui.nav_panel("Constraints", value="Constraints"):
 
-                "Current Phase Constraints:"
-                @render.code
-                def app_showphaseconstr():
-                    return showphaseconstr()
-                with ui.layout_column_wrap():
-                    with ui.card():
-                        ui.card_header("Add new constraint")
-                        constraint_types = {"eqv": "equivalence",
-                                            "eqn": "equation"}
-                        ui.input_select("constr_type", "constraint type",
-                                        constraint_types)
+            "Current Phase Constraints:"
+            @render.code
+            def app_showphaseconstr():
+                return showphaseconstr()
+            with ui.layout_column_wrap():
+                with ui.card():
+                    ui.card_header("Add new constraint")
+                    constraint_types = {"eqv": "equivalence",
+                                        "eqn": "equation"}
+                    ui.input_select("constr_type", "constraint type",
+                                    constraint_types)
 
-                        @render.data_frame
-                        def new_constr():
-                            codes = render_constr_table.data_view(selected=True)[['code']]
-                            codes['coefficients'] = 1
-                            return render.DataTable(codes, editable=True)
+                    @render.data_frame
+                    def new_constr():
+                        codes = render_constr_table.data_view(
+                                selected=True)[['code']]
+                        codes['coefficients'] = 1
+                        return render.DataTable(codes, editable=True)
 
-                        ui.input_action_button("add_constr", "add constraint")
+                    ui.input_action_button("add_constr", "add constraint")
 
-                        @reactive.effect
-                        @reactive.event(input.add_constr)
-                        def app_add_constr():
-                            constr = new_constr.data_view()
-                            add_constr(input.constr_type(), constr)
+                    @reactive.effect
+                    @reactive.event(input.add_constr)
+                    def app_add_constr():
+                        constr = new_constr.data_view()
+                        add_constr(input.constr_type(), constr)
 
-                    with ui.card():
-                        ui.card_header("select constraint parameters")
+                with ui.card():
+                    ui.card_header("select constraint parameters")
 
-                        @render.data_frame
-                        def render_constr_table():
-                            pn = input.selectphase()
-                            constr_df = build_constraints_df(pn)
-                            return render.DataTable(constr_df,
-                                                    selection_mode="rows",
-                                                    filters=True)
+                    @render.data_frame
+                    def render_constr_table():
+                        pn = input.selectphase()
+                        constr_df = build_constraints_df(pn)
+                        return render.DataTable(constr_df,
+                                                selection_mode="rows",
+                                                filters=True)
 
-            with ui.nav_panel("Restraints"):
-                "Restraints"
-            with ui.nav_panel("Rigid bodies"):
-                "Rigid bodies"
+        with ui.nav_panel("Restraints", value="Restraints"):
+            "Restraints"
+        with ui.nav_panel("Rigid Bodies", value="Rigid Bodies"):
+            "Rigid bodies"
 
     with ui.nav_menu("Other links"):
         with ui.nav_panel("D"):
@@ -150,6 +141,20 @@ with ui.navset_card_pill(id="tab"):
         with ui.nav_control():
             ui.a("Shiny", href="https://shiny.posit.co", target="_blank")
 
+with ui.navset_pill(id="plot"):
+    with ui.nav_panel("plots", value="plots"):
+        @render.plot(alt="A histogram")
+        @reactive.event(input.loadgpx)
+        def plot():
+            plot_powder()
+
+    with ui.nav_panel("History", value="hist"):
+
+        @render.data_frame
+        @reactive.event(input.updatehist)
+        def renderupdatehistory():
+            return render.DataTable(histdata())
+
 with ui.sidebar(bg="#f8f8f8", position='left'):
 
     ui.input_action_button("updatehist", "update history")
@@ -157,11 +162,32 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
     ui.input_select("selectgpx", "load GSASII project:",
                     gpx_choices)
     ui.input_action_button("loadgpx", "Load project")
+
     ui.input_select("viewprojdata", "View project data", view_proj_choices)
 
+    @reactive.effect
+    @reactive.event(input.viewprojdata)
+    def app_updateprojnav():
+        tab = input.viewprojdata()
+        updatenav(tab)
+
     ui.input_select("selectphase", "Phase", phase_choices)
+    ui.input_action_button("viewphase", "View Phase")
+
+    @reactive.effect
+    @reactive.event(input.viewphase)
+    def app_updatephasenav():
+        tab = "Phase"
+        updatenav(tab)
+
     ui.input_select("selecthist", "Histogram", hist_choices)
     ui.input_select("viewhistdata", "View Histogram data", view_hist_choices)
+
+    @reactive.effect
+    @reactive.event(input.viewhistdata)
+    def app_updatehistnav():
+        tab = input.viewhistdata()
+        updatenav(tab)
 
     ui.input_action_button("submit", "submit")
 

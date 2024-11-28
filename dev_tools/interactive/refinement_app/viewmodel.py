@@ -48,7 +48,12 @@ select_view_hist = reactive.value(view_hist_choices)
 
 view_proj_choices = {"Notebook": "Notebook", "Controls": "Controls",
                      "Constraints": "Constraints", "Restraints": "Restraints",
-                     "Rigid bodies": "Rigid Bodies"}
+                     "Rigid Bodies": "Rigid Bodies"}
+
+
+def updatenav(tab):
+    # set the tab in the main view from the sidebar controls
+    ui.update_navs(id="tab", selected=tab)
 
 
 def add_constr(ctype, df):
