@@ -22,7 +22,8 @@ from viewmodel import (
     build_constraints_df,
     add_constr,
     updatenav,
-    buildinstpage,
+    save_inst_params,
+    save_samp_params,
 )
 
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
@@ -46,14 +47,35 @@ with ui.navset_hidden(id="tab"):
             for param, label in samp_param_dict.items():
                 ui.input_numeric(param, label, 0)
 
-        with ui.nav_panel("Instrument Parameters",
-                          value="Instrument Parameters"):
-            ui.input_action_button("loadinst", "load instrument parameters")
+            ui.input_action_button("savesamp", "save sample parameters")
 
             @reactive.effect
-            @reactive.event(input.loadinst)
-            def app_buildinstpage():
-                buildinstpage()
+            @reactive.event(input.savesamp)
+            def app_savesamp():
+                save_samp_params(input)
+
+        with ui.nav_panel("Instrument Parameters",
+                          value="Instrument Parameters"):
+
+            inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U",
+                               "V": "V", "W": "W", "X": "X", "Y": "Y",
+                               "Z": "Z"}
+            ui.input_selectize("inst_selection",
+                               "Select instrument parameters to refine:",
+                               inst_param_dict,
+                               multiple=True,
+                               selected=None,
+                               )
+
+            for param, label in inst_param_dict.items():
+                ui.input_numeric(param, label, 0)
+
+            ui.input_action_button("saveinst", "save instrument parameters")
+
+            @reactive.effect
+            @reactive.event(input.saveinst)
+            def app_saveinst():
+                save_inst_params(input)
 
     with ui.nav_panel("Phase", value="Phase"):
         with ui.navset_pill(id="phases"):
@@ -223,4 +245,4 @@ with ui.sidebar(bg="#f8f8f8", position='left'):
     @reactive.effect
     @reactive.event(input.submit)
     def ui_submitout():
-        submitout(input)
+        submitout()

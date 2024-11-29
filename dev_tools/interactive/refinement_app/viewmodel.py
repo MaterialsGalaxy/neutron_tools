@@ -8,7 +8,6 @@ import pandas as pd
 import gxhistory
 import os
 from gsasIImodel import (
-    saveParameters,
     hist_export,
     gsas_load_gpx,
     load_phase_constraints,
@@ -117,20 +116,7 @@ def atomdata(phasename):
 
 def buildinstpage():
     # builds the instrument parameter panel
-    inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U",
-                       "V": "V", "W": "W", "X": "X", "Y": "Y",
-                       "Z": "Z"}
-    ui.insert_ui(
-        ui.input_selectize(
-            "inst_selection",
-            "Select instrument parameters to refine:",
-            inst_param_dict,
-            multiple=True,
-            selected=instreflist(),
-        ),
-        selector="#loadinst",
-        where="afterEnd",
-    )
+    ui.update_selectize("inst_selection", selected=instreflist())
     previous = "inst_selection"
     for param, val in instparams().items():
         ui.insert_ui(
@@ -145,6 +131,12 @@ def update_hist_samp_ui():
     ui.update_selectize("samp_selection", selected=sampreflist())
     for param, val in sampleparams().items():
         ui.update_numeric(param, value=val[0])
+
+
+def update_hist_inst_ui():
+    ui.update_selectize("inst_selection", selected=instreflist())
+    for param, val in instparams().items():
+        ui.update_numeric(param, value=val[1])
 
 
 def viewhist():
@@ -172,6 +164,7 @@ def loadhist(histname):
         sampleparams.set(sp)
         update_plot(gpx(), histname)
         update_hist_samp_ui()
+        update_hist_inst_ui()
 
 
 def update_plot(gpx, histname):
@@ -239,26 +232,48 @@ def loadproject(id):
 
         ui.update_select("selecthist", choices=select_hist_choices())
         ui.update_select("selectphase", choices=select_phase_choices())
+        loadhist(list(histnames.keys())[0])
 
 
-def submitout(app_input):
-    # collect inputs and add them to the model
-    srl = app_input.samp_selection()
+def save_inst_params(app_input):
+    # collects inputs and updates the gpx object
+    histname = app_input.selecthist()
+    h = gpx().histogram(histname)
+    instdictfull = h.getHistEntryValue(['Instrument Parameters'])
+    # set refinement flags
     irl = app_input.inst_selection()
-    sp = sampleparams().copy()
     ip = instparams().copy()
-    for param in sp:
-        sp[param][0] = getattr(app_input, param)()
+    instrefdict = {'Instrument Parameters': irl}
+    h.set_refinements(instrefdict)
+
+    for param in irl:
+        ip[param][2] = True
     for param in ip:
         ip[param][1] = getattr(app_input, param)()
-    sampreflist.set(srl)
+        instdictfull[0][param] = ip[param]
+    h.setHistEntryValue(['Instrument Parameters'],
+                        instdictfull)
     instreflist.set(irl)
-    sampleparams.set(sp)
     instparams.set(ip)
-    # save the parameters to the GSAS project file
-    # and submit to galaxy history
-    saveParameters(gpx(), instreflist(), instparams(),
-                   sampreflist(), sampleparams())
+
+
+def save_samp_params(app_input):
+    # collects inputs and updates the gpx object
+    histname = app_input.selecthist()
+    h = gpx().histogram(histname)
+    srl = app_input.samp_selection()
+    sp = sampleparams().copy()
+    for param in srl:
+        sp[param][1] = True
+    sampreflist.set(srl)
+    sampleparams.set(sp)
+    for param in sp:
+        sp[param][0] = getattr(app_input, param)()
+        h.setHistEntryValue(['Sample Parameters', param], sp[param])
+
+
+def submitout():
+    gpx().save()
     gxhistory.put("output.gpx")
 
 
