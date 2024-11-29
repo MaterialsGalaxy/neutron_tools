@@ -13,13 +13,14 @@ def load_phase_constraints(gpx):
     return phase_constraint_list
 
 
-def hist_export(gpx):
+def hist_export(gpx, histname):
     # gpx = G2sc.G2Project(gpx_file)
-    x = np.array(gpx.histogram(0).getdata("X"))
-    y = np.array(gpx.histogram(0).getdata("Yobs"))
-    ycalc = np.array(gpx.histogram(0).getdata("Ycalc"))
-    dy = np.array(gpx.histogram(0).getdata("Residual"))
-    bkg = np.array(gpx.histogram(0).getdata("Background"))
+    h = gpx.histogram(histname)
+    x = np.array(h.getdata("X"))
+    y = np.array(h.getdata("Yobs"))
+    ycalc = np.array(h.getdata("Ycalc"))
+    dy = np.array(h.getdata("Residual"))
+    bkg = np.array(h.getdata("Background"))
 
     return x, y, ycalc, dy, bkg
     # for i, h in enumerate(gpx.histograms()):
@@ -28,16 +29,8 @@ def hist_export(gpx):
     # h.Export(hfil, '.csv')
 
 
-def gsas_load_gpx(inputgpxfile):
-    gpx = G2sc.G2Project(gpxfile=inputgpxfile, newgpx="output.gpx")
-    gpx.save()
-    # get the sample and instrument parameters from previous refinement in
-    # dictionaries.
-
-    # h.getHistEntryValue(['Sample Parameters', 'Type'], 'Bragg-Brentano')
-    # histnum = len(gpx.histograms())
-    h = gpx.histograms()[0]
-
+def load_histogram_parameters(gpx, histname):
+    h = gpx.histogram(histname)
     sampleparams = {
         "Scale": h.getHistEntryValue(['Sample Parameters', 'Scale']),
         "DisplaceX": h.getHistEntryValue(['Sample Parameters', 'DisplaceX']),
@@ -75,17 +68,29 @@ def gsas_load_gpx(inputgpxfile):
     for param in instparams:
         if instparams[param][2] is True:
             instreflist.append(param)
-    return gpx, instreflist, instparams, sampreflist, sampleparams
+    return instreflist, instparams, sampreflist, sampleparams
 
+
+def gsas_load_gpx(inputgpxfile):
+    gpx = G2sc.G2Project(gpxfile=inputgpxfile, newgpx="output.gpx")
+    gpx.save()
+    # get the sample and instrument parameters from previous refinement in
+    # dictionaries.
+
+    # h.getHistEntryValue(['Sample Parameters', 'Type'], 'Bragg-Brentano')
+    # histnum = len(gpx.histograms())
+    return gpx
 
 # define function to write to gpx project
+
+
 def saveParameters(gpx,
                    instreflist,
                    instparams,
                    sampreflist,
                    sampleparams):
     """
-    saves new instrument and sample parameters to a chosen GSAS project file.
+    saves new instrument and sample parameters to a chosen GSAS project
     """
     # gpx = G2sc.G2Project(gpxfile=gpxfile)
     h = gpx.histograms()[0]

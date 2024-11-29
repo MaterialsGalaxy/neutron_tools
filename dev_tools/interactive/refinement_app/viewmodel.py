@@ -12,6 +12,7 @@ from gsasIImodel import (
     hist_export,
     gsas_load_gpx,
     load_phase_constraints,
+    load_histogram_parameters,
 )
 import matplotlib.pyplot as plt
 
@@ -87,6 +88,7 @@ def build_constraints_df(phasename):
 
 def showphaseconstr():
     constraints = load_phase_constraints(gpx())
+    # rearrange the data for visualisation
     return constraints
 
 
@@ -113,6 +115,38 @@ def atomdata(phasename):
     return atomframe
 
 
+def buildinstpage():
+    # builds the instrument parameter panel
+    inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U",
+                       "V": "V", "W": "W", "X": "X", "Y": "Y",
+                       "Z": "Z"}
+    ui.insert_ui(
+        ui.input_selectize(
+            "inst_selection",
+            "Select instrument parameters to refine:",
+            inst_param_dict,
+            multiple=True,
+            selected=instreflist(),
+        ),
+        selector="#loadinst",
+        where="afterEnd",
+    )
+    previous = "inst_selection"
+    for param, val in instparams().items():
+        ui.insert_ui(
+            ui.input_numeric(param, param, value=val[1]),
+            selector="#"+previous,
+            where="afterEnd",
+        )
+        previous = param
+
+
+def update_hist_samp_ui():
+    ui.update_selectize("samp_selection", selected=sampreflist())
+    for param, val in sampleparams().items():
+        ui.update_numeric(param, value=val[0])
+
+
 def viewhist():
     # view a specific subtree of the histogram in the histogram tab
     print(select_view_hist())
@@ -129,13 +163,33 @@ def loadhist(histname):
         select_view_hist.set(options)
         ui.update_select("viewhistdata", choices=select_view_hist())
 
+        # code for after histogram selection
+        irl, ip, srl, sp = load_histogram_parameters(gpx(), histname)
+        # to be put after the histogram is chosen
+        instreflist.set(irl)
+        instparams.set(ip)
+        sampreflist.set(srl)
+        sampleparams.set(sp)
+        update_plot(gpx(), histname)
+        update_hist_samp_ui()
+
+
+def update_plot(gpx, histname):
+    tx, ty, tycalc, tdy, tbkg = hist_export(gpx, histname)
+    x.set(tx)
+    y.set(ty)
+    ycalc.set(tycalc)
+    dy.set(tdy)
+    bkg.set(tbkg)
+
 
 def loadphase():
     # load the ui for phase data in the project tab
     print(select_phase_choices())
 
 
-def plot_powder():
+def plot_powder(histname):
+    update_plot(gpx(), histname)
     plt.scatter(x(), y(), c='blue')
     plt.plot(x(), ycalc(), c='green')
     plt.plot(x(), bkg(), c='red')
@@ -167,8 +221,7 @@ def loadproject(id):
         location = "/var/shiny-server/shiny_test/work/"
         fp = os.path.join(location, fn)
         gxhistory.getproject(id, fp)
-        tgpx, irl, ip, srl, sp = gsas_load_gpx(fp)
-
+        tgpx = gsas_load_gpx(fp)
         phasenames = {}
         for phase in tgpx.phases():
             name = phase.name
@@ -180,32 +233,12 @@ def loadproject(id):
             histnames[hist.name] = hist.name
         select_hist_choices.set(histnames)
 
-        gpx.set(tgpx)
-        instreflist.set(irl)
-        instparams.set(ip)
-        sampreflist.set(srl)
-        sampleparams.set(sp)
         inputgpxfile.set(fp)
-        tx, ty, tycalc, tdy, tbkg = hist_export(gpx())
-        x.set(tx)
-        y.set(ty)
-        ycalc.set(tycalc)
-        dy.set(tdy)
-        bkg.set(tbkg)
-
+        gpx.set(tgpx)
         constraints.set([])
-        update_gpx_ui()
 
-
-def update_gpx_ui():
-    ui.update_select("selecthist", choices=select_hist_choices())
-    ui.update_select("selectphase", choices=select_phase_choices())
-    ui.update_selectize("inst_selection", selected=instreflist())
-    ui.update_selectize("samp_selection", selected=sampreflist())
-    for param, val in instparams().items():
-        ui.update_numeric(param, value=val[1])
-    for param, val in sampleparams().items():
-        ui.update_numeric(param, value=val[0])
+        ui.update_select("selecthist", choices=select_hist_choices())
+        ui.update_select("selectphase", choices=select_phase_choices())
 
 
 def submitout(app_input):

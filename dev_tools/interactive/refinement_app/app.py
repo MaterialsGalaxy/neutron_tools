@@ -22,6 +22,7 @@ from viewmodel import (
     build_constraints_df,
     add_constr,
     updatenav,
+    buildinstpage,
 )
 
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
@@ -45,19 +46,14 @@ with ui.navset_hidden(id="tab"):
             for param, label in samp_param_dict.items():
                 ui.input_numeric(param, label, 0)
 
-        with ui.nav_panel("Instrument Parameters", value="Instrument Parameters"):
-            inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U",
-                               "V": "V", "W": "W", "X": "X", "Y": "Y",
-                               "Z": "Z"}
-            ui.input_selectize(
-                "inst_selection",
-                "Select instrument parameters to refine:",
-                inst_param_dict,
-                multiple=True,
-                selected=None,
-            )
-            for param, label in inst_param_dict.items():
-                ui.input_numeric(param, label, 0)
+        with ui.nav_panel("Instrument Parameters",
+                          value="Instrument Parameters"):
+            ui.input_action_button("loadinst", "load instrument parameters")
+
+            @reactive.effect
+            @reactive.event(input.loadinst)
+            def app_buildinstpage():
+                buildinstpage()
 
     with ui.nav_panel("Phase", value="Phase"):
         with ui.navset_pill(id="phases"):
@@ -143,10 +139,12 @@ with ui.navset_hidden(id="tab"):
 
 with ui.navset_pill(id="plot"):
     with ui.nav_panel("plots", value="plots"):
+        ui.input_action_button("renderplot", "Render plot")
+
         @render.plot(alt="A histogram")
-        @reactive.event(input.loadgpx)
+        @reactive.event(input.renderplot)
         def plot():
-            plot_powder()
+            plot_powder(input.selecthist())
 
     with ui.nav_panel("History", value="hist"):
 
