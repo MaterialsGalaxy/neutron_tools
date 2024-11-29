@@ -3,6 +3,10 @@ import subprocess
 import logging
 import os
 
+"""These functions were edited from the interactive wallace too repo.
+Some may not be necessary and anything here should probably be referenced?
+"""
+
 DEBUG = os.environ.get('DEBUG', "False").lower() == 'true'
 if DEBUG:
     logging.basicConfig(level=logging.DEBUG)

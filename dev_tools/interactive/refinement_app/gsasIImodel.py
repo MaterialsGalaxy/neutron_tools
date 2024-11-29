@@ -7,14 +7,18 @@ import GSASIIscriptable as G2sc  # type: ignore
 
 
 def load_phase_constraints(gpx):
-    # load the constraints previously added to the project
-    # seems to not be readable
+    """
+    load the phase constraints previously added to the project
+    seems to not be readable
+    """
     phase_constraint_list = gpx.get_Constraints('Phase')
     return phase_constraint_list
 
 
 def hist_export(gpx, histname):
-    # gpx = G2sc.G2Project(gpx_file)
+    """
+    returns histogram data for plotting
+    """
     h = gpx.histogram(histname)
     x = np.array(h.getdata("X"))
     y = np.array(h.getdata("Yobs"))
@@ -30,7 +34,13 @@ def hist_export(gpx, histname):
 
 
 def load_histogram_parameters(gpx, histname):
+    """
+    loads a subset of sample and isntrument parameters and refinement
+    flags of interest for the UI. Could be extended to everything. 
+    """
     h = gpx.histogram(histname)
+
+    # dictionary of subset of sample parameters values of interest
     sampleparams = {
         "Scale": h.getHistEntryValue(['Sample Parameters', 'Scale']),
         "DisplaceX": h.getHistEntryValue(['Sample Parameters', 'DisplaceX']),
@@ -40,18 +50,23 @@ def load_histogram_parameters(gpx, histname):
     sampreflist = []
     instreflist = []
 
+    # populating list of sample refinements that are already active
     for param in sampleparams:
         if sampleparams[param][1] is True:
             sampreflist.append(param)
+    
+    # debugging print statements
     print(h.getHistEntryValue(['Instrument Parameters'])[0]['Lam'])
     print(h.getHistEntryValue(['Instrument Parameters']))
 
+    # full instrument parameter dictionary
     instdict = h.getHistEntryValue(['Instrument Parameters'])[0]
     # print tests
     # getinstdict = h.getHistEntryValue(['Instrument Parameters'])
     # print(getinstdict, "\n")
     # print(getinstdict["Zero"], "\n")
 
+    # subset dictionary of instrument parameters of interest
     instparams = {
         "Lam": instdict['Lam'],
         "Zero": instdict['Zero'],
@@ -65,6 +80,7 @@ def load_histogram_parameters(gpx, histname):
     }
     print(instparams)
 
+    # populating list of refinement flags already active
     for param in instparams:
         if instparams[param][2] is True:
             instreflist.append(param)
@@ -72,11 +88,9 @@ def load_histogram_parameters(gpx, histname):
 
 
 def gsas_load_gpx(inputgpxfile):
+    """loads gpx from input file and saves it to output file
+        the current project is in outputfile so the loaded ones
+        from the galaxy history remain unchanged"""
     gpx = G2sc.G2Project(gpxfile=inputgpxfile, newgpx="output.gpx")
     gpx.save()
-    # get the sample and instrument parameters from previous refinement in
-    # dictionaries.
-
-    # h.getHistEntryValue(['Sample Parameters', 'Type'], 'Bragg-Brentano')
-    # histnum = len(gpx.histograms())
     return gpx

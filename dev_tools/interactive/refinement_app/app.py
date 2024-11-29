@@ -29,7 +29,8 @@ from viewmodel import (
 ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
 
 with ui.navset_hidden(id="tab"):
-
+    # hidden can be switched to a menu or pillset, so the further nav_menu
+    # elements can be left alone if we want to change it later.
     with ui.nav_menu("Powder data"):
         with ui.nav_panel("Sample Parameters", value="Sample Parameters"):
             samp_param_dict = {"Scale": "Scale",
@@ -159,6 +160,7 @@ with ui.navset_hidden(id="tab"):
         with ui.nav_control():
             ui.a("Shiny", href="https://shiny.posit.co", target="_blank")
 
+# separate always visible section for plots
 with ui.navset_pill(id="plot"):
     with ui.nav_panel("plots", value="plots"):
         ui.input_action_button("renderplot", "Render plot")
