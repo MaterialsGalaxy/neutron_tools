@@ -8,6 +8,7 @@ from viewmodel import (
     hist_choices,
     view_hist_choices,
     view_proj_choices,
+    inst_param_dict,
     plot_powder,
     updatehistory,
     loadproject,
@@ -56,22 +57,18 @@ with ui.navset_hidden(id="tab"):
             def app_savesamp():
                 save_samp_params(input)
 
-        with ui.nav_panel("Instrument Parameters",
+        with ui.nav_panel("Instrument Refinements",
                           value="Instrument Parameters"):
-            inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U",
-                               "V": "V", "W": "W", "X": "X", "Y": "Y",
-                               "Z": "Z"}
             ui.input_selectize("inst_selection",
                                "Select instrument parameters to refine:",
                                inst_param_dict,
                                multiple=True,
                                selected=None,
                                )
-            with ui.navset_hidden(id="instruments"):
-                with ui.nav_panel(""):
 
-                    for param, label in inst_param_dict.items():
-                        ui.input_numeric(param, label, 0)
+            with ui.navset_hidden(id="instruments"):
+                with ui.nav_panel("Instrument Parameter Values"):
+                    "Set values:"
 
             ui.input_action_button("saveinst",
                                    "save instrument parameters")

@@ -55,6 +55,10 @@ view_proj_choices = {"Notebook": "Notebook", "Controls": "Controls",
                      "Constraints": "Constraints", "Restraints": "Restraints",
                      "Rigid Bodies": "Rigid Bodies"}
 
+inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U",
+                   "V": "V", "W": "W", "X": "X", "Y": "Y",
+                   "Z": "Z"}
+
 
 def updatenav(tab):
     """
@@ -169,13 +173,20 @@ def buildinstpage():
     """
     # update the refinement flags
     ui.update_selectize("inst_selection", selected=instreflist())
-    previous = "inst_selection"
+    # previous = "inst_selection"
 
     # generate the new UI elements
     # Ideally generate all directly from the gsas histogram object's
     # instrument parameter dictionary
     # finds previous element from selector, inserts new element after it
     # requires removing too, unclear how this works
+    # ui.remove_ui(selector="div:has(> #instruments)",
+    #              multiple=True, immediate=True)
+
+    previous = "instruments"
+
+    # could make a dictionary of param keys to ui labels
+
     for param, val in instparams().items():
         ui.insert_ui(
             ui.input_numeric(param, param, value=val[1]),
@@ -183,6 +194,11 @@ def buildinstpage():
             where="afterEnd",
         )
         previous = param
+
+
+def remove_inst_inputs():
+    for param in inst_param_dict.keys():
+        ui.remove_ui(selector="div:has(> "+"#"+param+")", immediate=True)
 
 
 def update_hist_samp_ui():
@@ -212,7 +228,7 @@ def viewhist():
 
 def loadhist(histname):
     """
-    loads the sleected histogram and updates the UI
+    loads the selected histogram and updates the UI
     to reflect the new hsitograms data.
     """
     # load the ui for hist data in the project tab
@@ -224,6 +240,8 @@ def loadhist(histname):
             options[subheading] = subheading
         select_view_hist.set(options)
         ui.update_select("viewhistdata", choices=select_view_hist())
+        # delete old ui
+        remove_inst_inputs()
 
         # set the new histogram parameters for the UI
         irl, ip, srl, sp = load_histogram_parameters(gpx(), histname)
@@ -236,8 +254,10 @@ def loadhist(histname):
 
         # update the plots and the UI
         update_plot(gpx(), histname)
+
+        # build the new UI
         update_hist_samp_ui()
-        update_hist_inst_ui()
+        buildinstpage()
 
 
 def update_plot(gpx, histname):
@@ -294,6 +314,9 @@ def viewproj():
 
 def loadproject(id):
     if id != "init":
+        # remove any dynamic UI items from previous project
+        remove_inst_inputs()
+
         # get the file from galaxy and load the gsas project
         fn = select_gpx_choices()[id]
         location = "/var/shiny-server/shiny_test/work/"
