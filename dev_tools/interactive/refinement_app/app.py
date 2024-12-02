@@ -151,15 +151,6 @@ with ui.navset_hidden(id="tab"):
         with ui.nav_panel("Rigid Bodies", value="Rigid Bodies"):
             "Rigid bodies"
 
-    with ui.nav_menu("Other links"):
-        with ui.nav_panel("D"):
-            "Page D content"
-
-        "----"
-        "Description:"
-        with ui.nav_control():
-            ui.a("Shiny", href="https://shiny.posit.co", target="_blank")
-
 # separate always visible section for plots
 with ui.navset_pill(id="plot"):
     with ui.nav_panel("plots", value="plots"):

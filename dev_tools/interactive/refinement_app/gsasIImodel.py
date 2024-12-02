@@ -36,7 +36,7 @@ def hist_export(gpx, histname):
 def load_histogram_parameters(gpx, histname):
     """
     loads a subset of sample and isntrument parameters and refinement
-    flags of interest for the UI. Could be extended to everything. 
+    flags of interest for the UI. Could be extended to everything.
     """
     h = gpx.histogram(histname)
 
@@ -54,7 +54,7 @@ def load_histogram_parameters(gpx, histname):
     for param in sampleparams:
         if sampleparams[param][1] is True:
             sampreflist.append(param)
-    
+
     # debugging print statements
     print(h.getHistEntryValue(['Instrument Parameters'])[0]['Lam'])
     print(h.getHistEntryValue(['Instrument Parameters']))
