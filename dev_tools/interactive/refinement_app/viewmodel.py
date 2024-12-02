@@ -20,9 +20,9 @@ these have to be passed as inputs to the function."""
 # as a side effect from reactive functions
 gpx = reactive.value()
 instreflist = reactive.value()
-instparams = reactive.value()
+instparams = reactive.value(None)
 sampreflist = reactive.value()
-sampleparams = reactive.value()
+sampleparams = reactive.value(None)
 inputgpxfile = reactive.value()
 
 x = reactive.value()
@@ -180,8 +180,6 @@ def buildinstpage():
     # instrument parameter dictionary
     # finds previous element from selector, inserts new element after it
     # requires removing too, unclear how this works
-    # ui.remove_ui(selector="div:has(> #instruments)",
-    #              multiple=True, immediate=True)
 
     previous = "instruments"
 
@@ -196,9 +194,28 @@ def buildinstpage():
         previous = param
 
 
+def buildsamppage():
+    ui.update_selectize("samp_selection", selected=sampreflist())
+    previous = "sample"
+    for param, val in sampleparams().items():
+        ui.insert_ui(
+            ui.input_numeric(param, param, value=val[0]),
+            selector="#"+previous,
+            where="afterEnd",
+        )
+        previous = param
+
+
+def remove_samp_inputs():
+    if sampleparams() is not None:
+        for param in sampleparams().keys():
+            ui.remove_ui(selector="div:has(> "+"#"+param+")", immediate=True)
+
+
 def remove_inst_inputs():
-    for param in inst_param_dict.keys():
-        ui.remove_ui(selector="div:has(> "+"#"+param+")", immediate=True)
+    if instparams() is not None:
+        for param in instparams().keys():
+            ui.remove_ui(selector="div:has(> "+"#"+param+")", immediate=True)
 
 
 def update_hist_samp_ui():
@@ -242,7 +259,7 @@ def loadhist(histname):
         ui.update_select("viewhistdata", choices=select_view_hist())
         # delete old ui
         remove_inst_inputs()
-
+        remove_samp_inputs()
         # set the new histogram parameters for the UI
         irl, ip, srl, sp = load_histogram_parameters(gpx(), histname)
         instreflist.set(irl)
@@ -256,7 +273,7 @@ def loadhist(histname):
         update_plot(gpx(), histname)
 
         # build the new UI
-        update_hist_samp_ui()
+        buildsamppage()
         buildinstpage()
 
 
@@ -316,6 +333,7 @@ def loadproject(id):
     if id != "init":
         # remove any dynamic UI items from previous project
         remove_inst_inputs()
+        remove_samp_inputs()
 
         # get the file from galaxy and load the gsas project
         fn = select_gpx_choices()[id]

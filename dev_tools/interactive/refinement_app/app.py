@@ -47,8 +47,10 @@ with ui.navset_hidden(id="tab"):
             )
             with ui.navset_hidden(id="sample"):
                 with ui.nav_panel(""):
-                    for param, label in samp_param_dict.items():
-                        ui.input_numeric(param, label, 0)
+                    "Set Sample Parameter values:"
+
+                    # for param, label in samp_param_dict.items():
+                    #     ui.input_numeric(param, label, 0)
 
             ui.input_action_button("savesamp", "save sample parameters")
 
