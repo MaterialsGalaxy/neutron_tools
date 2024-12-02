@@ -44,9 +44,10 @@ with ui.navset_hidden(id="tab"):
                                 multiple=True,
                                 selected=None,
             )
-
-            for param, label in samp_param_dict.items():
-                ui.input_numeric(param, label, 0)
+            with ui.navset_hidden(id="sample"):
+                with ui.nav_panel(""):
+                    for param, label in samp_param_dict.items():
+                        ui.input_numeric(param, label, 0)
 
             ui.input_action_button("savesamp", "save sample parameters")
 
@@ -57,7 +58,6 @@ with ui.navset_hidden(id="tab"):
 
         with ui.nav_panel("Instrument Parameters",
                           value="Instrument Parameters"):
-
             inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U",
                                "V": "V", "W": "W", "X": "X", "Y": "Y",
                                "Z": "Z"}
@@ -67,11 +67,14 @@ with ui.navset_hidden(id="tab"):
                                multiple=True,
                                selected=None,
                                )
+            with ui.navset_hidden(id="instruments"):
+                with ui.nav_panel(""):
 
-            for param, label in inst_param_dict.items():
-                ui.input_numeric(param, label, 0)
+                    for param, label in inst_param_dict.items():
+                        ui.input_numeric(param, label, 0)
 
-            ui.input_action_button("saveinst", "save instrument parameters")
+            ui.input_action_button("saveinst",
+                                   "save instrument parameters")
 
             @reactive.effect
             @reactive.event(input.saveinst)

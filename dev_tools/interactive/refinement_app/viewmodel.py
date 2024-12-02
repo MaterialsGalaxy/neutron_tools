@@ -232,6 +232,8 @@ def loadhist(histname):
         sampreflist.set(srl)
         sampleparams.set(sp)
 
+        # change how parameters are loaded
+
         # update the plots and the UI
         update_plot(gpx(), histname)
         update_hist_samp_ui()
