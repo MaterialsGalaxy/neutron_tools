@@ -10,7 +10,7 @@ from gsasIImodel import (
     load_histogram_parameters,
 )
 import matplotlib.pyplot as plt
-
+import typing
 """contains all reactive events functions and variables
 and processes all logic from the ui, GSASII and galaxy history models.
 note functions defined here cannot directly access inputs from view.
@@ -448,78 +448,13 @@ def save_inst_params(app_input):
     h.setHistEntryValue(['Instrument Parameters'],
                         instdictfull)
     instparams.set(tempip)
-    """    # copies current full instrument parameter dictionary
-    # this is actually a list. [0] has the dict
-    # [1] has a depracated GSAS1 thing
-    instdictfull = h.getHistEntryValue(['Instrument Parameters'])
 
-    # set refinement flags
-    irl = app_input.inst_selection()
+    """def save_samp_params(app_input):
 
-    # copies instrument  parameters to avoid overwriting the underlying object
-    ip = instparams().copy()
-    instrefdict = {'Instrument Parameters': irl}
-    h.set_refinements(instrefdict)
-
-    # set the refinement flags directly in the dictionary too, so they show up
-    # if reloading the project file when no rfinement ahve run
-    for param in irl:
-        ip[param][2] = True
-
-    # update the new parameter values
-    for param in ip:
-        ip[param][1] = getattr(app_input, param)()
-        instdictfull[0][param] = ip[param]
-
-    # copy the new dictionary back into the gpx histogram object
-    h.setHistEntryValue(['Instrument Parameters'],
-                        instdictfull)"""
-
-
-def save_samp_params(app_input):
-    """
-    collects sample parameter inputs and saves them to gpx
-    """
     histname = app_input.selecthist()
     h = gpx().histogram(histname)
-    # change this to change the full dictionary directly
-    # some inputs filtered out so need a reference for which inputs to take
-    tempsp = sampleparams().copy()
-    # histname = app_input.selecthist()
-    # h = gpx().histogram(histname)
 
-    # set all flags to false
-    for vals in tempsp.values():
-        if isinstance(vals, list):
-            if vals[1]:
-                vals[1] = False
-
-    # set the new chosen flags
-    sampreflist.set(list(app_input.samp_selection()))
-    for param in sampreflist():
-        tempsp[param][1] = True
-
-    # set the new values
-    for param, vals in tempsp.items():
-        if hasattr(app_input, param):
-            if isinstance(vals, list):
-                vals[0] = getattr(app_input, param)()
-            else:
-                vals = getattr(app_input, param)()
-            h.setHistEntryValue(['Sample Parameters', param], vals)
-    sampleparams.set(tempsp)
-
-    """        if isinstance(vals, list) and param != "Materials":
-            if isinstance(vals[0], float):
-                vals[0] = getattr(app_input, param)()
-
-        elif isinstance(vals, float) and param != "Gonio. radius":
-            vals = getattr(app_input, param)()
-
-        elif vals == "InstrName" or vals == "Type":
-            vals = getattr(app_input, param)()"""
-
-    """    # gets sample refinement input
+    # gets sample refinement input
     srl = app_input.samp_selection()
 
     # copies sample parameters to avoid overwriting the underlying object
@@ -528,7 +463,9 @@ def save_samp_params(app_input):
     for param in srl:
         sp[param][1] = True
 
-    # set the new vlaues in the gpx object
+    # add validation here for different params
+
+    # set the new values in the gpx object
     for param in sp:
         sp[param][0] = getattr(app_input, param)()
         h.setHistEntryValue(['Sample Parameters', param], sp[param])
@@ -536,6 +473,42 @@ def save_samp_params(app_input):
     # update the reactive values / global values
     sampreflist.set(srl)
     sampleparams.set(sp)"""
+
+
+def save_samp_params(app_input):
+    """
+    collects sample parameter inputs and saves them to gpx
+    """
+    histname = app_input.selecthist()
+    h = gpx().histogram(histname)
+    sp = sampleparams().copy()
+
+    # gets sample refinement input
+    srl = app_input.samp_selection()
+
+    # set all flags to false
+    for param in sp:
+        if isinstance(sp[param], list):
+            if sp[param][1]:
+                sp[param][1] = False
+
+    # set the new chosen flags
+
+    for param in srl:
+        sp[param][1] = True
+
+    # set the new values
+    for param in sp:
+        if hasattr(app_input, param):
+            if isinstance(sp[param], list):
+                sp[param][0] = getattr(app_input, param)()
+            else:
+                sp[param] = getattr(app_input, param)()
+            h.setHistEntryValue(['Sample Parameters', param], sp[param])
+
+    # update the reactive values / global values
+    sampreflist.set(srl)
+    sampleparams.set(sp)
 
 
 def submitout():
