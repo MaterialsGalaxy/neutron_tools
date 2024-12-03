@@ -34,11 +34,56 @@ def hist_export(gpx, histname):
 
 
 def load_histogram_parameters(gpx, histname):
-    """
+    h = gpx.histogram(histname)
+    sampledict = h.getHistEntryValue(['Sample Parameters'])
+    instdict = h.getHistEntryValue(['Instrument Parameters'])[0]
+    sp = {}
+    ip = {}
+    # initialise parameter dictionaries with fixed keynames
+    for param, value in sampledict.items():
+        # new_param_name = param.translate({ord(i): None for i in './'})
+        # sp[new_param_name] = value
+        sp[param] = value
+
+    for param, value in instdict.items():
+        # new_param_name = param.translate({ord(i): None for i in './'})
+        # ip[new_param_name] = value
+        ip[param] = value
+
+    srl = []
+    irl = []
+    sc = {}
+    ic = {}
+    # populating list of sample refinements that are already active
+    for param, val in sp.items():
+        # set sample choices dict for UI
+        if isinstance(val, list):
+            if isinstance(val[1], bool):
+                sc[param] = param
+                if val[1]:
+                    srl.append(param)
+    # populating list of refinement flags already active
+    for param, val in ip.items():
+        if isinstance(val, list) and len(val) == 3:
+            # set instrument choices dict for UI
+            if isinstance(val[2], bool):
+                ic[param] = param
+                if val[2]:
+                    irl.append(param)
+
+    return (irl, ip, ic, srl, sp, sc)
+
+
+"""
+def load_histogram_parameters(gpx, histname):
+
     loads a subset of sample and isntrument parameters and refinement
     flags of interest for the UI. Could be extended to everything.
-    """
+
     h = gpx.histogram(histname)
+
+    # Change to full dictionaries
+    # add returning of choices dictionary for refinement flags
 
     # dictionary of subset of sample parameters values of interest
     sampleparams = {
@@ -47,20 +92,26 @@ def load_histogram_parameters(gpx, histname):
         "DisplaceY": h.getHistEntryValue(['Sample Parameters', 'DisplaceY']),
         "Absorption": h.getHistEntryValue(['Sample Parameters', 'Absorption']),
     }
-    sampreflist = []
-    instreflist = []
-
+    sp = h.getHistEntryValue(['Sample Parameters'])
+    ip = h.getHistEntryValue(['Instrument Parameters'])[0]
+    srl = []
+    irl = []
+    sc = {}
+    ic = {}
     # populating list of sample refinements that are already active
-    for param in sampleparams:
-        if sampleparams[param][1] is True:
-            sampreflist.append(param)
+    for param, val in sp.items():
+        # set sample choices dict for UI
+        if isinstance(val[1], bool):
+            sc[param] = param
+            if val[1] is True:
+                srl.append(param)
 
     # debugging print statements
     print(h.getHistEntryValue(['Instrument Parameters'])[0]['Lam'])
     print(h.getHistEntryValue(['Instrument Parameters']))
 
     # full instrument parameter dictionary
-    instdict = h.getHistEntryValue(['Instrument Parameters'])[0]
+    # instparams = h.getHistEntryValue(['Instrument Parameters'])[0]
     # print tests
     # getinstdict = h.getHistEntryValue(['Instrument Parameters'])
     # print(getinstdict, "\n")
@@ -78,13 +129,18 @@ def load_histogram_parameters(gpx, histname):
         "Z": instdict['Z'],
         # "SH/L": instdict['SH/L'],
     }
-    print(instparams)
+    print(ip)
 
     # populating list of refinement flags already active
-    for param in instparams:
-        if instparams[param][2] is True:
-            instreflist.append(param)
-    return instreflist, instparams, sampreflist, sampleparams
+    for param, val in ip.items():
+        # set instrument choices dict for UI
+        if isinstance(val[2], bool):
+            ic[param] = param
+            if val[2] is True:
+                irl.append(param)
+
+    return irl, ip, ic, srl, sp, sc
+"""
 
 
 def gsas_load_gpx(inputgpxfile):

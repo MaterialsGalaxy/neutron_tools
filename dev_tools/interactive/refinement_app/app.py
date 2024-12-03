@@ -9,6 +9,7 @@ from viewmodel import (
     view_hist_choices,
     view_proj_choices,
     inst_param_dict,
+    samp_param_dict,
     plot_powder,
     updatehistory,
     loadproject,
@@ -27,17 +28,14 @@ from viewmodel import (
     save_samp_params,
 )
 
-ui.page_opts(title="GSASII refinement: instrument parameters", fillable=True)
+ui.page_opts(title="GSASII refinement", fillable=True)
 
 with ui.navset_hidden(id="tab"):
     # hidden can be switched to a menu or pillset, so the further nav_menu
     # elements can be left alone if we want to change it later.
     with ui.nav_menu("Powder data"):
         with ui.nav_panel("Sample Parameters", value="Sample Parameters"):
-            samp_param_dict = {"Scale": "Scale",
-                               "DisplaceX": "Sample X displ. perp. to beam",
-                               "DisplaceY": "Sample Y displ. prll. to beam",
-                               "Absorption": "Sample Absorption"}
+
             ui.input_selectize(
                                 "samp_selection",
                                 "Select sample parameters to refine:",

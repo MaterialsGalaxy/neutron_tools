@@ -24,6 +24,8 @@ instparams = reactive.value(None)
 sampreflist = reactive.value()
 sampleparams = reactive.value(None)
 inputgpxfile = reactive.value()
+instchoices = reactive.value()
+sampchoices = reactive.value()
 
 x = reactive.value()
 y = reactive.value()
@@ -58,6 +60,11 @@ view_proj_choices = {"Notebook": "Notebook", "Controls": "Controls",
 inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U",
                    "V": "V", "W": "W", "X": "X", "Y": "Y",
                    "Z": "Z"}
+
+samp_param_dict = {"Scale": "Scale",
+                   "DisplaceX": "Sample X displ. perp. to beam",
+                   "DisplaceY": "Sample Y displ. prll. to beam",
+                   "Absorption": "Sample Absorption"}
 
 
 def updatenav(tab):
@@ -171,8 +178,11 @@ def buildinstpage():
     needed as Continuous Wave and Time of Flight experiments
     have different parameters
     """
-    # update the refinement flags
-    ui.update_selectize("inst_selection", selected=instreflist())
+    # update the refinement flags choices too
+    # and filter which inputs to show numerically/text
+    ui.update_selectize("inst_selection",
+                        choices=instchoices(),
+                        selected=instreflist())
     # previous = "inst_selection"
 
     # generate the new UI elements
@@ -186,24 +196,60 @@ def buildinstpage():
     # could make a dictionary of param keys to ui labels
 
     for param, val in instparams().items():
-        ui.insert_ui(
-            ui.input_numeric(param, param, value=val[1]),
-            selector="#"+previous,
-            where="afterEnd",
-        )
-        previous = param
+        if isinstance(val, list):
+            if (isinstance(val[1], float) and param != 'SH/L' and param != "Polariz."):
+
+                ui.insert_ui(
+                    ui.input_numeric(id=param, label=param, value=val[1]),
+                    selector="#"+previous,
+                    where="afterEnd",
+                )
+                previous = param
 
 
 def buildsamppage():
-    ui.update_selectize("samp_selection", selected=sampreflist())
+    # add updating the flag choices and filter which inputs to show
+    # numerically or text aswell.
+    ui.update_selectize("samp_selection",
+                        choices=sampchoices(),
+                        selected=sampreflist())
     previous = "sample"
     for param, val in sampleparams().items():
-        ui.insert_ui(
-            ui.input_numeric(param, param, value=val[0]),
-            selector="#"+previous,
-            where="afterEnd",
-        )
-        previous = param
+        if isinstance(val, list) and param != "Materials":
+            if isinstance(val[0], float):
+                ui.insert_ui(
+                    ui.input_numeric(id=param, label=param, value=val[0]),
+                    selector="#"+previous,
+                    where="afterEnd",
+                )
+                previous = param
+
+        if isinstance(val, float) and param != 'Gonio. radius':
+            ui.insert_ui(
+                ui.input_numeric(id=param, label=param, value=val),
+                selector="#"+previous,
+                where="afterEnd",
+                )
+            previous = param
+
+        if param == "InstrName":
+            ui.insert_ui(
+                ui.input_text(id=param, label="Instrument Name", value=val),
+                selector="#"+previous,
+                where="afterEnd",
+            )
+            previous = param
+
+        if param == "Type":
+            ui.insert_ui(
+                ui.input_select(id=param, label="Type:",
+                                choices={"Debye-Scherrer": "Debye-Scherrer",
+                                         "Bragg-Brentano": "Bragg-Brentano"},
+                                selected=val),
+                selector="#"+previous,
+                where="afterEnd",
+            )
+            previous = param
 
 
 def remove_samp_inputs():
@@ -261,12 +307,14 @@ def loadhist(histname):
         remove_inst_inputs()
         remove_samp_inputs()
         # set the new histogram parameters for the UI
-        irl, ip, srl, sp = load_histogram_parameters(gpx(), histname)
-        instreflist.set(irl)
-        instparams.set(ip)
-        sampreflist.set(srl)
-        sampleparams.set(sp)
-
+        # add flag choices dicts here
+        hp = load_histogram_parameters(gpx(), histname)
+        instreflist.set(hp[0])
+        instparams.set(hp[1])
+        instchoices.set(hp[2])
+        sampreflist.set(hp[3])
+        sampleparams.set(hp[4])
+        sampchoices.set(hp[5])
         # change how parameters are loaded
 
         # update the plots and the UI
@@ -372,9 +420,35 @@ def save_inst_params(app_input):
     """
     collects instrument parameter inputs and saves them to gpx
     """
+    # change this to change the full dictionary directly
+    # some inputs filtered out so need a reference for which inputs to take
     histname = app_input.selecthist()
     h = gpx().histogram(histname)
-    # copies current full instrument parameter dictionary
+    instdictfull = h.getHistEntryValue(['Instrument Parameters'])
+
+    tempip = instparams().copy()
+    # set all flags to false
+    for param in tempip:
+        if isinstance(tempip[param], list):
+            if len(tempip[param]) == 3:
+                if tempip[param][2]:
+                    instdictfull[0][param][2] = False
+
+    # add new refinement flags
+    instreflist.set(app_input.inst_selection())
+    for param in instreflist():
+        instdictfull[0][param][2] = True
+
+    # add new set values
+    for param in tempip:
+        if isinstance(tempip[param], list):
+            if isinstance(tempip[param][1], float) and param != "Polariz." and param != "SH/L":
+                instdictfull[0][param][1] = getattr(app_input, param)()
+
+    h.setHistEntryValue(['Instrument Parameters'],
+                        instdictfull)
+    instparams.set(tempip)
+    """    # copies current full instrument parameter dictionary
     # this is actually a list. [0] has the dict
     # [1] has a depracated GSAS1 thing
     instdictfull = h.getHistEntryValue(['Instrument Parameters'])
@@ -399,11 +473,7 @@ def save_inst_params(app_input):
 
     # copy the new dictionary back into the gpx histogram object
     h.setHistEntryValue(['Instrument Parameters'],
-                        instdictfull)
-
-    # set the new values for global reactive variables.
-    instreflist.set(irl)
-    instparams.set(ip)
+                        instdictfull)"""
 
 
 def save_samp_params(app_input):
@@ -412,8 +482,44 @@ def save_samp_params(app_input):
     """
     histname = app_input.selecthist()
     h = gpx().histogram(histname)
+    # change this to change the full dictionary directly
+    # some inputs filtered out so need a reference for which inputs to take
+    tempsp = sampleparams().copy()
+    # histname = app_input.selecthist()
+    # h = gpx().histogram(histname)
 
-    # gets sample refinement input
+    # set all flags to false
+    for vals in tempsp.values():
+        if isinstance(vals, list):
+            if vals[1]:
+                vals[1] = False
+
+    # set the new chosen flags
+    sampreflist.set(list(app_input.samp_selection()))
+    for param in sampreflist():
+        tempsp[param][1] = True
+
+    # set the new values
+    for param, vals in tempsp.items():
+        if hasattr(app_input, param):
+            if isinstance(vals, list):
+                vals[0] = getattr(app_input, param)()
+            else:
+                vals = getattr(app_input, param)()
+            h.setHistEntryValue(['Sample Parameters', param], vals)
+    sampleparams.set(tempsp)
+
+    """        if isinstance(vals, list) and param != "Materials":
+            if isinstance(vals[0], float):
+                vals[0] = getattr(app_input, param)()
+
+        elif isinstance(vals, float) and param != "Gonio. radius":
+            vals = getattr(app_input, param)()
+
+        elif vals == "InstrName" or vals == "Type":
+            vals = getattr(app_input, param)()"""
+
+    """    # gets sample refinement input
     srl = app_input.samp_selection()
 
     # copies sample parameters to avoid overwriting the underlying object
@@ -429,7 +535,7 @@ def save_samp_params(app_input):
 
     # update the reactive values / global values
     sampreflist.set(srl)
-    sampleparams.set(sp)
+    sampleparams.set(sp)"""
 
 
 def submitout():
