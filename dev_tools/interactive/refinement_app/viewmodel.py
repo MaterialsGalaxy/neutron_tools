@@ -415,6 +415,44 @@ def loadproject(id):
         # load data for a histogram/clear previous histogram data
         loadhist(list(histnames.keys())[0])
 
+    """def save_inst_params(app_input):
+
+    collects instrument parameter inputs and saves them to gpx
+
+    histname = app_input.selecthist()
+    h = gpx().histogram(histname)
+    # copies current full instrument parameter dictionary
+    # this is actually a list. [0] has the dict
+    # [1] has a depracated GSAS1 thing
+    instdictfull = h.getHistEntryValue(["Instrument Parameters"])
+
+    # set refinement flags
+    irl = app_input.inst_selection()
+
+    # copies instrument  parameters to avoid overwriting the underlying object
+    ip = instparams().copy()
+    instrefdict = {"Instrument Parameters": irl}
+    h.set_refinements(instrefdict)
+
+    # set the refinement flags directly in the dictionary too, so they show up
+    # if reloading the project file when no rfinement ahve run
+    for param in irl:
+        ip[param][2] = True
+
+    # just edit this to add validation for the types
+
+    # update the new parameter values
+    for param in ip:
+        ip[param][1] = getattr(app_input, param)()
+        instdictfull[0][param] = ip[param]
+
+    # copy the new dictionary back into the gpx histogram object
+    h.setHistEntryValue(["Instrument Parameters"], instdictfull)
+
+    # set the new values for global reactive variables.
+    instreflist.set(irl)
+    instparams.set(ip)"""
+
 
 def save_inst_params(app_input):
     """
@@ -424,30 +462,35 @@ def save_inst_params(app_input):
     # some inputs filtered out so need a reference for which inputs to take
     histname = app_input.selecthist()
     h = gpx().histogram(histname)
-    instdictfull = h.getHistEntryValue(['Instrument Parameters'])
+    instdictfull = h.getHistEntryValue(["Instrument Parameters"])
+    irl = app_input.inst_selection()
+    ip = instparams().copy()
 
-    tempip = instparams().copy()
     # set all flags to false
-    for param in tempip:
-        if isinstance(tempip[param], list):
-            if len(tempip[param]) == 3:
-                if tempip[param][2]:
+    for param in ip:
+        if isinstance(ip[param], list):
+            if len(ip[param]) == 3:
+                if ip[param][2]:
                     instdictfull[0][param][2] = False
 
     # add new refinement flags
-    instreflist.set(app_input.inst_selection())
-    for param in instreflist():
+
+    instrefdict = {"Instrument Parameters": irl}
+    h.set_refinements(instrefdict)
+
+    for param in irl:
         instdictfull[0][param][2] = True
 
     # add new set values
-    for param in tempip:
-        if isinstance(tempip[param], list):
-            if isinstance(tempip[param][1], float) and param != "Polariz." and param != "SH/L":
+    for param in ip:
+        if isinstance(ip[param], list):
+            if isinstance(ip[param][1], float) and param != "Polariz." and param != "SH/L":
                 instdictfull[0][param][1] = getattr(app_input, param)()
 
-    h.setHistEntryValue(['Instrument Parameters'],
+    h.setHistEntryValue(["Instrument Parameters"],
                         instdictfull)
-    instparams.set(tempip)
+    instparams.set(ip)
+    instreflist.set(irl)
 
     """def save_samp_params(app_input):
 
