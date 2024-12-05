@@ -29,10 +29,6 @@ def hist_export(gpx, histname):
     bkg = np.array(h.getdata("Background"))
 
     return x, y, ycalc, dy, bkg
-    # for i, h in enumerate(gpx.histograms()):
-    # hfil = os.path.splitext(gpx_file)[0]+'_'+str(i)  # file to write
-    # print('\t', h.name, hfil+'.csv')
-    # h.Export(hfil, '.csv')
 
 
 def load_histogram_parameters(gpx, histname):
@@ -75,75 +71,6 @@ def load_histogram_parameters(gpx, histname):
                     irl.append(param)
 
     return (irl, ip, ic, srl, sp, sc)
-
-
-"""
-def load_histogram_parameters(gpx, histname):
-
-    loads a subset of sample and isntrument parameters and refinement
-    flags of interest for the UI. Could be extended to everything.
-
-    h = gpx.histogram(histname)
-
-    # Change to full dictionaries
-    # add returning of choices dictionary for refinement flags
-
-    # dictionary of subset of sample parameters values of interest
-    sampleparams = {
-        "Scale": h.getHistEntryValue(['Sample Parameters', 'Scale']),
-        "DisplaceX": h.getHistEntryValue(['Sample Parameters', 'DisplaceX']),
-        "DisplaceY": h.getHistEntryValue(['Sample Parameters', 'DisplaceY']),
-        "Absorption": h.getHistEntryValue(['Sample Parameters', 'Absorption']),
-    }
-    sp = h.getHistEntryValue(['Sample Parameters'])
-    ip = h.getHistEntryValue(['Instrument Parameters'])[0]
-    srl = []
-    irl = []
-    sc = {}
-    ic = {}
-    # populating list of sample refinements that are already active
-    for param, val in sp.items():
-        # set sample choices dict for UI
-        if isinstance(val[1], bool):
-            sc[param] = param
-            if val[1] is True:
-                srl.append(param)
-
-    # debugging print statements
-    print(h.getHistEntryValue(['Instrument Parameters'])[0]['Lam'])
-    print(h.getHistEntryValue(['Instrument Parameters']))
-
-    # full instrument parameter dictionary
-    # instparams = h.getHistEntryValue(['Instrument Parameters'])[0]
-    # print tests
-    # getinstdict = h.getHistEntryValue(['Instrument Parameters'])
-    # print(getinstdict, "\n")
-    # print(getinstdict["Zero"], "\n")
-
-    # subset dictionary of instrument parameters of interest
-    instparams = {
-        "Lam": instdict['Lam'],
-        "Zero": instdict['Zero'],
-        "U": instdict['U'],
-        "V": instdict['V'],
-        "W": instdict['W'],
-        "X": instdict['X'],
-        "Y": instdict['Y'],
-        "Z": instdict['Z'],
-        # "SH/L": instdict['SH/L'],
-    }
-    print(ip)
-
-    # populating list of refinement flags already active
-    for param, val in ip.items():
-        # set instrument choices dict for UI
-        if isinstance(val[2], bool):
-            ic[param] = param
-            if val[2] is True:
-                irl.append(param)
-
-    return irl, ip, ic, srl, sp, sc
-"""
 
 
 def gsas_load_gpx(inputgpxfile):

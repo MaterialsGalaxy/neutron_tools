@@ -230,14 +230,27 @@ def buildsamppage():
     # numerically or text aswell.
     ui.update_selectize("samp_selection", choices=sampchoices(), selected=sampreflist())
     previous = "sample"
-    sample_hidden_list = ["Materials", "Gonio. radius", "FreePrm1", "FreePrm2",
-                          "FreePrm3", "ranId", "Time",
-                          "Thick", "Constrast",
-                          "Trans", "SlitLen", "Shift", "Transparency",
-                          "Temperature", "Pressure",
-                          "Omega", "Chi", "Phi",
-                          "Azimuth",
-                          ]
+    sample_hidden_list = [
+        "Materials",
+        "Gonio. radius",
+        "FreePrm1",
+        "FreePrm2",
+        "FreePrm3",
+        "ranId",
+        "Time",
+        "Thick",
+        "Constrast",
+        "Trans",
+        "SlitLen",
+        "Shift",
+        "Transparency",
+        "Temperature",
+        "Pressure",
+        "Omega",
+        "Chi",
+        "Phi",
+        "Azimuth",
+    ]
     sample_UI_list = []
     for param, val in sampleparams().items():
         if param not in sample_hidden_list:
@@ -298,26 +311,6 @@ def remove_inst_inputs():
     if instparams() is not None:
         for param in instparams().keys():
             ui.remove_ui(selector="div:has(> " + "#" + param + ")")
-
-
-def update_hist_samp_ui():
-    """
-    update sample parameters UI elements with data
-    from the last selected histogram
-    """
-    ui.update_selectize("samp_selection", selected=sampreflist())
-    for param, val in sampleparams().items():
-        ui.update_numeric(param, value=val[0])
-
-
-def update_hist_inst_ui():
-    """
-    update instrument parameters UI elements with data
-    from the last selected histogram
-    """
-    ui.update_selectize("inst_selection", selected=instreflist())
-    for param, val in instparams().items():
-        ui.update_numeric(param, value=val[1])
 
 
 def viewhist():
@@ -450,44 +443,6 @@ def loadproject(id):
         # load data for a histogram/clear previous histogram data
         loadhist(list(histnames.keys())[0])
 
-    """def save_inst_params(app_input):
-
-    collects instrument parameter inputs and saves them to gpx
-
-    histname = app_input.selecthist()
-    h = gpx().histogram(histname)
-    # copies current full instrument parameter dictionary
-    # this is actually a list. [0] has the dict
-    # [1] has a depracated GSAS1 thing
-    instdictfull = h.getHistEntryValue(["Instrument Parameters"])
-
-    # set refinement flags
-    irl = app_input.inst_selection()
-
-    # copies instrument  parameters to avoid overwriting the underlying object
-    ip = instparams().copy()
-    instrefdict = {"Instrument Parameters": irl}
-    h.set_refinements(instrefdict)
-
-    # set the refinement flags directly in the dictionary too, so they show up
-    # if reloading the project file when no rfinement ahve run
-    for param in irl:
-        ip[param][2] = True
-
-    # just edit this to add validation for the types
-
-    # update the new parameter values
-    for param in ip:
-        ip[param][1] = getattr(app_input, param)()
-        instdictfull[0][param] = ip[param]
-
-    # copy the new dictionary back into the gpx histogram object
-    h.setHistEntryValue(["Instrument Parameters"], instdictfull)
-
-    # set the new values for global reactive variables.
-    instreflist.set(irl)
-    instparams.set(ip)"""
-
 
 def save_inst_params(app_input):
     """
@@ -526,31 +481,6 @@ def save_inst_params(app_input):
     h.setHistEntryValue(["Instrument Parameters"], instdictfull)
     instparams.set(ip)
     instreflist.set(irl)
-
-    """def save_samp_params(app_input):
-
-    histname = app_input.selecthist()
-    h = gpx().histogram(histname)
-
-    # gets sample refinement input
-    srl = app_input.samp_selection()
-
-    # copies sample parameters to avoid overwriting the underlying object
-    sp = sampleparams().copy()
-    # set the refinement flag in the dictionary itself
-    for param in srl:
-        sp[param][1] = True
-
-    # add validation here for different params
-
-    # set the new values in the gpx object
-    for param in sp:
-        sp[param][0] = getattr(app_input, param)()
-        h.setHistEntryValue(['Sample Parameters', param], sp[param])
-
-    # update the reactive values / global values
-    sampreflist.set(srl)
-    sampleparams.set(sp)"""
 
 
 def save_samp_params(app_input):
