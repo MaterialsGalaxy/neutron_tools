@@ -12,6 +12,7 @@ from viewmodel import (
     samp_param_dict,
     sampleparams,
     instparams,
+    sampUIlist,
     plot_powder,
     updatehistory,
     loadproject,
@@ -39,11 +40,11 @@ with ui.navset_hidden(id="tab"):
         with ui.nav_panel("Sample Parameters", value="Sample Parameters"):
 
             ui.input_selectize(
-                                "samp_selection",
-                                "Select sample parameters to refine:",
-                                samp_param_dict,
-                                multiple=True,
-                                selected=None,
+                "samp_selection",
+                "Select sample parameters to refine:",
+                samp_param_dict,
+                multiple=True,
+                selected=None,
             )
             with ui.navset_hidden(id="sample"):
                 with ui.nav_panel(""):
@@ -62,23 +63,22 @@ with ui.navset_hidden(id="tab"):
             @render.code
             @reactive.event(input.savesamp)
             def app_render_save_samp():
-                return sampleparams()
+                return sampUIlist(), sampleparams()
 
-        with ui.nav_panel("Instrument Refinements",
-                          value="Instrument Parameters"):
-            ui.input_selectize("inst_selection",
-                               "Select instrument parameters to refine:",
-                               inst_param_dict,
-                               multiple=True,
-                               selected=None,
-                               )
+        with ui.nav_panel("Instrument Refinements", value="Instrument Parameters"):
+            ui.input_selectize(
+                "inst_selection",
+                "Select instrument parameters to refine:",
+                inst_param_dict,
+                multiple=True,
+                selected=None,
+            )
 
             with ui.navset_hidden(id="instruments"):
                 with ui.nav_panel("Instrument Parameter Values"):
                     "Set values:"
 
-            ui.input_action_button("saveinst",
-                                   "save instrument parameters")
+            ui.input_action_button("saveinst", "save instrument parameters")
 
             @reactive.effect
             @reactive.event(input.saveinst)
@@ -102,8 +102,9 @@ with ui.navset_hidden(id="tab"):
                 @render.data_frame
                 @reactive.event(input.updateatoms)
                 def renderatomtable():
-                    return render.DataTable(atomdata(input.selectphase()),
-                                            editable=True)
+                    return render.DataTable(
+                        atomdata(input.selectphase()), editable=True
+                    )
 
                 ui.input_action_button("saveatoms", "Save atoms changes")
 
@@ -121,22 +122,21 @@ with ui.navset_hidden(id="tab"):
         with ui.nav_panel("Constraints", value="Constraints"):
 
             "Current Phase Constraints:"
+
             @render.code
             def app_showphaseconstr():
                 return showphaseconstr()
+
             with ui.layout_column_wrap():
                 with ui.card():
                     ui.card_header("Add new constraint")
-                    constraint_types = {"eqv": "equivalence",
-                                        "eqn": "equation"}
-                    ui.input_select("constr_type", "constraint type",
-                                    constraint_types)
+                    constraint_types = {"eqv": "equivalence", "eqn": "equation"}
+                    ui.input_select("constr_type", "constraint type", constraint_types)
 
                     @render.data_frame
                     def new_constr():
-                        codes = render_constr_table.data_view(
-                                selected=True)[['code']]
-                        codes['coefficients'] = 1
+                        codes = render_constr_table.data_view(selected=True)[["code"]]
+                        codes["coefficients"] = 1
                         return render.DataTable(codes, editable=True)
 
                     ui.input_action_button("add_constr", "add constraint")
@@ -154,9 +154,9 @@ with ui.navset_hidden(id="tab"):
                     def render_constr_table():
                         pn = input.selectphase()
                         constr_df = build_constraints_df(pn)
-                        return render.DataTable(constr_df,
-                                                selection_mode="rows",
-                                                filters=True)
+                        return render.DataTable(
+                            constr_df, selection_mode="rows", filters=True
+                        )
 
         with ui.nav_panel("Restraints", value="Restraints"):
             "Restraints"
@@ -180,12 +180,12 @@ with ui.navset_pill(id="plot"):
         def renderupdatehistory():
             return render.DataTable(histdata())
 
-with ui.sidebar(bg="#f8f8f8", position='left'):
+
+with ui.sidebar(bg="#f8f8f8", position="left"):
 
     ui.input_action_button("updatehist", "update history")
 
-    ui.input_select("selectgpx", "load GSASII project:",
-                    gpx_choices)
+    ui.input_select("selectgpx", "load GSASII project:", gpx_choices)
     ui.input_action_button("loadgpx", "Load project")
 
     ui.input_select("viewprojdata", "View project data", view_proj_choices)

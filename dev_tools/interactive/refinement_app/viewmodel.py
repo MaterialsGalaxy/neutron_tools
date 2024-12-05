@@ -11,6 +11,7 @@ from gsasIImodel import (
 )
 import matplotlib.pyplot as plt
 import typing
+
 """contains all reactive events functions and variables
 and processes all logic from the ui, GSASII and galaxy history models.
 note functions defined here cannot directly access inputs from view.
@@ -26,6 +27,7 @@ sampleparams = reactive.value(None)
 inputgpxfile = reactive.value()
 instchoices = reactive.value()
 sampchoices = reactive.value()
+sampUIlist = reactive.value([])
 
 x = reactive.value()
 y = reactive.value()
@@ -38,33 +40,42 @@ constraints = reactive.value()
 
 # initial values for sidebar selections when no project is loaded
 # reactive values for when projects are loaded
-gpx_choices = {"init":
-               "update the history before loading a new project"}
+gpx_choices = {"init": "update the history before loading a new project"}
 select_gpx_choices = reactive.value(gpx_choices)
 
-phase_choices = {"init":
-                 "Load a project before selecting a phase"}
+phase_choices = {"init": "Load a project before selecting a phase"}
 select_phase_choices = reactive.value(phase_choices)
 
-hist_choices = {"init":
-                "Load a project before selecting a histogram"}
+hist_choices = {"init": "Load a project before selecting a histogram"}
 select_hist_choices = reactive.value(hist_choices)
-view_hist_choices = {"init":
-                     "Load a project before selecting a histogram"}
+view_hist_choices = {"init": "Load a project before selecting a histogram"}
 select_view_hist = reactive.value(view_hist_choices)
 
-view_proj_choices = {"Notebook": "Notebook", "Controls": "Controls",
-                     "Constraints": "Constraints", "Restraints": "Restraints",
-                     "Rigid Bodies": "Rigid Bodies"}
+view_proj_choices = {
+    "Notebook": "Notebook",
+    "Controls": "Controls",
+    "Constraints": "Constraints",
+    "Restraints": "Restraints",
+    "Rigid Bodies": "Rigid Bodies",
+}
 
-inst_param_dict = {"Lam": "Lam", "Zero": "Zero", "U": "U",
-                   "V": "V", "W": "W", "X": "X", "Y": "Y",
-                   "Z": "Z"}
+inst_param_dict = {
+    "Lam": "Lam",
+    "Zero": "Zero",
+    "U": "U",
+    "V": "V",
+    "W": "W",
+    "X": "X",
+    "Y": "Y",
+    "Z": "Z",
+}
 
-samp_param_dict = {"Scale": "Scale",
-                   "DisplaceX": "Sample X displ. perp. to beam",
-                   "DisplaceY": "Sample Y displ. prll. to beam",
-                   "Absorption": "Sample Absorption"}
+samp_param_dict = {
+    "Scale": "Scale",
+    "DisplaceX": "Sample X displ. perp. to beam",
+    "DisplaceY": "Sample Y displ. prll. to beam",
+    "Absorption": "Sample Absorption",
+}
 
 
 def updatenav(tab):
@@ -116,13 +127,14 @@ def build_constraints_df(phasename):
         for atom in phase.atoms():
 
             # generate the code GSASII needs for constraint functions
-            code = str(phase.id)+"::"+param+":"+str(i)
+            code = str(phase.id) + "::" + param + ":" + str(i)
 
             i += 1
             constraint_vals = [code, phasename, param, atom.label]
             constraint_record = dict(zip(constraint_cols, constraint_vals))
-            phase_constr_df = phase_constr_df._append(constraint_record,
-                                                      ignore_index=True)
+            phase_constr_df = phase_constr_df._append(
+                constraint_record, ignore_index=True
+            )
     return phase_constr_df
 
 
@@ -143,8 +155,8 @@ def saveatomtable(df, phasename):
 
     phase = gpx().phase(phasename)
     for atom in phase.atoms():
-        atomrecord = df.loc[df['Name'] == atom.label]
-        atom.refinement_flags = atomrecord.iloc[0]['refine']
+        atomrecord = df.loc[df["Name"] == atom.label]
+        atom.refinement_flags = atomrecord.iloc[0]["refine"]
 
 
 def atomdata(phasename):
@@ -156,15 +168,22 @@ def atomdata(phasename):
     phase = gpx().phase(phasename)
 
     # initialise the dataframe
-    atomcols = ["Name", "type", "refine", "x", "y", "z",
-                "frac", "multi", "Uiso"]
+    atomcols = ["Name", "type", "refine", "x", "y", "z", "frac", "multi", "Uiso"]
     atomframe = pd.DataFrame(columns=atomcols)
 
     # populate the dataframe with data from the project
     for atom in phase.atoms():
-        atomvals = [atom.label, atom.type, atom.refinement_flags,
-                    atom.coordinates[0], atom.coordinates[1],
-                    atom.coordinates[2], atom.occupancy, atom.mult, atom.uiso]
+        atomvals = [
+            atom.label,
+            atom.type,
+            atom.refinement_flags,
+            atom.coordinates[0],
+            atom.coordinates[1],
+            atom.coordinates[2],
+            atom.occupancy,
+            atom.mult,
+            atom.uiso,
+        ]
         atomrecord = dict(zip(atomcols, atomvals))
         atomframe = atomframe._append(atomrecord, ignore_index=True)
 
@@ -180,9 +199,7 @@ def buildinstpage():
     """
     # update the refinement flags choices too
     # and filter which inputs to show numerically/text
-    ui.update_selectize("inst_selection",
-                        choices=instchoices(),
-                        selected=instreflist())
+    ui.update_selectize("inst_selection", choices=instchoices(), selected=instreflist())
     # previous = "inst_selection"
 
     # generate the new UI elements
@@ -198,11 +215,11 @@ def buildinstpage():
     for param, val in instparams().items():
         if isinstance(val, list):
             if isinstance(val[0], float) or isinstance(val[1], float):
-                if param != 'SH/L' and param != "Polariz.":
+                if param != "SH/L" and param != "Polariz.":
 
                     ui.insert_ui(
                         ui.input_numeric(id=param, label=param, value=val[1]),
-                        selector="#"+previous,
+                        selector="#" + previous,
                         where="afterEnd",
                     )
                     previous = param
@@ -211,58 +228,76 @@ def buildinstpage():
 def buildsamppage():
     # add updating the flag choices and filter which inputs to show
     # numerically or text aswell.
-    ui.update_selectize("samp_selection",
-                        choices=sampchoices(),
-                        selected=sampreflist())
+    ui.update_selectize("samp_selection", choices=sampchoices(), selected=sampreflist())
     previous = "sample"
+    sample_hidden_list = ["Materials", "Gonio. radius", "FreePrm1", "FreePrm2",
+                          "FreePrm3", "ranId", "Time",
+                          "Thick", "Constrast",
+                          "Trans", "SlitLen", "Shift", "Transparency",
+                          "Temperature", "Pressure",
+                          "Omega", "Chi", "Phi",
+                          "Azimuth",
+                          ]
+    sample_UI_list = []
     for param, val in sampleparams().items():
-        if isinstance(val, list) and param != "Materials":
-            if isinstance(val[0], float):
+        if param not in sample_hidden_list:
+            if isinstance(val, list):
+                if isinstance(val[0], float):
+                    ui.insert_ui(
+                        ui.input_numeric(id=param, label=param, value=val[0]),
+                        selector="#" + previous,
+                        where="afterEnd",
+                    )
+                    sample_UI_list.append(param)
+                    previous = param
+
+            if isinstance(val, float):
                 ui.insert_ui(
-                    ui.input_numeric(id=param, label=param, value=val[0]),
-                    selector="#"+previous,
+                    ui.input_numeric(id=param, label=param, value=val),
+                    selector="#" + previous,
                     where="afterEnd",
                 )
+                sample_UI_list.append(param)
                 previous = param
 
-        if isinstance(val, float) and param != 'Gonio. radius':
-            ui.insert_ui(
-                ui.input_numeric(id=param, label=param, value=val),
-                selector="#"+previous,
-                where="afterEnd",
+            if param == "InstrName":
+                ui.insert_ui(
+                    ui.input_text(id=param, label="Instrument Name", value=val),
+                    selector="#" + previous,
+                    where="afterEnd",
                 )
-            previous = param
+                sample_UI_list.append(param)
+                previous = param
 
-        if param == "InstrName":
-            ui.insert_ui(
-                ui.input_text(id=param, label="Instrument Name", value=val),
-                selector="#"+previous,
-                where="afterEnd",
-            )
-            previous = param
-
-        if param == "Type":
-            ui.insert_ui(
-                ui.input_select(id=param, label="Type:",
-                                choices={"Debye-Scherrer": "Debye-Scherrer",
-                                         "Bragg-Brentano": "Bragg-Brentano"},
-                                selected=val),
-                selector="#"+previous,
-                where="afterEnd",
-            )
-            previous = param
+            if param == "Type":
+                ui.insert_ui(
+                    ui.input_select(
+                        id=param,
+                        label="Type:",
+                        choices={
+                            "Debye-Scherrer": "Debye-Scherrer",
+                            "Bragg-Brentano": "Bragg-Brentano",
+                        },
+                        selected=val,
+                    ),
+                    selector="#" + previous,
+                    where="afterEnd",
+                )
+                sample_UI_list.append(param)
+                previous = param
+    sampUIlist.set(sample_UI_list)
 
 
 def remove_samp_inputs():
     if sampleparams() is not None:
         for param in sampleparams().keys():
-            ui.remove_ui(selector="div:has(> "+"#"+param+")", immediate=True)
+            ui.remove_ui(selector="div:has(> " + "#" + param + ")")
 
 
 def remove_inst_inputs():
     if instparams() is not None:
         for param in instparams().keys():
-            ui.remove_ui(selector="div:has(> "+"#"+param+")", immediate=True)
+            ui.remove_ui(selector="div:has(> " + "#" + param + ")")
 
 
 def update_hist_samp_ui():
@@ -349,9 +384,9 @@ def plot_powder(histname):
     plots the powder histogram data from the current project
     """
     update_plot(gpx(), histname)
-    plt.scatter(x(), y(), c='blue')
-    plt.plot(x(), ycalc(), c='green')
-    plt.plot(x(), bkg(), c='red')
+    plt.scatter(x(), y(), c="blue")
+    plt.plot(x(), ycalc(), c="green")
+    plt.plot(x(), bkg(), c="red")
     plt.title("Powder histogram")
     plt.xlabel("2 Theta")
     plt.ylabel("intensity")
@@ -367,8 +402,7 @@ def updatehistory():
     histframe = pd.DataFrame(history)
     histtable = histframe[["hid", "name", "id"]]
     histdata.set(histtable)
-    choicedict = dict([(i, fn) for i, fn in zip(histtable['id'],
-                                                histtable['name'])])
+    choicedict = dict([(i, fn) for i, fn in zip(histtable["id"], histtable["name"])])
     select_gpx_choices.set(choicedict)  # dictionary with {ID:name}
     ui.update_select("selectgpx", choices=select_gpx_choices())
 
@@ -489,8 +523,7 @@ def save_inst_params(app_input):
                 if param != "Polariz." and param != "SH/L":
                     instdictfull[0][param][1] = getattr(app_input, param)()
 
-    h.setHistEntryValue(["Instrument Parameters"],
-                        instdictfull)
+    h.setHistEntryValue(["Instrument Parameters"], instdictfull)
     instparams.set(ip)
     instreflist.set(irl)
 
@@ -544,16 +577,18 @@ def save_samp_params(app_input):
 
     # set the new values
     for param in sp:
-
-        if hasattr(app_input, param)():
+        if param in sampUIlist():
 
             if isinstance(sp[param], list):
                 sp[param][0] = getattr(app_input, param)()
-
+                print("a")
+            elif param == "Type":
+                sp[param] = getattr(app_input, param)()
             else:
+                print("b")
                 sp[param] = getattr(app_input, param)()
 
-            h.setHistEntryValue(['Sample Parameters', param], sp[param])
+            h.setHistEntryValue(["Sample Parameters", param], sp[param])
 
     # update the reactive values / global values
     sampreflist.set(srl)

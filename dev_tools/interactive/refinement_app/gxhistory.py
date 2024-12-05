@@ -7,7 +7,7 @@ import os
 Some may not be necessary and anything here should probably be referenced?
 """
 
-DEBUG = os.environ.get('DEBUG', "False").lower() == 'true'
+DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 if DEBUG:
     logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("bioblend").setLevel(logging.CRITICAL)
@@ -15,22 +15,21 @@ log = logging.getLogger()
 
 
 def _get_ip():
-    """Get IP address for the docker host
-    """
-    cmd_netstat = ['netstat', '-nr']
+    """Get IP address for the docker host"""
+    cmd_netstat = ["netstat", "-nr"]
     p1 = subprocess.Popen(cmd_netstat, stdout=subprocess.PIPE)
-    cmd_grep = ['grep', '^0\.0\.0\.0']
+    cmd_grep = ["grep", "^0\.0\.0\.0"]
     p2 = subprocess.Popen(cmd_grep, stdin=p1.stdout, stdout=subprocess.PIPE)
-    cmd_awk = ['awk', '{ print $2 }']
+    cmd_awk = ["awk", "{ print $2 }"]
     p3 = subprocess.Popen(cmd_awk, stdin=p2.stdout, stdout=subprocess.PIPE)
     galaxy_ip = p3.stdout.read()
-    log.debug('Host IP determined to be %s', galaxy_ip)
+    log.debug("Host IP determined to be %s", galaxy_ip)
     return galaxy_ip
 
 
 def get_galaxy_connection(history_id=None, obj=True):
     # history_id = history_id or os.environ['HISTORY_ID']
-    key = os.environ['API_KEY']
+    key = os.environ["API_KEY"]
     """
     Customised/Raw galaxy_url
     galaxy_ip = _get_ip()
@@ -54,40 +53,50 @@ def get_galaxy_connection(history_id=None, obj=True):
     url = built_galaxy_url.rstrip('/')
     url = os.environ['GALAXY_URL'].rstrip('/')
     """
-    url = 'http://host-172-16-101-76.nubes.stfc.ac.uk/'
+    url = "http://host-172-16-101-76.nubes.stfc.ac.uk/"
     gi = GalaxyInstance(url=url, key=key)
     # gi.histories.get_histories(history_id)
     return gi
 
 
-def put(filename, file_type='auto', history_id=None):
+def put(filename, file_type="auto", history_id=None):
     """
-        Given a filename of any file accessible to the docker instance, this
-        function will upload that file to galaxy using the current history.
-        Does not return anything.
+    Given a filename of any file accessible to the docker instance, this
+    function will upload that file to galaxy using the current history.
+    Does not return anything.
     """
 
     gi = get_galaxy_connection(history_id=history_id)
-    history_id = os.environ['HISTORY_ID']
-    log.debug('Uploading gx=%s history=%s localpath=%s ft=%s', gi, history_id,
-              filename, file_type)
+    history_id = os.environ["HISTORY_ID"]
+    log.debug(
+        "Uploading gx=%s history=%s localpath=%s ft=%s",
+        gi,
+        history_id,
+        filename,
+        file_type,
+    )
     # history = gi.histories.get(history_id)
     # history.upload_file(filename, file_type=file_type)
     gi.tools.upload_file(filename, history_id)
 
 
 def updateHist():
-    history_id = os.environ['HISTORY_ID']
+    history_id = os.environ["HISTORY_ID"]
     gi = get_galaxy_connection(history_id=history_id)
-    history = gi.histories.show_history(history_id=history_id, contents=True,
-                                        deleted=False, visible=True,
-                                        types=['dataset'],
-                                        keys=['Id', 'Hid', 'Name'])
+    history = gi.histories.show_history(
+        history_id=history_id,
+        contents=True,
+        deleted=False,
+        visible=True,
+        types=["dataset"],
+        keys=["Id", "Hid", "Name"],
+    )
     return history
 
 
 def getproject(dataset_id, filep):
-    history_id = os.environ['HISTORY_ID']
+    history_id = os.environ["HISTORY_ID"]
     gi = get_galaxy_connection(history_id=history_id)
-    gi.datasets.download_dataset(dataset_id=dataset_id, file_path=filep,
-                                 use_default_filename=False)
+    gi.datasets.download_dataset(
+        dataset_id=dataset_id, file_path=filep, use_default_filename=False
+    )

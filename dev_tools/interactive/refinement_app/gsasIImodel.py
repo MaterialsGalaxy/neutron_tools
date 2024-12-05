@@ -1,6 +1,8 @@
 import sys
+
 # import os
 import numpy as np
+
 sys.path.append("/srv/shiny-server/GSASII")
 sys.path.append("/home/mkscd/miniconda3/envs/GSASII/GSAS-II/GSASII")
 import GSASIIscriptable as G2sc  # type: ignore
@@ -11,7 +13,7 @@ def load_phase_constraints(gpx):
     load the phase constraints previously added to the project
     seems to not be readable
     """
-    phase_constraint_list = gpx.get_Constraints('Phase')
+    phase_constraint_list = gpx.get_Constraints("Phase")
     return phase_constraint_list
 
 
@@ -35,8 +37,8 @@ def hist_export(gpx, histname):
 
 def load_histogram_parameters(gpx, histname):
     h = gpx.histogram(histname)
-    sampledict = h.getHistEntryValue(['Sample Parameters'])
-    instdict = h.getHistEntryValue(['Instrument Parameters'])[0]
+    sampledict = h.getHistEntryValue(["Sample Parameters"])
+    instdict = h.getHistEntryValue(["Instrument Parameters"])[0]
     sp = {}
     ip = {}
     # initialise parameter dictionaries with fixed keynames
@@ -54,8 +56,7 @@ def load_histogram_parameters(gpx, histname):
     irl = []
     sc = {}
     ic = {}
-    inst_noref_list = ["Type", "Bank", "Lam1", "Lam2",
-                       "Azimuth", "2-theta", "fltPath"]
+    inst_noref_list = ["Type", "Bank", "Lam1", "Lam2", "Azimuth", "2-theta", "fltPath"]
     # populating list of sample refinements that are already active
     for param, val in sp.items():
         # set sample choices dict for UI
@@ -147,8 +148,8 @@ def load_histogram_parameters(gpx, histname):
 
 def gsas_load_gpx(inputgpxfile):
     """loads gpx from input file and saves it to output file
-        the current project is in outputfile so the loaded ones
-        from the galaxy history remain unchanged"""
+    the current project is in outputfile so the loaded ones
+    from the galaxy history remain unchanged"""
     gpx = G2sc.G2Project(gpxfile=inputgpxfile, newgpx="output.gpx")
     gpx.save()
     return gpx
