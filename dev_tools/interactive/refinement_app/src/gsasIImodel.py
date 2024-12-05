@@ -4,7 +4,7 @@ import sys
 import numpy as np
 
 sys.path.append("/srv/shiny-server/GSASII")
-sys.path.append("/home/mkscd/miniconda3/envs/GSASII/GSAS-II/GSASII")
+
 import GSASIIscriptable as G2sc  # type: ignore
 
 
