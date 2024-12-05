@@ -10,6 +10,8 @@ from viewmodel import (
     view_proj_choices,
     inst_param_dict,
     samp_param_dict,
+    sampleparams,
+    instparams,
     plot_powder,
     updatehistory,
     loadproject,
@@ -57,6 +59,11 @@ with ui.navset_hidden(id="tab"):
             def app_savesamp():
                 save_samp_params(input)
 
+            @render.code
+            @reactive.event(input.savesamp)
+            def app_render_save_samp():
+                return sampleparams()
+
         with ui.nav_panel("Instrument Refinements",
                           value="Instrument Parameters"):
             ui.input_selectize("inst_selection",
@@ -77,6 +84,11 @@ with ui.navset_hidden(id="tab"):
             @reactive.event(input.saveinst)
             def app_saveinst():
                 save_inst_params(input)
+
+            @render.code
+            @reactive.event(input.saveinst)
+            def app_render_save_inst():
+                return instparams()
 
     with ui.nav_panel("Phase", value="Phase"):
         with ui.navset_pill(id="phases"):

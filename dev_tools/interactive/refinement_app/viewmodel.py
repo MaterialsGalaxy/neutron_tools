@@ -197,14 +197,15 @@ def buildinstpage():
 
     for param, val in instparams().items():
         if isinstance(val, list):
-            if (isinstance(val[1], float) and param != 'SH/L' and param != "Polariz."):
+            if isinstance(val[0], float) or isinstance(val[1], float):
+                if param != 'SH/L' and param != "Polariz.":
 
-                ui.insert_ui(
-                    ui.input_numeric(id=param, label=param, value=val[1]),
-                    selector="#"+previous,
-                    where="afterEnd",
-                )
-                previous = param
+                    ui.insert_ui(
+                        ui.input_numeric(id=param, label=param, value=val[1]),
+                        selector="#"+previous,
+                        where="afterEnd",
+                    )
+                    previous = param
 
 
 def buildsamppage():
@@ -484,8 +485,9 @@ def save_inst_params(app_input):
     # add new set values
     for param in ip:
         if isinstance(ip[param], list):
-            if isinstance(ip[param][1], float) and param != "Polariz." and param != "SH/L":
-                instdictfull[0][param][1] = getattr(app_input, param)()
+            if isinstance(ip[param][0], float) or isinstance(ip[param][1], float):
+                if param != "Polariz." and param != "SH/L":
+                    instdictfull[0][param][1] = getattr(app_input, param)()
 
     h.setHistEntryValue(["Instrument Parameters"],
                         instdictfull)
@@ -542,11 +544,15 @@ def save_samp_params(app_input):
 
     # set the new values
     for param in sp:
-        if hasattr(app_input, param):
+
+        if hasattr(app_input, param)():
+
             if isinstance(sp[param], list):
                 sp[param][0] = getattr(app_input, param)()
+
             else:
                 sp[param] = getattr(app_input, param)()
+
             h.setHistEntryValue(['Sample Parameters', param], sp[param])
 
     # update the reactive values / global values
