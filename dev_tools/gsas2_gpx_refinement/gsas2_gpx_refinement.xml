@@ -1,0 +1,30 @@
+<tool id="gpx_gsas2" name="GSASII Refinement: Interactive executor" profile="22.05" version="0">
+    <description>Tool for GSASII Rietveld refinement called from an interactive refinement tool</description>
+    <requirements></requirements>
+    <command detect_errors="exit_code"><![CDATA[
+        conda init bash &&
+        source ../home/.bashrc &&
+        conda activate GSASII &&
+        mkdir app &&
+        cd app/ &&
+        touch $output &&
+        mkdir portal &&
+        ln -s $project gsas_project.gpx &&
+        python $__tool_directory__/gsas2_gpx_refinement.py
+                --project-filename gsas_project.gpx
+                --output-directory /portal      
+        > >(tee -a $output) 2> >(tee -a $output >&2)
+    ]]></command>
+    <inputs>
+        <param name="project" type="data" format="Binary" label="GSASII project file"/>
+    </inputs>
+    <outputs>
+        <data format="txt" name="output" label="GSAS2 console output"></data>
+        <collection type="list" name="output_collection1" label="GSAS2 refinement output">
+            <discover_datasets format="binary" pattern="__designation__" directory="app/portal" visible="true"/>
+        </collection>
+    </outputs>
+    <help>
+        A tool to run a GSAS2 Rietveld refinement.
+    </help>
+</tool>

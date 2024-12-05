@@ -14,8 +14,9 @@ locally i added:
     conda activate GSASII
 in the tool xml commands to get this to work
 """
+
 # import G2script as G2sc
-sys.path.append("/home/mkscd/miniconda3/envs/GSASII/GSAS-II/GSASII")
+sys.path.append("/home/dxp41838/miniconda3/envs/GSASII/GSAS-II/GSASII")
 # needed to "find" GSAS-II modules
 import GSASIIscriptable as G2sc  # type: ignore
 
@@ -27,8 +28,6 @@ def run_gsas2_fit(
     output_stem_fn,
     stype,
     bank,
-    xmin,
-    xmax,
     output_path,
     num_cycles=5,
     init_vals: Union[None, Dict[str, Any]] = None,
@@ -100,17 +99,17 @@ def run_gsas2_fit(
         print(bank)
         hist1 = gpx.add_powder_histogram(gsa_fn, prm_fn, databank=bank, instbank=bank)
         print("now!")
-        hist1.set_refinements({"Limits": [xmin, xmax]})
     if stype == "X":
         print("here! x-ray!!")
         # prmFile = "pdfitc/utils/PDFNSLSII.instprm"
         hist1 = gpx.add_powder_histogram(gsa_fn, prm_fn)
-        hist1.set_refinements({"Limits": [xmin, xmax]})
 
     hists.append(hist1)
 
     # step 2: add a phase and link it to the previous histograms
-    _ = gpx.add_phase(structure_fn, phasename="structure", fmthint="CIF", histograms=hists)
+    _ = gpx.add_phase(
+        structure_fn, phasename="structure", fmthint="CIF", histograms=hists
+    )
     print("phase loaded")
     cell_i = gpx.phase("structure").get_cell()
 
@@ -129,12 +128,21 @@ def run_gsas2_fit(
         num_coeffs = init_vals["bkg"]["NumCoeffs"]
         coeffs = init_vals["bkg"]["Coeffs"]
         refdict2 = {
-            "set": {"Background": {"type": bkg_type, "no. coeffs": num_coeffs, "coeffs": coeffs, "refine": True}},
+            "set": {
+                "Background": {
+                    "type": bkg_type,
+                    "no. coeffs": num_coeffs,
+                    "coeffs": coeffs,
+                    "refine": True,
+                }
+            },
             "call": HistStats,
         }
     else:
         refdict2 = {
-            "set": {"Background": {"type": "chebyschev", "no. coeffs": 6, "refine": True}},
+            "set": {
+                "Background": {"type": "chebyschev", "no. coeffs": 6, "refine": True}
+            },
             "call": HistStats,
         }
     # refinement step 3: refine lattice parameter and Uiso refinement (Phase)
@@ -164,7 +172,9 @@ def run_gsas2_fit(
     refs = gpx.histogram(0).reflections()
     ref_list = refs["structure"]["RefList"]
 
-    output_cif_fn = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.cif")
+    output_cif_fn = os.path.join(
+        os.getcwd(), "portal/", output_stem_fn + "_refined.cif"
+    )
     gpx.phase("structure").export_CIF(output_cif_fn)
     cell_r = gpx.phase("structure").get_cell()
 
