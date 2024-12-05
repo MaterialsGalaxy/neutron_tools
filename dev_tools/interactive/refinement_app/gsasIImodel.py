@@ -54,6 +54,8 @@ def load_histogram_parameters(gpx, histname):
     irl = []
     sc = {}
     ic = {}
+    inst_noref_list = ["Type", "Bank", "Lam1", "Lam2",
+                       "Azimuth", "2-theta", "fltPath"]
     # populating list of sample refinements that are already active
     for param, val in sp.items():
         # set sample choices dict for UI
@@ -66,7 +68,7 @@ def load_histogram_parameters(gpx, histname):
     for param, val in ip.items():
         if isinstance(val, list) and len(val) == 3:
             # set instrument choices dict for UI
-            if isinstance(val[2], bool):
+            if param not in inst_noref_list:
                 ic[param] = param
                 if val[2]:
                     irl.append(param)
