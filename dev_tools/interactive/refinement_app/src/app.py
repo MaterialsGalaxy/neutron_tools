@@ -29,6 +29,7 @@ from viewmodel import (
     updatenav,
     save_inst_params,
     save_samp_params,
+    # view_tool_inputs,
 )
 
 ui.page_opts(title="GSASII refinement", fillable=True)

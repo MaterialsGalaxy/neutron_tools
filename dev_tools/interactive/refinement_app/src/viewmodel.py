@@ -11,6 +11,7 @@ from gsasIImodel import (
 )
 import matplotlib.pyplot as plt
 import typing
+import time
 
 """contains all reactive events functions and variables
 and processes all logic from the ui, GSASII and galaxy history models.
@@ -37,6 +38,8 @@ bkg = reactive.value()
 
 histdata = reactive.value()
 constraints = reactive.value()
+
+current_gpx_id = reactive.value()
 
 # initial values for sidebar selections when no project is loaded
 # reactive values for when projects are loaded
@@ -417,6 +420,7 @@ def loadproject(id):
         fp = os.path.join(location, fn)
         gxhistory.getproject(id, fp)
         tgpx = gsas_load_gpx(fp)
+        current_gpx_id.set(id)
 
         # load the phase names for the sidebar selection
         phasenames = {}
@@ -531,3 +535,22 @@ def submitout():
     """
     gpx().save()
     gxhistory.put("output.gpx")
+    time.sleep(5)
+    updatehistory()
+
+    row_id = histdata()["hid"].idxmax()
+    id = histdata().loc[row_id, "id"]
+
+    gxhistory.run_refinement(id)
+    current_gpx_id.set(id)
+    time.sleep(15)
+    updatehistory()
+    gpx_table = histdata()[(histdata()["name"].str.contains("gpx"))]
+    row_id = gpx_table["hid"].idxmax()
+    id = gpx_table.loc[row_id, "id"]
+    loadproject(id)
+    ui.update_select("selectgpx", selected=id)
+
+
+# def view_tool_inputs():
+#   return gxhistory.run_refinement(current_gpx_id())
