@@ -110,3 +110,9 @@ def run_refinement(dataset_id):
     inputdata = {}
     inputdata["project"] = {"values": [{"src": "hda", "id": dataset_id}]}
     gi.tools.run_tool(history_id, "gpx_gsas2", inputdata)
+
+
+def wait_for_dataset(dataset_id):
+    history_id = os.environ["HISTORY_ID"]
+    gi = get_galaxy_connection(history_id=history_id)
+    gi.datasets.wait_for_dataset(dataset_id)

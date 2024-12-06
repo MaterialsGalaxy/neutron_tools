@@ -532,25 +532,40 @@ def save_samp_params(app_input):
 def submitout():
     """
     saves project changes to file and submits to galaxy history
+    runs static tool GSAS2_refinement_executor in the background
+    loads the refined file back into the interactive tool on completion
     """
     gpx().save()
     gxhistory.put("output.gpx")
-    time.sleep(5)
-    updatehistory()
 
-    row_id = histdata()["hid"].idxmax()
-    id = histdata().loc[row_id, "id"]
-
+    # wait for the file to save in galaxy and run refinement
+    id = refresh_gpx_history()
     gxhistory.run_refinement(id)
     current_gpx_id.set(id)
-    time.sleep(15)
+
+    # wait for refinement to complete
+    id = refresh_gpx_history()
+    gxhistory.wait_for_dataset(id)
+
+    # load the history with the new refinement output gpx file
     updatehistory()
     gpx_table = histdata()[(histdata()["name"].str.contains("gpx"))]
     row_id = gpx_table["hid"].idxmax()
     id = gpx_table.loc[row_id, "id"]
+
+    # load the refined output project and update the UI
     loadproject(id)
     ui.update_select("selectgpx", selected=id)
 
 
-# def view_tool_inputs():
-#   return gxhistory.run_refinement(current_gpx_id())
+def refresh_gpx_history():
+    """Finds the API id of the latest files in the galaxy history.
+
+    Returns:
+        str: Galaxy API ID for the msot recent event in the history.
+    """
+    time.sleep(2)
+    updatehistory()
+    row_id = histdata()["hid"].idxmax()
+    id = histdata().loc[row_id, "id"]
+    return id

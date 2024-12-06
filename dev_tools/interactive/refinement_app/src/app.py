@@ -215,7 +215,7 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
         tab = input.viewhistdata()
         updatenav(tab)
 
-    ui.input_action_button("submit", "submit")
+    ui.input_action_button("submit", "Refine")
 
     @reactive.effect
     @reactive.event(input.updatehist)
