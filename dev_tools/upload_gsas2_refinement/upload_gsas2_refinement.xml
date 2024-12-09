@@ -18,7 +18,6 @@
                 --gsas-filename powder.raw
                 --instrument-params-filename instrument.prm
                 --scatter-type $scatter_type
-                --bank-id $bank_id
                 --output-directory /portal
         > >(tee -a $output) 2> >(tee -a $output >&2)
     ]]></command>
@@ -31,7 +30,6 @@
             <option value="N" selected="false">Neutron</option>
             <option value="X" selected="false">X-ray</option>
         </param>
-        <param name="bank_id" type="integer" label="Bank ID" value="0" />
     </inputs>
     <outputs>
         <data format="txt" name="output" label="GSAS2 console output"></data>

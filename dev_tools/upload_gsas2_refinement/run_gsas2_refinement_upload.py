@@ -27,7 +27,6 @@ def run_gsas2_fit(
     prm_fn,
     output_stem_fn,
     stype,
-    bank,
     output_path,
     num_cycles=5,
     init_vals: Union[None, Dict[str, Any]] = None,
@@ -45,8 +44,6 @@ def run_gsas2_fit(
         output stem filename.
     stype: str
         scattering type
-    banks: str
-        bank 1-6.
     xmin: float
         minimum x value
     xmax: float
@@ -91,13 +88,12 @@ def run_gsas2_fit(
     else:
         print("no project created at path", proj_path)
 
-    # add six bank histograms to the project
+    # add histograms to the project
     hists = []
     if stype == "N":
         print("heee!!!")
         # debugging print statements
-        print(bank)
-        hist1 = gpx.add_powder_histogram(gsa_fn, prm_fn, databank=bank, instbank=bank)
+        hist1 = gpx.add_powder_histogram(gsa_fn, prm_fn)
         print("now!")
     if stype == "X":
         print("here! x-ray!!")

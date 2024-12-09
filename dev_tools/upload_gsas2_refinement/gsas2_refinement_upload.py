@@ -12,12 +12,9 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
     parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
     parser.add_argument("-s", "--scatter-type", help='Scatter type: ["N", "X"]', choices=["N", "X"], type=str)
-    parser.add_argument("-b", "--bank-id", help="Index of the bank to use", type=str)
     parser.add_argument("-n", "--num-cycles", help="Number of refinement cycles", type=int)
     parser.add_argument("-v", "--initial-values", help="Initial values for refinement", type=str)
     args = parser.parse_args()
-
-    bank_id = int(args.bank_id)
 
     # Add key-word arguments
     kwargs = dict()
@@ -33,7 +30,6 @@ if __name__ == "__main__":
         args.instrument_params_filename,
         args.output_stem_name,
         args.scatter_type,
-        bank_id,
         args.output_directory,
         **kwargs,
     )
