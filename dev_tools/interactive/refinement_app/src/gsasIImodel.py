@@ -73,10 +73,10 @@ def load_histogram_parameters(gpx, histname):
     return (irl, ip, ic, srl, sp, sc)
 
 
-def gsas_load_gpx(inputgpxfile):
+def gsas_load_gpx(inputgpxfile, fn):
     """loads gpx from input file and saves it to output file
     the current project is in outputfile so the loaded ones
     from the galaxy history remain unchanged"""
-    gpx = G2sc.G2Project(gpxfile=inputgpxfile, newgpx="output.gpx")
+    gpx = G2sc.G2Project(gpxfile=inputgpxfile, newgpx=fn)
     gpx.save()
     return gpx

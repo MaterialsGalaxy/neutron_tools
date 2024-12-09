@@ -21,6 +21,7 @@ these have to be passed as inputs to the function."""
 # reactive value parameters for anything that needs to be passed on
 # as a side effect from reactive functions
 gpx = reactive.value()
+current_gpx_fname = reactive.value()
 instreflist = reactive.value()
 instparams = reactive.value(None)
 sampreflist = reactive.value()
@@ -398,7 +399,11 @@ def updatehistory():
     histframe = pd.DataFrame(history)
     histtable = histframe[["hid", "name", "id"]]
     histdata.set(histtable)
-    choicedict = dict([(i, fn) for i, fn in zip(histtable["id"], histtable["name"])])
+    choicedict = dict([(i, str(h) + ": " + fn) for i, h, fn in zip(histtable["id"], histtable["hid"], histtable["name"])])
+    # choicedict = {}
+    # for row in histtable.itertuples():
+    #    choicedict[row.id] = row.hid + ": " + row.name
+
     select_gpx_choices.set(choicedict)  # dictionary with {ID:name}
     ui.update_select("selectgpx", choices=select_gpx_choices())
 
@@ -415,13 +420,15 @@ def loadproject(id):
         remove_samp_inputs()
 
         # get the file from galaxy and load the gsas project
-        fn = select_gpx_choices()[id]
+        hid_and_fn = select_gpx_choices()[id]
+        fn = hid_and_fn.split(": ")[1]
+
         location = "/var/shiny-server/shiny_test/work/"
         fp = os.path.join(location, fn)
         gxhistory.getproject(id, fp)
-        tgpx = gsas_load_gpx(fp)
+        tgpx = gsas_load_gpx(fp, fn)
         current_gpx_id.set(id)
-
+        current_gpx_fname.set(fn)
         # load the phase names for the sidebar selection
         phasenames = {}
         for phase in tgpx.phases():
@@ -536,7 +543,7 @@ def submitout():
     loads the refined file back into the interactive tool on completion
     """
     gpx().save()
-    gxhistory.put("output.gpx")
+    gxhistory.put(current_gpx_fname())
 
     # wait for the file to save in galaxy and run refinement
     id = refresh_gpx_history()
