@@ -122,12 +122,6 @@ with ui.navset_hidden(id="tab"):
             "Controls"
         with ui.nav_panel("Constraints", value="Constraints"):
 
-            "Current Phase Constraints:"
-
-            @render.code
-            def app_showphaseconstr():
-                return showphaseconstr()
-
             with ui.layout_column_wrap():
                 with ui.card():
                     ui.card_header("Add new constraint")
@@ -138,9 +132,14 @@ with ui.navset_hidden(id="tab"):
                     def new_constr():
                         codes = render_constr_table.data_view(selected=True)[["code"]]
                         codes["coefficients"] = 1
-                        return render.DataTable(codes, editable=True)
+                        return render.DataTable(codes, height=None, editable=True)
 
                     ui.input_action_button("add_constr", "add constraint")
+
+                    @render.data_frame
+                    @reactive.event(input.add_constr, input.loadgpx)
+                    def app_showphaseconstr():
+                        return render.DataTable(showphaseconstr(), width="100%")
 
                     @reactive.effect
                     @reactive.event(input.add_constr)

@@ -146,9 +146,38 @@ def showphaseconstr():
     """
     TBC reads constraint data from the gpx and re arranges them for UI output
     """
+    gpx().index_ids()
     constraints = load_phase_constraints(gpx())
+    current_constraints = pd.DataFrame(columns=["current constraints"])
     # rearrange the data for visualisation
-    return constraints
+    for constraint in constraints:
+        # equation constraint
+        if constraint[-1] == "c":
+            new_entry = "CONST "
+            for parameter in constraint:
+                if isinstance(parameter, list):
+                    var_obj = parameter[1]
+                    var_name = var_obj.varname()
+                    new_entry = new_entry + str(parameter[0]) + "*" + var_name + " + "
+
+            new_entry = new_entry.strip("+ ")
+            new_entry = new_entry + " = " + str(constraint[-3])
+
+        # equivalence constraint
+        elif constraint[-1] == "e":
+            new_entry = "EQUIV "
+            for parameter in constraint:
+                if isinstance(parameter, list):
+                    var_coef = str(parameter[0])
+                    var_obj = parameter[1]
+                    var_name = var_obj.varname()
+                    new_entry = new_entry + var_coef + "*" + var_name + " = "
+            new_entry = new_entry.strip("= ")
+
+        # add new entry to dataframe
+        current_constraints.loc[len(current_constraints)] = [new_entry]
+
+    return current_constraints
 
 
 def saveatomtable(df, phasename):
