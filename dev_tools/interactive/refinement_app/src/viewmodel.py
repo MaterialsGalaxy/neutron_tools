@@ -31,6 +31,9 @@ instchoices = reactive.value()
 sampchoices = reactive.value()
 sampUIlist = reactive.value([])
 
+num_bkg_coefs = reactive.value()
+current_bkg_func = reactive.value()
+
 x = reactive.value()
 y = reactive.value()
 ycalc = reactive.value()
@@ -79,6 +82,17 @@ samp_param_dict = {
     "DisplaceX": "Sample X displ. perp. to beam",
     "DisplaceY": "Sample Y displ. prll. to beam",
     "Absorption": "Sample Absorption",
+}
+
+background_functions = {
+    "chebyschev": "chebyschev",
+    "chebyschev-1": "chebyschev-1",
+    "cosine": "cosine",
+    "Q^2 power series": "Q^2 power series",
+    "Q^-2 power series": "Q^-2 power series",
+    "lin interpolate": "lin interpolate",
+    "inv interpolate": "inv interpolate",
+    "log interpolate": "log interpolate",
 }
 
 
@@ -153,9 +167,9 @@ def showphaseconstr():
     """
     gpx().index_ids()
     constraints = load_phase_constraints(gpx())
-    current_constraints = pd.DataFrame(columns=["index", "constraint"])
+    current_constraints = pd.DataFrame(columns=["current constraints"])
     # rearrange the data for visualisation
-    for c_id, constraint in enumerate(constraints):
+    for constraint in constraints:
         # equation constraint
         if constraint[-1] == "c":
             new_entry = "CONST "
@@ -181,8 +195,7 @@ def showphaseconstr():
 
         # add new entry to dataframe
         current_constraints.loc[len(current_constraints)] = {
-            "index": c_id,
-            "constraint": new_entry,
+            "current constraints": new_entry,
         }
 
     return current_constraints
@@ -229,6 +242,41 @@ def atomdata(phasename):
         atomframe = atomframe._append(atomrecord, ignore_index=True)
 
     return atomframe
+
+
+def load_bkg_data(histname):
+    if histname != "init":
+        bkg_data = gpx().histogram(histname).Background
+        return bkg_data
+    else:
+        return None
+    # num_bkg_coefs.set()
+    # current_bkg_func.set()
+
+
+def build_bkg_page(histname):
+    bkg_data = load_bkg_data(histname)
+    ui.update_select("background_function", selected=bkg_data[0][0])
+    ui.update_checkbox("bkg_refine", value=bkg_data[0][1])
+    ui.update_numeric("num_bkg_coefs", value=bkg_data[0][2])
+
+
+def set_bkg_func(histname, func):
+    if histname != "init":
+        bkg_data = load_bkg_data(histname)
+        bkg_data[0][0] = func
+
+
+def set_bkg_refine(histname, flag):
+    if histname != "init":
+        bkg_data = load_bkg_data(histname)
+        bkg_data[0][1] = flag
+
+
+def set_bkg_coefs(histname, num):
+    if histname != "init":
+        bkg_data = load_bkg_data(histname)
+        bkg_data[0][2] = num
 
 
 def buildinstpage():
@@ -393,6 +441,7 @@ def loadhist(histname):
         # build the new UI
         buildsamppage()
         buildinstpage()
+        build_bkg_page(histname)
 
 
 def update_plot(gpx, histname):

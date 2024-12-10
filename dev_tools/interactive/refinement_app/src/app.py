@@ -12,6 +12,7 @@ from viewmodel import (
     samp_param_dict,
     sampleparams,
     instparams,
+    background_functions,
     sampUIlist,
     plot_powder,
     updatehistory,
@@ -20,6 +21,10 @@ from viewmodel import (
     loadphase,
     loadhist,
     viewhist,
+    load_bkg_data,
+    set_bkg_func,
+    set_bkg_refine,
+    set_bkg_coefs,
     submitout,
     atomdata,
     saveatomtable,
@@ -39,6 +44,53 @@ with ui.navset_hidden(id="tab"):
     # hidden can be switched to a menu or pillset, so the further nav_menu
     # elements can be left alone if we want to change it later.
     with ui.nav_menu("Powder data"):
+        with ui.nav_panel("Background", value="Background"):
+            ui.input_select(
+                "background_function",
+                "Background function",
+                background_functions,
+                selected=None,
+            )
+            ui.input_checkbox("bkg_refine", "refine", False)
+
+            ui.input_numeric(
+                "num_bkg_coefs",
+                "Number of Coefficients",
+                value=0,
+            )
+
+            @reactive.effect
+            @reactive.event(input.background_function)
+            def app_bkg_func():
+                set_bkg_func(input.selecthist(), input.background_function())
+
+            @reactive.effect
+            @reactive.event(input.bkg_refine)
+            def app_bkg_ref():
+                set_bkg_refine(input.selecthist(), input.bkg_refine())
+
+            @reactive.effect
+            @reactive.event(input.num_bkg_coefs)
+            def app_bkg_coefs():
+                set_bkg_coefs(input.selecthist(), input.num_bkg_coefs())
+
+            @render.code
+            @reactive.event(
+                input.loadgpx,
+                input.selecthist,
+                input.background_function,
+                input.bkg_refine,
+                input.num_bkg_coefs,
+            )
+            def bkg_data():
+                return load_bkg_data(input.selecthist())
+
+            # @render.data_frame
+            # @reactive.effect(input.loadgpx, input.selecthist)
+            # def bkg_coeff_df():
+            #     return render.DataTable(
+            #       )
+
         with ui.nav_panel("Sample Parameters", value="Sample Parameters"):
 
             ui.input_selectize(
@@ -137,8 +189,6 @@ with ui.navset_hidden(id="tab"):
 
                     ui.input_action_button("add_constr", "add constraint")
 
-                    ui.h2("Current constraints")
-
                     @render.data_frame
                     @reactive.event(input.add_constr, input.loadgpx, input.popconstr)
                     def app_showphaseconstr():
@@ -146,7 +196,7 @@ with ui.navset_hidden(id="tab"):
                             showphaseconstr(),
                             height=None,
                             width="100%",
-                            selection_mode="rows",
+                            selection_mode="row",
                         )
 
                     @reactive.effect
@@ -160,11 +210,17 @@ with ui.navset_hidden(id="tab"):
                     @reactive.effect
                     @reactive.event(input.popconstr)
                     def app_remove_constr():
-                        constr_id = app_showphaseconstr.data_view(selected=True)[
-                            ["index"]
+                        constr_df = app_showphaseconstr.data_view(selected=True)[
+                            ["current constraints"]
                         ]
-                        c_id = constr_id["index"].loc[constr_id.index[0]]
-                        remove_constraint(c_id)
+                        constr_val = constr_df["current constraints"].loc[
+                            constr_df.index[0]
+                        ]
+                        all_constr = app_showphaseconstr.data()
+                        constr_id = all_constr.index[
+                            all_constr["current constraints"] == constr_val
+                        ].tolist()
+                        remove_constraint(constr_id[0])
 
                 with ui.card():
                     ui.card_header("select constraint parameters")
