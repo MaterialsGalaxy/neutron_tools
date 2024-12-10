@@ -142,15 +142,20 @@ def build_constraints_df(phasename):
     return phase_constr_df
 
 
+def remove_constraint(id):
+    constraints = load_phase_constraints(gpx())
+    constraints.pop(id)
+
+
 def showphaseconstr():
     """
     TBC reads constraint data from the gpx and re arranges them for UI output
     """
     gpx().index_ids()
     constraints = load_phase_constraints(gpx())
-    current_constraints = pd.DataFrame(columns=["current constraints"])
+    current_constraints = pd.DataFrame(columns=["index", "constraint"])
     # rearrange the data for visualisation
-    for constraint in constraints:
+    for c_id, constraint in enumerate(constraints):
         # equation constraint
         if constraint[-1] == "c":
             new_entry = "CONST "
@@ -175,7 +180,10 @@ def showphaseconstr():
             new_entry = new_entry.strip("= ")
 
         # add new entry to dataframe
-        current_constraints.loc[len(current_constraints)] = [new_entry]
+        current_constraints.loc[len(current_constraints)] = {
+            "index": c_id,
+            "constraint": new_entry,
+        }
 
     return current_constraints
 
@@ -428,7 +436,12 @@ def updatehistory():
     histframe = pd.DataFrame(history)
     histtable = histframe[["hid", "name", "id"]]
     histdata.set(histtable)
-    choicedict = dict([(i, str(h) + ": " + fn) for i, h, fn in zip(histtable["id"], histtable["hid"], histtable["name"])])
+    choicedict = dict(
+        [
+            (i, str(h) + ": " + fn)
+            for i, h, fn in zip(histtable["id"], histtable["hid"], histtable["name"])
+        ]
+    )
     # choicedict = {}
     # for row in histtable.itertuples():
     #    choicedict[row.id] = row.hid + ": " + row.name

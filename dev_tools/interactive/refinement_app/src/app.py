@@ -26,6 +26,7 @@ from viewmodel import (
     showphaseconstr,
     build_constraints_df,
     add_constr,
+    remove_constraint,
     updatenav,
     save_inst_params,
     save_samp_params,
@@ -136,16 +137,34 @@ with ui.navset_hidden(id="tab"):
 
                     ui.input_action_button("add_constr", "add constraint")
 
+                    ui.h2("Current constraints")
+
                     @render.data_frame
-                    @reactive.event(input.add_constr, input.loadgpx)
+                    @reactive.event(input.add_constr, input.loadgpx, input.popconstr)
                     def app_showphaseconstr():
-                        return render.DataTable(showphaseconstr(), width="100%")
+                        return render.DataTable(
+                            showphaseconstr(),
+                            height=None,
+                            width="100%",
+                            selection_mode="rows",
+                        )
 
                     @reactive.effect
                     @reactive.event(input.add_constr)
                     def app_add_constr():
                         constr = new_constr.data_view()
                         add_constr(input.constr_type(), constr)
+
+                    ui.input_action_button("popconstr", "remove constraint")
+
+                    @reactive.effect
+                    @reactive.event(input.popconstr)
+                    def app_remove_constr():
+                        constr_id = app_showphaseconstr.data_view(selected=True)[
+                            ["index"]
+                        ]
+                        c_id = constr_id["index"].loc[constr_id.index[0]]
+                        remove_constraint(c_id)
 
                 with ui.card():
                     ui.card_header("select constraint parameters")
