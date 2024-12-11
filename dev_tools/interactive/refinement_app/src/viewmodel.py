@@ -3,6 +3,7 @@ from shiny import reactive
 import pandas as pd
 import gxhistory
 import os
+import numpy as np
 from gsasIImodel import (
     hist_export,
     gsas_load_gpx,
@@ -277,6 +278,23 @@ def set_bkg_coefs(histname, num):
     if histname != "init":
         bkg_data = load_bkg_data(histname)
         bkg_data[0][2] = num
+        current_coefs = len(bkg_data[0]) - 3
+        if num > current_coefs:
+            bkg_data[0] = bkg_data[0] + [np.float64(0.0)] * (num - current_coefs)
+
+
+def build_bkg_coef_df(histname):
+    if histname != "init":
+        bkg_data = load_bkg_data(histname)
+        coefs = bkg_data[0][3:]
+        bkg_coef_df = pd.DataFrame(coefs, columns=["Background Coefficients"])
+        return bkg_coef_df
+
+
+def save_bkg_coefs(histname, coefs):
+    if histname != "init":
+        bkg_data = load_bkg_data(histname)
+        bkg_data[0][3:] = np.float64(coefs)
 
 
 def buildinstpage():

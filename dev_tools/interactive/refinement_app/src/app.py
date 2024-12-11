@@ -25,6 +25,8 @@ from viewmodel import (
     set_bkg_func,
     set_bkg_refine,
     set_bkg_coefs,
+    build_bkg_coef_df,
+    save_bkg_coefs,
     submitout,
     atomdata,
     saveatomtable,
@@ -74,6 +76,12 @@ with ui.navset_hidden(id="tab"):
             def app_bkg_coefs():
                 set_bkg_coefs(input.selecthist(), input.num_bkg_coefs())
 
+            @reactive.effect
+            @reactive.event(input.save_bkg_coefs)
+            def app_save_bkg_coefs():
+                coefs = bkg_coeff_df.data_view()["Background Coefficients"].tolist()
+                save_bkg_coefs(input.selecthist(), coefs)
+
             @render.code
             @reactive.event(
                 input.loadgpx,
@@ -81,15 +89,26 @@ with ui.navset_hidden(id="tab"):
                 input.background_function,
                 input.bkg_refine,
                 input.num_bkg_coefs,
+                input.save_bkg_coefs,
             )
             def bkg_data():
                 return load_bkg_data(input.selecthist())
 
-            # @render.data_frame
-            # @reactive.effect(input.loadgpx, input.selecthist)
-            # def bkg_coeff_df():
-            #     return render.DataTable(
-            #       )
+            @render.data_frame
+            @reactive.event(
+                input.loadgpx,
+                input.selecthist,
+                input.num_bkg_coefs,
+                input.save_bkg_coefs,
+            )
+            def bkg_coeff_df():
+                return render.DataTable(
+                    build_bkg_coef_df(input.selecthist()),
+                    editable=True,
+                    height=None,
+                )
+
+            ui.input_action_button("save_bkg_coefs", "Save Background Coefficients")
 
         with ui.nav_panel("Sample Parameters", value="Sample Parameters"):
 
