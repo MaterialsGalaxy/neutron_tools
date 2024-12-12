@@ -311,7 +311,7 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
     ui.input_action_button("submit", "Refine")
 
     @reactive.effect
-    @reactive.event(input.updatehist)
+    @reactive.event(input.updatehist, ignore_none=False)
     def app_updatehistory():
         updatehistory()
 
