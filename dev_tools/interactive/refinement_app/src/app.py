@@ -1,6 +1,7 @@
 # import numpy as np
 from shiny.express import ui, input
 from shiny import reactive, render
+from shinywidgets import render_plotly
 from viewmodel import (
     histdata,
     gpx_choices,
@@ -260,12 +261,11 @@ with ui.navset_hidden(id="tab"):
 # separate always visible section for plots
 with ui.navset_pill(id="plot"):
     with ui.nav_panel("plots", value="plots"):
-        ui.input_action_button("renderplot", "Render plot")
 
-        @render.plot(alt="A histogram")
-        @reactive.event(input.renderplot)
+        @render_plotly
         def plot():
-            plot_powder(input.selecthist())
+            fig = plot_powder(input.selecthist())
+            return fig
 
     with ui.nav_panel("History", value="hist"):
 

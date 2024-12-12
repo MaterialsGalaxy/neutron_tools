@@ -10,7 +10,7 @@ from gsasIImodel import (
     load_phase_constraints,
     load_histogram_parameters,
 )
-import matplotlib.pyplot as plt
+import plotly.express as px
 import typing
 import time
 
@@ -485,12 +485,36 @@ def plot_powder(histname):
     plots the powder histogram data from the current project
     """
     update_plot(gpx(), histname)
-    plt.scatter(x(), y(), c="blue")
-    plt.plot(x(), ycalc(), c="green")
-    plt.plot(x(), bkg(), c="red")
-    plt.title("Powder histogram")
-    plt.xlabel("2 Theta")
-    plt.ylabel("intensity")
+    pwdr_data = {
+        "2 Theta": x(),
+        "intensity": y(),
+        "fit": ycalc(),
+        "background": bkg(),
+    }
+    df = pd.DataFrame(pwdr_data)
+    tdf = pd.DataFrame([[0, 0]], columns=["2 Theta", "intensity"])
+
+    fig = px.scatter(tdf, x="2 Theta", y="intensity", opacity=0, title=histname)
+
+    fig.add_scatter(x=df["2 Theta"], y=df["intensity"], mode="markers", opacity=0.8, name="powder data", zorder=0)
+    fig.update_traces(
+        marker=dict(
+            size=5,
+            symbol="cross-thin",
+            color="royalblue",
+            line=dict(
+                width=2,
+                color="royalblue",
+            )
+        ),
+        selector=dict(mode="markers"),
+    )
+
+    fig.add_scatter(x=df["2 Theta"], y=df["fit"], mode="lines", opacity=1, name="fit", zorder=2)
+    fig.add_scatter(x=df["2 Theta"], y=df["background"], mode="lines", opacity=1, name="background", zorder=1)
+
+    # fig.show()
+    return fig
 
 
 def updatehistory():
