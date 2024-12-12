@@ -171,13 +171,12 @@ with ui.navset_hidden(id="tab"):
             with ui.nav_panel("data", value="phasedata"):
                 "data"
             with ui.nav_panel("atoms", value="atoms"):
-                ui.input_action_button("updateatoms", "update phase atoms")
 
                 @render.data_frame
-                @reactive.event(input.updateatoms)
+                @reactive.event(input.loadgpx, input.selectphase, input.saveatoms)
                 def renderatomtable():
                     return render.DataTable(
-                        atomdata(input.selectphase()), editable=True
+                        atomdata(input.selectphase()), editable=True, height=None,
                     )
 
                 ui.input_action_button("saveatoms", "Save atoms changes")
