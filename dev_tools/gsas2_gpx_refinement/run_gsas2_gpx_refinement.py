@@ -1,6 +1,7 @@
 import os
 import sys
 import numpy as np
+from deepdiff import Delta
 
 """
 change how GSASIIscriptable is imported for actual deployment
@@ -16,6 +17,7 @@ import GSASIIscriptable as G2sc  # type: ignore
 
 def run_gsas2_fit(
     project_fn,
+    delta_fn,
     output_stem_fn,
     output_path,
     num_cycles=5,
@@ -25,6 +27,8 @@ def run_gsas2_fit(
     ----------
     project_fn: str
         input GSAS .gpx project file name
+    delta_fn: str
+        input delta file from deepdiff containing updates for GSASII project object
     output_stem_fn: str
         output stem filename.
     output_path: str
@@ -57,8 +61,13 @@ def run_gsas2_fit(
     print(proj_path)
 
     # load from input project save to new name and directory
-    gpx = G2sc.G2Project(gpxfile=project_fn, newgpx=proj_path)
-    gpx.save(proj_path)
+    og_gpx = G2sc.G2Project(gpxfile=project_fn)
+
+    # apply delta and save the new project.
+    delta = Delta(delta_path=delta_fn)
+    gpx = og_gpx + delta
+    gpx.save(filename=proj_path)
+
     # check if the project got created
     if os.path.exists(proj_path):
         print("created project at path:", proj_path)
