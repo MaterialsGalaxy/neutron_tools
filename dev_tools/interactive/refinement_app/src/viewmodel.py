@@ -1,5 +1,6 @@
 from shiny.express import ui
 from shiny import reactive
+from deepdiff import DeepDiff, Delta
 import pandas as pd
 import gxhistory
 import os
@@ -22,6 +23,7 @@ these have to be passed as inputs to the function."""
 # reactive value parameters for anything that needs to be passed on
 # as a side effect from reactive functions
 gpx = reactive.value()
+og_gpx = reactive.value()
 current_gpx_fname = reactive.value()
 instreflist = reactive.value()
 instparams = reactive.value(None)
@@ -560,6 +562,7 @@ def loadproject(id):
         fp = os.path.join(location, fn)
         gxhistory.getproject(id, fp)
         tgpx = gsas_load_gpx(fp, fn)
+        og_tgpx = gsas_load_gpx(fp, "og_"+fn)
         current_gpx_id.set(id)
         current_gpx_fname.set(fn)
         # load the phase names for the sidebar selection
@@ -578,6 +581,7 @@ def loadproject(id):
         # set reactive variable values
         inputgpxfile.set(fp)
         gpx.set(tgpx)
+        og_gpx.set(og_tgpx)
         constraints.set([])
 
         # update the phase/histogram selection uis
@@ -676,6 +680,8 @@ def submitout():
     loads the refined file back into the interactive tool on completion
     """
     gpx().save()
+    save_all_changes()
+    gxhistory.put("delta1")
     gxhistory.put(current_gpx_fname())
 
     # wait for the file to save in galaxy and run refinement
@@ -709,3 +715,10 @@ def refresh_gpx_history():
     row_id = histdata()["hid"].idxmax()
     id = histdata().loc[row_id, "id"]
     return id
+
+
+def save_all_changes():
+    diff = DeepDiff(og_gpx(), gpx(), exclude_paths="filename")
+    delta = Delta(diff)
+    with open('delta1', 'wb') as dump_file:
+        delta.dump(dump_file)
