@@ -64,7 +64,7 @@ def run_gsas2_fit(
     og_gpx = G2sc.G2Project(gpxfile=project_fn)
 
     # apply delta and save the new project.
-    delta = Delta(delta_path=delta_fn)
+    delta = Delta(delta_path=delta_fn, safe_to_import={'GSASIIobj.G2VarObj'})
     gpx = og_gpx + delta
     gpx.save(filename=proj_path)
 
