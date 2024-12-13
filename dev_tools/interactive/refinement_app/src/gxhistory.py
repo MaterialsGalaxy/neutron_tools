@@ -65,12 +65,13 @@ def getproject(dataset_id, filep):
     )
 
 
-def run_refinement(dataset_id):
+def run_refinement(dataset_id, delta_id):
     history_id = os.environ["HISTORY_ID"]
     gi = get_galaxy_connection(history_id=history_id)
-    gi.datasets.wait_for_dataset(dataset_id)
+    gi.datasets.wait_for_dataset(delta_id)
     inputdata = {}
     inputdata["project"] = {"values": [{"src": "hda", "id": dataset_id}]}
+    inputdata["delta"] = {"values": [{"src": "hda", "id": delta_id}]}
     gi.tools.run_tool(history_id, "gpx_gsas2", inputdata)
 
 

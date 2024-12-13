@@ -680,14 +680,13 @@ def submitout():
     loads the refined file back into the interactive tool on completion
     """
     gpx().save()
-    save_all_changes()
+    save_delta()
     gxhistory.put("delta1")
-    gxhistory.put(current_gpx_fname())
 
     # wait for the file to save in galaxy and run refinement
     id = refresh_gpx_history()
-    gxhistory.run_refinement(id)
-    current_gpx_id.set(id)
+    gxhistory.run_refinement(current_gpx_id(), id)
+    # current_gpx_id.set(id)
 
     # wait for refinement to complete
     id = refresh_gpx_history()
@@ -717,7 +716,7 @@ def refresh_gpx_history():
     return id
 
 
-def save_all_changes():
+def save_delta():
     diff = DeepDiff(og_gpx(), gpx(), exclude_paths="filename")
     delta = Delta(diff)
     with open('delta1', 'wb') as dump_file:
