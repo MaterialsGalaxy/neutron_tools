@@ -110,7 +110,7 @@ def updatenav(tab):
     ui.update_navs(id="tab", selected=tab)
 
 
-def add_constr(ctype, df):
+def add_constr(ctype, df, var_df):
     """
     wrapper function for adding equivalence or equation constraints
     equation constraints are forced to have a total of 1
@@ -118,12 +118,22 @@ def add_constr(ctype, df):
     # add constraints to constraints list and to gpx
     constr_vars = df["code"].tolist()
     constr_coefs = df["coefficients"].tolist()
-    if ctype == "eqv":
-        constraints().append(["EQUIV", constr_vars, constr_coefs])
-        gpx().add_EquivConstr(constr_vars, multlist=constr_coefs)
-    elif ctype == "eqn":
-        constraints().append(["CONST", constr_vars, constr_coefs])
-        gpx().add_EqnConstr(1, constr_vars, multlist=constr_coefs)
+
+    # validation
+    valid = False
+    if len(df.index) >= 2:
+        vars_valid = set(constr_vars).issubset(set(var_df["code"].tolist()))
+        if vars_valid:
+            valid = all(isinstance(sub, (int, float)) for sub in constr_coefs[1:])
+
+    # add the constriants to the gpx
+    if valid:
+        if ctype == "eqv":
+            constraints().append(["EQUIV", constr_vars, constr_coefs])
+            gpx().add_EquivConstr(constr_vars, multlist=constr_coefs)
+        elif ctype == "eqn":
+            constraints().append(["CONST", constr_vars, constr_coefs])
+            gpx().add_EqnConstr(1, constr_vars, multlist=constr_coefs)
 
 
 def build_constraints_df(phasename):

@@ -222,7 +222,8 @@ with ui.navset_hidden(id="tab"):
                     @reactive.event(input.add_constr)
                     def app_add_constr():
                         constr = new_constr.data_view()
-                        add_constr(input.constr_type(), constr)
+                        if len(constr.index) >= 2:
+                            add_constr(input.constr_type(), constr, render_constr_table.data())
 
                     ui.input_action_button("popconstr", "remove constraint")
 
