@@ -123,17 +123,21 @@ def add_constr(ctype, df, var_df):
     valid = False
     if len(df.index) >= 2:
         vars_valid = set(constr_vars).issubset(set(var_df["code"].tolist()))
-        if vars_valid:
-            valid = all(isinstance(sub, (int, float)) for sub in constr_coefs[1:])
+        try:
+            coefs = [float(c) for c in constr_coefs]
+        except:
+            print("invalid coefficients")
+        else:
+            valid = True
 
     # add the constriants to the gpx
     if valid:
         if ctype == "eqv":
-            constraints().append(["EQUIV", constr_vars, constr_coefs])
-            gpx().add_EquivConstr(constr_vars, multlist=constr_coefs)
+            constraints().append(["EQUIV", constr_vars, coefs])
+            gpx().add_EquivConstr(constr_vars, multlist=coefs)
         elif ctype == "eqn":
-            constraints().append(["CONST", constr_vars, constr_coefs])
-            gpx().add_EqnConstr(1, constr_vars, multlist=constr_coefs)
+            constraints().append(["CONST", constr_vars, coefs])
+            gpx().add_EqnConstr(1, constr_vars, multlist=coefs)
 
 
 def build_constraints_df(phasename):
