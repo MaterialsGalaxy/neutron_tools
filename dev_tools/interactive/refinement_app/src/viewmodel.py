@@ -544,10 +544,11 @@ def updatehistory():
     histframe = pd.DataFrame(history)
     histtable = histframe[["hid", "name", "id"]]
     histdata.set(histtable)
+    gpx_df = histtable[histtable["name"].str.endswith("gpx")]
     choicedict = dict(
         [
             (i, str(h) + ": " + fn)
-            for i, h, fn in zip(histtable["id"], histtable["hid"], histtable["name"])
+            for i, h, fn in zip(gpx_df["id"], gpx_df["hid"], gpx_df["name"])
         ]
     )
     # choicedict = {}
