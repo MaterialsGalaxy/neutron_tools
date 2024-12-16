@@ -283,16 +283,18 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
     ui.input_select("selectgpx", "load GSASII project:", gpx_choices)
     ui.input_action_button("loadgpx", "Load project")
 
-    ui.input_select("viewprojdata", "View project data", view_proj_choices)
+    ui.input_select("viewprojdata", "Project", view_proj_choices)
+
+    ui.input_action_button("viewproj", "View project")
 
     @reactive.effect
-    @reactive.event(input.viewprojdata)
+    @reactive.event(input.viewprojdata, input.viewproj)
     def app_updateprojnav():
         tab = input.viewprojdata()
         updatenav(tab)
 
     ui.input_select("selectphase", "Phase", phase_choices)
-    ui.input_action_button("viewphase", "View Phase")
+    ui.input_action_button("viewphase", "View phase")
 
     @reactive.effect
     @reactive.event(input.viewphase)
@@ -302,9 +304,10 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
 
     ui.input_select("selecthist", "Histogram", hist_choices)
     ui.input_select("viewhistdata", "View Histogram data", view_hist_choices)
+    ui.input_action_button("viewhistogram", "View histogram")
 
     @reactive.effect
-    @reactive.event(input.viewhistdata)
+    @reactive.event(input.viewhistdata, input.viewhistogram)
     def app_updatehistnav():
         tab = input.viewhistdata()
         updatenav(tab)
