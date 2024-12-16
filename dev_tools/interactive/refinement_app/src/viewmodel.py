@@ -161,7 +161,8 @@ def build_constraints_df(phasename):
 
 def remove_constraint(id):
     constraints = load_phase_constraints(gpx())
-    constraints.pop(id)
+    if isinstance(id, int) and id < len(constraints):
+        constraints.pop(id)
 
 
 def showphaseconstr():

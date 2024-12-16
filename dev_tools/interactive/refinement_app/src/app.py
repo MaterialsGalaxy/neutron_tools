@@ -232,14 +232,15 @@ with ui.navset_hidden(id="tab"):
                         constr_df = app_showphaseconstr.data_view(selected=True)[
                             ["current constraints"]
                         ]
-                        constr_val = constr_df["current constraints"].loc[
-                            constr_df.index[0]
-                        ]
-                        all_constr = app_showphaseconstr.data()
-                        constr_id = all_constr.index[
-                            all_constr["current constraints"] == constr_val
-                        ].tolist()
-                        remove_constraint(constr_id[0])
+                        if not constr_df.empty:
+                            constr_val = constr_df["current constraints"].loc[
+                                constr_df.index[0]
+                            ]
+                            all_constr = app_showphaseconstr.data()
+                            constr_id = all_constr.index[
+                                all_constr["current constraints"] == constr_val
+                            ].tolist()
+                            remove_constraint(constr_id[0])
 
                 with ui.card():
                     ui.card_header("select constraint parameters")
