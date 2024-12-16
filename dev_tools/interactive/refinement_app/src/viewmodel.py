@@ -125,7 +125,7 @@ def add_constr(ctype, df, var_df):
         vars_valid = set(constr_vars).issubset(set(var_df["code"].tolist()))
         try:
             coefs = [float(c) for c in constr_coefs]
-        except:
+        except Exception:
             print("invalid coefficients")
         else:
             valid = True
@@ -320,7 +320,14 @@ def build_bkg_coef_df(histname):
 def save_bkg_coefs(histname, coefs):
     if histname != "init":
         bkg_data = load_bkg_data(histname)
-        bkg_data[0][3:] = np.float64(coefs)
+        try:
+            new_coefs = np.float64(coefs)
+
+        except Exception:
+            print("invalid coefficient inputs")
+        else:
+            bkg_data[0][3:] = new_coefs
+
 
 
 def buildinstpage():
