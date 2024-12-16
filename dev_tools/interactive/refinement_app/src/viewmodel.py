@@ -551,6 +551,8 @@ def updatehistory():
             for i, h, fn in zip(gpx_df["id"], gpx_df["hid"], gpx_df["name"])
         ]
     )
+
+    choicedict = dict(reversed(choicedict.items()))
     # choicedict = {}
     # for row in histtable.itertuples():
     #    choicedict[row.id] = row.hid + ": " + row.name
