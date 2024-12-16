@@ -226,9 +226,18 @@ def saveatomtable(df, phasename):
     """
 
     phase = gpx().phase(phasename)
+
     for atom in phase.atoms():
-        atomrecord = df.loc[df["Name"] == atom.label]
-        atom.refinement_flags = atomrecord.iloc[0]["refine"]
+        atomrecord = df.loc[df["Name"] == atom.label] 
+        flag = atomrecord.iloc[0]["refine"]
+        # check_flag = flag.translate({ord(i): None for i in 'FXU'})
+        check_flag = flag
+        for f in "FXU":
+            check_flag = check_flag.replace(f, "", 1)
+        if check_flag == "":
+            atom.refinement_flags = flag
+        else:
+            print("invalid flags")
 
 
 def atomdata(phasename):
