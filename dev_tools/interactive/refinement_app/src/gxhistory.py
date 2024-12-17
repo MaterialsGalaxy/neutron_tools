@@ -22,9 +22,9 @@ def get_galaxy_connection(history_id=None, obj=True):
     return gi
 
 
-def put(filename, file_type="auto", history_id=None):
+def put(file_name, file_type="auto", history_id=None):
     """
-    Given a filename of any file accessible to the docker instance, this
+    Given a file_name of any file accessible to the docker instance, this
     function will upload that file to galaxy using the current history.
     Does not return anything.
     """
@@ -35,14 +35,14 @@ def put(filename, file_type="auto", history_id=None):
         "Uploading gx=%s history=%s localpath=%s ft=%s",
         gi,
         history_id,
-        filename,
+        file_name,
         file_type,
     )
 
-    gi.tools.upload_file(filename, history_id)
+    gi.tools.upload_file(file_name, history_id)
 
 
-def updateHist():
+def gx_update_history():
     history_id = os.environ["HISTORY_ID"]
     gi = get_galaxy_connection(history_id=history_id)
     history = gi.histories.show_history(
@@ -56,11 +56,11 @@ def updateHist():
     return history
 
 
-def getproject(dataset_id, filep):
+def get_project(dataset_id, filep):
     history_id = os.environ["HISTORY_ID"]
     gi = get_galaxy_connection(history_id=history_id)
     gi.datasets.download_dataset(
-        dataset_id=dataset_id, file_path=filep, use_default_filename=False
+        dataset_id=dataset_id, file_path=filep, use_default_file_name=False
     )
 
 
@@ -68,10 +68,10 @@ def run_refinement(dataset_id, delta_id):
     history_id = os.environ["HISTORY_ID"]
     gi = get_galaxy_connection(history_id=history_id)
     gi.datasets.wait_for_dataset(delta_id)
-    inputdata = {}
-    inputdata["project"] = {"values": [{"src": "hda", "id": dataset_id}]}
-    inputdata["delta"] = {"values": [{"src": "hda", "id": delta_id}]}
-    gi.tools.run_tool(history_id, "gpx_gsas2", inputdata)
+    input_data = {}
+    input_data["project"] = {"values": [{"src": "hda", "id": dataset_id}]}
+    input_data["delta"] = {"values": [{"src": "hda", "id": delta_id}]}
+    gi.tools.run_tool(history_id, "gpx_gsas2", input_data)
 
 
 def wait_for_dataset(dataset_id):

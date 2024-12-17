@@ -25,14 +25,14 @@ these have to be passed as inputs to the function."""
 gpx = reactive.value()
 og_gpx = reactive.value()
 current_gpx_fname = reactive.value()
-instreflist = reactive.value()
-instparams = reactive.value(None)
-sampreflist = reactive.value()
-sampleparams = reactive.value(None)
-inputgpxfile = reactive.value()
-instchoices = reactive.value()
-sampchoices = reactive.value()
-sampUIlist = reactive.value([])
+inst_ref_list = reactive.value()
+inst_params = reactive.value(None)
+samp_ref_list = reactive.value()
+sample_params = reactive.value(None)
+input_gpx_file = reactive.value()
+inst_choices = reactive.value()
+sanp_choices = reactive.value()
+samp_UI_list = reactive.value([])
 
 num_bkg_coefs = reactive.value()
 current_bkg_func = reactive.value()
@@ -43,7 +43,7 @@ ycalc = reactive.value()
 dy = reactive.value()
 bkg = reactive.value()
 
-histdata = reactive.value()
+hist_data = reactive.value()
 constraints = reactive.value()
 
 current_gpx_id = reactive.value()
@@ -99,7 +99,7 @@ background_functions = {
 }
 
 
-def updatenav(tab):
+def update_nav(tab):
     """
     updates the tab viewed in the UI.
     The main UI uses a hidden navset so the menus
@@ -143,7 +143,7 @@ def add_constr(ctype, df, var_df):
             gpx().add_EqnConstr(1, constr_vars, multlist=coefs)
 
 
-def build_constraints_df(phasename):
+def build_constraints_df(phase_name):
     """
     builds/populates the Dataframe of possible parameters
     to choose for phase constraints
@@ -153,7 +153,7 @@ def build_constraints_df(phasename):
     constraint_cols = ["code", "phase", "parameter", "atom"]
     phase_constr_df = pd.DataFrame(columns=constraint_cols)
 
-    phase = gpx().phase(phasename)
+    phase = gpx().phase(phase_name)
 
     # list of selectable parameter types. to be extended
     parameters = ["Afrac", "AUiso"]
@@ -168,7 +168,7 @@ def build_constraints_df(phasename):
             code = str(phase.id) + "::" + param + ":" + str(i)
 
             i += 1
-            constraint_vals = [code, phasename, param, atom.label]
+            constraint_vals = [code, phase_name, param, atom.label]
             constraint_record = dict(zip(constraint_cols, constraint_vals))
             phase_constr_df = phase_constr_df._append(
                 constraint_record, ignore_index=True
@@ -182,7 +182,7 @@ def remove_constraint(id):
         constraints.pop(id)
 
 
-def showphaseconstr():
+def show_phase_constr():
     """
     TBC reads constraint data from the gpx and re arranges them for UI output
     """
@@ -222,17 +222,17 @@ def showphaseconstr():
     return current_constraints
 
 
-def saveatomtable(df, phasename):
+def save_atom_table(df, phase_name):
     """
     saves the edited atom dataframe
     currently only saves refinement flag edits to the gpx
     """
 
-    phase = gpx().phase(phasename)
+    phase = gpx().phase(phase_name)
 
     for atom in phase.atoms():
-        atomrecord = df.loc[df["Name"] == atom.label] 
-        flag = atomrecord.iloc[0]["refine"]
+        atom_record = df.loc[df["Name"] == atom.label]
+        flag = atom_record.iloc[0]["refine"]
         # check_flag = flag.translate({ord(i): None for i in 'FXU'})
         check_flag = flag
         for f in "FXU":
@@ -243,21 +243,21 @@ def saveatomtable(df, phasename):
             print("invalid flags")
 
 
-def atomdata(phasename):
+def atom_data(phase_name):
     """
     generates a pandas dataframe containing data for atoms
     in the selected phase.
     used to render in the phase atom UI.
     """
-    phase = gpx().phase(phasename)
+    phase = gpx().phase(phase_name)
 
     # initialise the dataframe
-    atomcols = ["Name", "type", "refine", "x", "y", "z", "frac", "multi", "Uiso"]
-    atomframe = pd.DataFrame(columns=atomcols)
+    atom_cols = ["Name", "type", "refine", "x", "y", "z", "frac", "multi", "Uiso"]
+    atom_frame = pd.DataFrame(columns=atom_cols)
 
     # populate the dataframe with data from the project
     for atom in phase.atoms():
-        atomvals = [
+        atom_vals = [
             atom.label,
             atom.type,
             atom.refinement_flags,
@@ -268,15 +268,15 @@ def atomdata(phasename):
             atom.mult,
             atom.uiso,
         ]
-        atomrecord = dict(zip(atomcols, atomvals))
-        atomframe = atomframe._append(atomrecord, ignore_index=True)
+        atom_record = dict(zip(atom_cols, atom_vals))
+        atom_frame = atom_frame._append(atom_record, ignore_index=True)
 
-    return atomframe
+    return atom_frame
 
 
-def load_bkg_data(histname):
-    if histname != "init":
-        bkg_data = gpx().histogram(histname).Background
+def load_bkg_data(hist_name):
+    if hist_name != "init":
+        bkg_data = gpx().histogram(hist_name).Background
         return bkg_data
     else:
         return None
@@ -284,45 +284,45 @@ def load_bkg_data(histname):
     # current_bkg_func.set()
 
 
-def build_bkg_page(histname):
-    bkg_data = load_bkg_data(histname)
+def build_bkg_page(hist_name):
+    bkg_data = load_bkg_data(hist_name)
     ui.update_select("background_function", selected=bkg_data[0][0])
     ui.update_checkbox("bkg_refine", value=bkg_data[0][1])
     ui.update_numeric("num_bkg_coefs", value=bkg_data[0][2])
 
 
-def set_bkg_func(histname, func):
-    if histname != "init":
-        bkg_data = load_bkg_data(histname)
+def set_bkg_func(hist_name, func):
+    if hist_name != "init":
+        bkg_data = load_bkg_data(hist_name)
         bkg_data[0][0] = func
 
 
-def set_bkg_refine(histname, flag):
-    if histname != "init":
-        bkg_data = load_bkg_data(histname)
+def set_bkg_refine(hist_name, flag):
+    if hist_name != "init":
+        bkg_data = load_bkg_data(hist_name)
         bkg_data[0][1] = flag
 
 
-def set_bkg_coefs(histname, num):
-    if histname != "init":
-        bkg_data = load_bkg_data(histname)
+def set_bkg_coefs(hist_name, num):
+    if hist_name != "init":
+        bkg_data = load_bkg_data(hist_name)
         bkg_data[0][2] = num
         current_coefs = len(bkg_data[0]) - 3
         if num > current_coefs:
             bkg_data[0] = bkg_data[0] + [np.float64(0.0)] * (num - current_coefs)
 
 
-def build_bkg_coef_df(histname):
-    if histname != "init":
-        bkg_data = load_bkg_data(histname)
+def build_bkg_coef_df(hist_name):
+    if hist_name != "init":
+        bkg_data = load_bkg_data(hist_name)
         coefs = bkg_data[0][3:]
         bkg_coef_df = pd.DataFrame(coefs, columns=["Background Coefficients"])
         return bkg_coef_df
 
 
-def save_bkg_coefs(histname, coefs):
-    if histname != "init":
-        bkg_data = load_bkg_data(histname)
+def save_bkg_coefs(hist_name, coefs):
+    if hist_name != "init":
+        bkg_data = load_bkg_data(hist_name)
         try:
             new_coefs = np.float64(coefs)
 
@@ -332,7 +332,7 @@ def save_bkg_coefs(histname, coefs):
             bkg_data[0][3:] = new_coefs
 
 
-def buildinstpage():
+def build_inst_page():
     """
     in development
     generate the instrument parameter UI dynamically
@@ -341,7 +341,7 @@ def buildinstpage():
     """
     # update the refinement flags choices too
     # and filter which inputs to show numerically/text
-    ui.update_selectize("inst_selection", choices=instchoices(), selected=instreflist())
+    ui.update_selectize("inst_selection", choices=inst_choices(), selected=inst_ref_list())
     # previous = "inst_selection"
 
     # generate the new UI elements
@@ -354,7 +354,7 @@ def buildinstpage():
 
     # could make a dictionary of param keys to ui labels
 
-    for param, val in instparams().items():
+    for param, val in inst_params().items():
         if isinstance(val, list):
             if isinstance(val[0], float) or isinstance(val[1], float):
                 if param != "SH/L" and param != "Polariz.":
@@ -367,10 +367,10 @@ def buildinstpage():
                     previous = param
 
 
-def buildsamppage():
+def build_samp_page():
     # add updating the flag choices and filter which inputs to show
     # numerically or text aswell.
-    ui.update_selectize("samp_selection", choices=sampchoices(), selected=sampreflist())
+    ui.update_selectize("samp_selection", choices=sanp_choices(), selected=samp_ref_list())
     previous = "sample"
     sample_hidden_list = [
         "Materials",
@@ -394,7 +394,7 @@ def buildsamppage():
         "Azimuth",
     ]
     sample_UI_list = []
-    for param, val in sampleparams().items():
+    for param, val in sample_params().items():
         if param not in sample_hidden_list:
             if isinstance(val, list):
                 if isinstance(val[0], float):
@@ -440,57 +440,57 @@ def buildsamppage():
                 )
                 sample_UI_list.append(param)
                 previous = param
-    sampUIlist.set(sample_UI_list)
+    samp_UI_list.set(sample_UI_list)
 
 
 def remove_samp_inputs():
-    if sampleparams() is not None:
-        for param in sampleparams().keys():
+    if sample_params() is not None:
+        for param in sample_params().keys():
             ui.remove_ui(selector="div:has(> " + "#" + param + ")")
 
 
 def remove_inst_inputs():
-    if instparams() is not None:
-        for param in instparams().keys():
+    if inst_params() is not None:
+        for param in inst_params().keys():
             ui.remove_ui(selector="div:has(> " + "#" + param + ")")
 
 
-def viewhist():
+def view_hist():
     # view a specific subtree of the histogram in the histogram tab
     print(select_view_hist())
 
 
-def loadhist(histname):
+def load_histogram(hist_name):
     """
     loads the selected histogram and updates the UI
     to reflect the new hsitograms data.
     """
     # load the ui for hist data in the project tab
-    if histname != "init":
+    if hist_name != "init":
         # update the histogram 'data tree' in the sidebar
-        h = gpx().histogram(histname)
+        h = gpx().histogram(hist_name)
         data = h.data
         options = {}
         for subheading in data:
             options[subheading] = subheading
         select_view_hist.set(options)
-        ui.update_select("viewhistdata", choices=select_view_hist())
+        ui.update_select("view_hist_data", choices=select_view_hist())
         # delete old ui
         remove_inst_inputs()
         remove_samp_inputs()
         # set the new histogram parameters for the UI
         # add flag choices dicts here
-        hp = load_histogram_parameters(gpx(), histname)
-        instreflist.set(hp[0])
-        instparams.set(hp[1])
-        instchoices.set(hp[2])
-        sampreflist.set(hp[3])
-        sampleparams.set(hp[4])
-        sampchoices.set(hp[5])
+        hp = load_histogram_parameters(gpx(), hist_name)
+        inst_ref_list.set(hp[0])
+        inst_params.set(hp[1])
+        inst_choices.set(hp[2])
+        samp_ref_list.set(hp[3])
+        sample_params.set(hp[4])
+        sanp_choices.set(hp[5])
         # change how parameters are loaded
 
         # update the plots and the UI
-        update_plot(gpx(), histname)
+        update_plot(gpx(), hist_name)
 
         lim_min = min(x())
         lim_max = max(x())
@@ -499,18 +499,17 @@ def loadhist(histname):
         ui.update_slider("limits", min=lim_min, max=lim_max, value=[lim_low, lim_up])
 
         # build the new UI
-        buildsamppage()
-        buildinstpage()
-        build_bkg_page(histname)
+        build_samp_page()
+        build_inst_page()
+        build_bkg_page(hist_name)
 
 
-def update_plot(gpx, histname):
+def update_plot(gpx, hist_name):
     """
     updates plot parameters for the powder hsitogram to ensure the
     output is not stale
     """
-    h = gpx.histogram(histname)
-    tx, ty, tycalc, tdy, tbkg = hist_export(gpx, histname)
+    tx, ty, tycalc, tdy, tbkg = hist_export(gpx, hist_name)
     x.set(tx)
     y.set(ty)
     ycalc.set(tycalc)
@@ -518,22 +517,22 @@ def update_plot(gpx, histname):
     bkg.set(tbkg)
 
 
-def loadphase():
+def load_phase():
     # load the ui for phase data in the project tab TBC or unecessary
     print(select_phase_choices())
 
 
-def set_hist_limits(histname, limits):
-    h = gpx().histogram(histname)
+def set_hist_limits(hist_name, limits):
+    h = gpx().histogram(hist_name)
     h.Limits("lower", limits[0])
     h.Limits("upper", limits[1])
 
 
-def plot_powder(histname, limits):
+def plot_powder(hist_name, limits):
     """
     plots the powder histogram data from the current project
     """
-    update_plot(gpx(), histname)
+    update_plot(gpx(), hist_name)
     pwdr_data = {
         "2 Theta": x(),
         "intensity": y(),
@@ -543,9 +542,16 @@ def plot_powder(histname, limits):
     df = pd.DataFrame(pwdr_data)
     tdf = pd.DataFrame([[0, 0]], columns=["2 Theta", "intensity"])
 
-    fig = px.scatter(tdf, x="2 Theta", y="intensity", opacity=0, title=histname)
+    fig = px.scatter(tdf, x="2 Theta", y="intensity", opacity=0, title=hist_name)
 
-    fig.add_scatter(x=df["2 Theta"], y=df["intensity"], mode="markers", opacity=0.8, name="powder data", zorder=0)
+    fig.add_scatter(
+        x=df["2 Theta"],
+        y=df["intensity"],
+        mode="markers",
+        opacity=0.8,
+        name="powder data",
+        zorder=0,
+    )
     fig.update_traces(
         marker=dict(
             size=5,
@@ -554,13 +560,22 @@ def plot_powder(histname, limits):
             line=dict(
                 width=2,
                 color="royalblue",
-            )
+            ),
         ),
         selector=dict(mode="markers"),
     )
 
-    fig.add_scatter(x=df["2 Theta"], y=df["fit"], mode="lines", opacity=1, name="fit", zorder=2)
-    fig.add_scatter(x=df["2 Theta"], y=df["background"], mode="lines", opacity=1, name="background", zorder=1)
+    fig.add_scatter(
+        x=df["2 Theta"], y=df["fit"], mode="lines", opacity=1, name="fit", zorder=2
+    )
+    fig.add_scatter(
+        x=df["2 Theta"],
+        y=df["background"],
+        mode="lines",
+        opacity=1,
+        name="background",
+        zorder=1,
+    )
 
     fig.add_vline(x=limits[0], line_width=3, line_dash="dash", line_color="green")
     fig.add_vline(x=limits[1], line_width=3, line_dash="dash", line_color="green")
@@ -568,39 +583,39 @@ def plot_powder(histname, limits):
     return fig
 
 
-def updatehistory():
+def update_history():
     """
     fetches history from galaxy to populate load project choices.
     uses pandas dataframes for shiny output rendering.
     """
-    print("updatehistory triggered")
-    history = gxhistory.updateHist()
-    histframe = pd.DataFrame(history)
-    histtable = histframe[["hid", "name", "id"]]
-    histdata.set(histtable)
-    gpx_df = histtable[histtable["name"].str.endswith("gpx")]
-    choicedict = dict(
+    print("update_history triggered")
+    history = gxhistory.gx_update_history()
+    hist_frame = pd.DataFrame(history)
+    hist_table = hist_frame[["hid", "name", "id"]]
+    hist_data.set(hist_table)
+    gpx_df = hist_table[hist_table["name"].str.endswith("gpx")]
+    choice_dict = dict(
         [
             (i, str(h) + ": " + fn)
             for i, h, fn in zip(gpx_df["id"], gpx_df["hid"], gpx_df["name"])
         ]
     )
 
-    choicedict = dict(reversed(choicedict.items()))
-    # choicedict = {}
-    # for row in histtable.itertuples():
-    #    choicedict[row.id] = row.hid + ": " + row.name
+    choice_dict = dict(reversed(choice_dict.items()))
+    # choice_dict = {}
+    # for row in hist_table.itertuples():
+    #    choice_dict[row.id] = row.hid + ": " + row.name
 
-    select_gpx_choices.set(choicedict)  # dictionary with {ID:name}
+    select_gpx_choices.set(choice_dict)  # dictionary with {ID:name}
     ui.update_select("selectgpx", choices=select_gpx_choices())
 
 
-def viewproj():
+def view_proj():
     # view project data window TBC
     print(view_proj_choices)
 
 
-def loadproject(id):
+def load_project(id):
     if id != "init":
         # remove any dynamic UI items from previous project
         remove_inst_inputs()
@@ -612,26 +627,26 @@ def loadproject(id):
 
         location = "/var/shiny-server/shiny_test/work/"
         fp = os.path.join(location, fn)
-        gxhistory.getproject(id, fp)
+        gxhistory.get_project(id, fp)
         tgpx = gsas_load_gpx(fp, fn)
-        og_tgpx = gsas_load_gpx(fp, "og_"+fn)
+        og_tgpx = gsas_load_gpx(fp, "og_" + fn)
         current_gpx_id.set(id)
         current_gpx_fname.set(fn)
         # load the phase names for the sidebar selection
-        phasenames = {}
+        phase_names = {}
         for phase in tgpx.phases():
             name = phase.name
-            phasenames[name] = name
-        select_phase_choices.set(phasenames)
+            phase_names[name] = name
+        select_phase_choices.set(phase_names)
 
         # load the histogram names for sidebar selection
-        histnames = {}
+        hist_names = {}
         for hist in tgpx.histograms():
-            histnames[hist.name] = hist.name
-        select_hist_choices.set(histnames)
+            hist_names[hist.name] = hist.name
+        select_hist_choices.set(hist_names)
 
         # set reactive variable values
-        inputgpxfile.set(fp)
+        input_gpx_file.set(fp)
         gpx.set(tgpx)
         og_gpx.set(og_tgpx)
         constraints.set([])
@@ -641,7 +656,7 @@ def loadproject(id):
         ui.update_select("selectphase", choices=select_phase_choices())
 
         # load data for a histogram/clear previous histogram data
-        loadhist(list(histnames.keys())[0])
+        load_histogram(list(hist_names.keys())[0])
 
 
 def save_inst_params(app_input):
@@ -650,46 +665,46 @@ def save_inst_params(app_input):
     """
     # change this to change the full dictionary directly
     # some inputs filtered out so need a reference for which inputs to take
-    histname = app_input.selecthist()
-    h = gpx().histogram(histname)
-    instdictfull = h.getHistEntryValue(["Instrument Parameters"])
+    hist_name = app_input.selecthist()
+    h = gpx().histogram(hist_name)
+    inst_dict_full = h.getHistEntryValue(["Instrument Parameters"])
     irl = app_input.inst_selection()
-    ip = instparams().copy()
+    ip = inst_params().copy()
 
     # set all flags to false
     for param in ip:
         if isinstance(ip[param], list):
             if len(ip[param]) == 3:
                 if ip[param][2]:
-                    instdictfull[0][param][2] = False
+                    inst_dict_full[0][param][2] = False
 
     # add new refinement flags
 
-    instrefdict = {"Instrument Parameters": irl}
-    h.set_refinements(instrefdict)
+    inst_ref_dict = {"Instrument Parameters": irl}
+    h.set_refinements(inst_ref_dict)
 
     for param in irl:
-        instdictfull[0][param][2] = True
+        inst_dict_full[0][param][2] = True
 
     # add new set values
     for param in ip:
         if isinstance(ip[param], list):
             if isinstance(ip[param][0], float) or isinstance(ip[param][1], float):
                 if param != "Polariz." and param != "SH/L":
-                    instdictfull[0][param][1] = getattr(app_input, param)()
+                    inst_dict_full[0][param][1] = getattr(app_input, param)()
 
-    h.setHistEntryValue(["Instrument Parameters"], instdictfull)
-    instparams.set(ip)
-    instreflist.set(irl)
+    h.setHistEntryValue(["Instrument Parameters"], inst_dict_full)
+    inst_params.set(ip)
+    inst_ref_list.set(irl)
 
 
 def save_samp_params(app_input):
     """
     collects sample parameter inputs and saves them to gpx
     """
-    histname = app_input.selecthist()
-    h = gpx().histogram(histname)
-    sp = sampleparams().copy()
+    hist_name = app_input.selecthist()
+    h = gpx().histogram(hist_name)
+    sp = sample_params().copy()
 
     # gets sample refinement input
     srl = app_input.samp_selection()
@@ -707,7 +722,7 @@ def save_samp_params(app_input):
 
     # set the new values
     for param in sp:
-        if param in sampUIlist():
+        if param in samp_UI_list():
 
             if isinstance(sp[param], list):
                 sp[param][0] = getattr(app_input, param)()
@@ -721,11 +736,11 @@ def save_samp_params(app_input):
             h.setHistEntryValue(["Sample Parameters", param], sp[param])
 
     # update the reactive values / global values
-    sampreflist.set(srl)
-    sampleparams.set(sp)
+    samp_ref_list.set(srl)
+    sample_params.set(sp)
 
 
-def submitout():
+def submit_out():
     """
     saves project changes to file and submits to galaxy history
     runs static tool GSAS2_refinement_executor in the background
@@ -745,13 +760,13 @@ def submitout():
     gxhistory.wait_for_dataset(id)
 
     # load the history with the new refinement output gpx file
-    updatehistory()
-    gpx_table = histdata()[(histdata()["name"].str.contains("gpx"))]
+    update_history()
+    gpx_table = hist_data()[(hist_data()["name"].str.contains("gpx"))]
     row_id = gpx_table["hid"].idxmax()
     id = gpx_table.loc[row_id, "id"]
 
     # load the refined output project and update the UI
-    loadproject(id)
+    load_project(id)
     ui.update_select("selectgpx", selected=id)
 
 
@@ -762,14 +777,14 @@ def refresh_gpx_history():
         str: Galaxy API ID for the msot recent event in the history.
     """
     time.sleep(2)
-    updatehistory()
-    row_id = histdata()["hid"].idxmax()
-    id = histdata().loc[row_id, "id"]
+    update_history()
+    row_id = hist_data()["hid"].idxmax()
+    id = hist_data().loc[row_id, "id"]
     return id
 
 
 def save_delta():
     diff = DeepDiff(og_gpx(), gpx(), exclude_paths="filename")
     delta = Delta(diff)
-    with open('delta1', 'wb') as dump_file:
+    with open("delta1", "wb") as dump_file:
         delta.dump(dump_file)

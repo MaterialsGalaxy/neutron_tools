@@ -11,11 +11,11 @@ def load_phase_constraints(gpx):
     return phase_constraint_list
 
 
-def hist_export(gpx, histname):
+def hist_export(gpx, histogram_name):
     """
     returns histogram data for plotting
     """
-    h = gpx.histogram(histname)
+    h = gpx.histogram(histogram_name)
     x = np.array(h.getdata("X"))
     y = np.array(h.getdata("Yobs"))
     ycalc = np.array(h.getdata("Ycalc"))
@@ -25,19 +25,19 @@ def hist_export(gpx, histname):
     return x, y, ycalc, dy, bkg
 
 
-def load_histogram_parameters(gpx, histname):
-    h = gpx.histogram(histname)
-    sampledict = h.getHistEntryValue(["Sample Parameters"])
-    instdict = h.getHistEntryValue(["Instrument Parameters"])[0]
+def load_histogram_parameters(gpx, histogram_name):
+    h = gpx.histogram(histogram_name)
+    sample_dict = h.getHistEntryValue(["Sample Parameters"])
+    inst_dict = h.getHistEntryValue(["Instrument Parameters"])[0]
     sp = {}
     ip = {}
     # initialise parameter dictionaries with fixed keynames
-    for param, value in sampledict.items():
+    for param, value in sample_dict.items():
         # new_param_name = param.translate({ord(i): None for i in './'})
         # sp[new_param_name] = value
         sp[param] = value
 
-    for param, value in instdict.items():
+    for param, value in inst_dict.items():
         # new_param_name = param.translate({ord(i): None for i in './'})
         # ip[new_param_name] = value
         ip[param] = value
@@ -67,10 +67,10 @@ def load_histogram_parameters(gpx, histname):
     return (irl, ip, ic, srl, sp, sc)
 
 
-def gsas_load_gpx(inputgpxfile, fn):
+def gsas_load_gpx(input_gpx_file, fn):
     """loads gpx from input file and saves it to output file
     the current project is in outputfile so the loaded ones
     from the galaxy history remain unchanged"""
-    gpx = G2sc.G2Project(gpxfile=inputgpxfile, newgpx=fn)
+    gpx = G2sc.G2Project(gpxfile=input_gpx_file, newgpx=fn)
     gpx.save()
     return gpx
