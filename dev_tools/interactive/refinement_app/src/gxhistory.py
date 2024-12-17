@@ -1,5 +1,4 @@
 from bioblend.galaxy import GalaxyInstance
-import subprocess
 import logging
 import os
 
@@ -17,7 +16,7 @@ log = logging.getLogger()
 def get_galaxy_connection(history_id=None, obj=True):
     # history_id = history_id or os.environ['HISTORY_ID']
     key = os.environ["API_KEY"]
-    url = "http://host-172-16-101-76.nubes.stfc.ac.uk/"
+    url = os.environ["GALAXY_URL"]
     gi = GalaxyInstance(url=url, key=key)
     # gi.histories.get_histories(history_id)
     return gi
