@@ -1,10 +1,4 @@
-import sys
-
-# import os
 import numpy as np
-
-sys.path.append("/srv/shiny-server/GSASII")
-
 import GSASIIscriptable as G2sc  # type: ignore
 
 

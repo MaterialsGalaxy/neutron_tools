@@ -1,7 +1,7 @@
 <tool id="dev_interactive_refinement" tool_type="interactive" name="interactive refinement demo" version="0.0.1">
     <description>Interactive tool for GSASII Rietveld refinement of neutron powder diffraction data</description>
     <requirements>
-        <container type="docker">milanscd/interactive_gsas2_refinement_demo:0.1.20</container>
+        <container type="docker">milanscd/interactive_gsas2_refinement_demo:0.1.21</container>
     </requirements>
     <entry_points>
         <entry_point name="Interactive_refinement" requires_domain="False" requires_path_in_url="False" requires_path_in_header_named="refinement-header">
@@ -20,6 +20,8 @@
     </environment_variables>
 
     <command><![CDATA[
+        cp -r $__tool_directory__/src/. /srv/shiny-server/ &&
+        cp $__tool_directory__/src/shiny-server.sh /usr/bin/shiny-server.sh &&
         /usr/bin/shiny-server.sh
     ]]>
     </command>
