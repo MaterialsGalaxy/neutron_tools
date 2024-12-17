@@ -123,12 +123,15 @@ def add_constr(ctype, df, var_df):
     valid = False
     if len(df.index) >= 2:
         vars_valid = set(constr_vars).issubset(set(var_df["code"].tolist()))
-        try:
-            coefs = [float(c) for c in constr_coefs]
-        except Exception:
-            print("invalid coefficients")
+        if vars_valid:
+            try:
+                coefs = [float(c) for c in constr_coefs]
+            except Exception:
+                print("invalid coefficients")
+            else:
+                valid = True
         else:
-            valid = True
+            print("invalid parameter name")
 
     # add the constriants to the gpx
     if valid:
@@ -329,7 +332,6 @@ def save_bkg_coefs(histname, coefs):
             bkg_data[0][3:] = new_coefs
 
 
-
 def buildinstpage():
     """
     in development
@@ -466,7 +468,8 @@ def loadhist(histname):
     # load the ui for hist data in the project tab
     if histname != "init":
         # update the histogram 'data tree' in the sidebar
-        data = gpx().histogram(histname).data
+        h = gpx().histogram(histname)
+        data = h.data
         options = {}
         for subheading in data:
             options[subheading] = subheading
@@ -489,6 +492,12 @@ def loadhist(histname):
         # update the plots and the UI
         update_plot(gpx(), histname)
 
+        lim_min = min(x())
+        lim_max = max(x())
+        lim_low = h.Limits("lower")
+        lim_up = h.Limits("upper")
+        ui.update_slider("limits", min=lim_min, max=lim_max, value=[lim_low, lim_up])
+
         # build the new UI
         buildsamppage()
         buildinstpage()
@@ -500,6 +509,7 @@ def update_plot(gpx, histname):
     updates plot parameters for the powder hsitogram to ensure the
     output is not stale
     """
+    h = gpx.histogram(histname)
     tx, ty, tycalc, tdy, tbkg = hist_export(gpx, histname)
     x.set(tx)
     y.set(ty)
@@ -513,7 +523,13 @@ def loadphase():
     print(select_phase_choices())
 
 
-def plot_powder(histname):
+def set_hist_limits(histname, limits):
+    h = gpx().histogram(histname)
+    h.Limits("lower", limits[0])
+    h.Limits("upper", limits[1])
+
+
+def plot_powder(histname, limits):
     """
     plots the powder histogram data from the current project
     """
@@ -546,6 +562,8 @@ def plot_powder(histname):
     fig.add_scatter(x=df["2 Theta"], y=df["fit"], mode="lines", opacity=1, name="fit", zorder=2)
     fig.add_scatter(x=df["2 Theta"], y=df["background"], mode="lines", opacity=1, name="background", zorder=1)
 
+    fig.add_vline(x=limits[0], line_width=3, line_dash="dash", line_color="green")
+    fig.add_vline(x=limits[1], line_width=3, line_dash="dash", line_color="green")
     # fig.show()
     return fig
 

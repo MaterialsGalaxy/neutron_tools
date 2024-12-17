@@ -16,6 +16,7 @@ from viewmodel import (
     background_functions,
     sampUIlist,
     plot_powder,
+    set_hist_limits,
     updatehistory,
     loadproject,
     viewproj,
@@ -265,13 +266,20 @@ with ui.navset_pill(id="plot"):
 
         @render_plotly
         def plot():
-            fig = plot_powder(input.selecthist())
+            fig = plot_powder(input.selecthist(), input.limits())
             return fig
+
+        ui.input_slider("limits", "Set limits", min=0, max=1, value=[0, 1])
+
+        @reactive.effect
+        @reactive.event(input.limits)
+        def app_set_limits():
+            set_hist_limits(input.selecthist(), input.limits())
 
     with ui.nav_panel("History", value="hist"):
 
         @render.data_frame
-        @reactive.event(input.updatehist)
+        @reactive.event(input.updatehist, input.loadgpx)
         def renderupdatehistory():
             return render.DataTable(histdata())
 
