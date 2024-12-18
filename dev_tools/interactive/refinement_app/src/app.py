@@ -173,7 +173,12 @@ with ui.navset_hidden(id="tab"):
             with ui.nav_panel("atoms", value="atoms"):
 
                 @render.data_frame
-                @reactive.event(input.load_gpx, input.select_phase, input.view_phase, input.save_atoms)
+                @reactive.event(
+                    input.load_gpx,
+                    input.select_phase,
+                    input.view_phase,
+                    input.save_atoms,
+                )
                 def render_atom_table():
                     return render.DataTable(
                         atom_data(input.select_phase()),

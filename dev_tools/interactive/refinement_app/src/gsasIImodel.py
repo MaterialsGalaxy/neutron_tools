@@ -7,6 +7,7 @@ from typing import (
 
 GSAS2Project = NewType("GSAS2Project", type[G2sc.G2Project])
 
+
 def load_phase_constraints(gpx: GSAS2Project) -> list:
     """
     load the phase constraints previously added to the project
@@ -30,12 +31,14 @@ def hist_export(gpx: GSAS2Project, histogram_name: str) -> tuple:
     return x, y, ycalc, dy, bkg
 
 
-def load_histogram_parameters(gpx: GSAS2Project, histogram_name: str) -> tuple:
+def load_histogram_parameters(
+    gpx: GSAS2Project, histogram_name: str
+) -> tuple[list, dict, dict, list, dict, dict]:
     h = gpx.histogram(histogram_name)
-    sample_dict = h.getHistEntryValue(["Sample Parameters"])
-    inst_dict = h.getHistEntryValue(["Instrument Parameters"])[0]
-    sp = {}
-    ip = {}
+    sample_dict: dict = h.getHistEntryValue(["Sample Parameters"])
+    inst_dict: dict = h.getHistEntryValue(["Instrument Parameters"])[0]
+    sp: dict = {}
+    ip: dict = {}
     # initialise parameter dictionaries with fixed keynames
     for param, value in sample_dict.items():
         # new_param_name = param.translate({ord(i): None for i in './'})
@@ -47,11 +50,19 @@ def load_histogram_parameters(gpx: GSAS2Project, histogram_name: str) -> tuple:
         # ip[new_param_name] = value
         ip[param] = value
 
-    srl = []
-    irl = []
-    sc = {}
-    ic = {}
-    inst_noref_list = ["Type", "Bank", "Lam1", "Lam2", "Azimuth", "2-theta", "fltPath"]
+    srl: list = []
+    irl: list = []
+    sc: dict = {}
+    ic: dict = {}
+    inst_noref_list: list[str] = [
+        "Type",
+        "Bank",
+        "Lam1",
+        "Lam2",
+        "Azimuth",
+        "2-theta",
+        "fltPath",
+    ]
     # populating list of sample refinements that are already active
     for param, val in sp.items():
         # set sample choices dict for UI

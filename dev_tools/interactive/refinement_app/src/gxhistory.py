@@ -1,6 +1,7 @@
 from bioblend.galaxy import GalaxyInstance
 import logging
 import os
+import typing
 
 """These functions were edited from the interactive wallace too repo.
 Some may not be necessary and anything here should probably be referenced?
@@ -13,16 +14,16 @@ logging.getLogger("bioblend").setLevel(logging.CRITICAL)
 log = logging.getLogger()
 
 
-def get_galaxy_connection(history_id=None, obj=True):
+def get_galaxy_connection(history_id: str = None, obj: bool = True):
     # history_id = history_id or os.environ['HISTORY_ID']
-    key = os.environ["API_KEY"]
-    url = os.environ["GALAXY_URL"]
+    key: str = os.environ["API_KEY"]
+    url: str = os.environ["GALAXY_URL"]
     gi = GalaxyInstance(url=url, key=key)
     # gi.histories.get_histories(history_id)
     return gi
 
 
-def put(file_name, file_type="auto", history_id=None):
+def put(file_name: str, file_type: str = "auto", history_id: bool = None) -> None:
     """
     Given a file_name of any file accessible to the docker instance, this
     function will upload that file to galaxy using the current history.
@@ -42,7 +43,7 @@ def put(file_name, file_type="auto", history_id=None):
     gi.tools.upload_file(file_name, history_id)
 
 
-def gx_update_history():
+def gx_update_history() -> dict:
     history_id = os.environ["HISTORY_ID"]
     gi = get_galaxy_connection(history_id=history_id)
     history = gi.histories.show_history(
@@ -56,7 +57,7 @@ def gx_update_history():
     return history
 
 
-def get_project(dataset_id, filep):
+def get_project(dataset_id: str, filep: str) -> None:
     history_id = os.environ["HISTORY_ID"]
     gi = get_galaxy_connection(history_id=history_id)
     gi.datasets.download_dataset(
@@ -64,7 +65,7 @@ def get_project(dataset_id, filep):
     )
 
 
-def run_refinement(dataset_id, delta_id):
+def run_refinement(dataset_id: str, delta_id: str) -> None:
     history_id = os.environ["HISTORY_ID"]
     gi = get_galaxy_connection(history_id=history_id)
     gi.datasets.wait_for_dataset(delta_id)
@@ -74,7 +75,7 @@ def run_refinement(dataset_id, delta_id):
     gi.tools.run_tool(history_id, "gpx_gsas2", input_data)
 
 
-def wait_for_dataset(dataset_id):
+def wait_for_dataset(dataset_id: str) -> None:
     history_id = os.environ["HISTORY_ID"]
     gi = get_galaxy_connection(history_id=history_id)
     gi.datasets.wait_for_dataset(dataset_id)
