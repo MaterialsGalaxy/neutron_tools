@@ -174,7 +174,7 @@ with ui.navset_hidden(id="tab"):
 
                 @render.data_frame
                 @reactive.event(input.load_gpx, input.select_phase, input.save_atoms)
-                def renderatomtable():
+                def render_atom_table():
                     return render.DataTable(
                         atom_data(input.select_phase()),
                         editable=True,
@@ -186,7 +186,7 @@ with ui.navset_hidden(id="tab"):
                 @reactive.effect
                 @reactive.event(input.save_atoms)
                 def app_save_atom_table():
-                    data = renderatomtable.data_view()
+                    data = render_atom_table.data_view()
                     save_atom_table(data, input.select_phase())
 
     with ui.nav_menu("Project"):
@@ -283,7 +283,7 @@ with ui.navset_pill(id="plot"):
 
         @render.data_frame
         @reactive.event(input.update_history, input.load_gpx)
-        def renderupdate_history():
+        def render_update_history():
             return render.DataTable(hist_data())
 
 
@@ -309,7 +309,7 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
 
     @reactive.effect
     @reactive.event(input.view_phase)
-    def app_updatephasenav():
+    def app_update_phase_nav():
         tab = "Phase"
         update_nav(tab)
 
@@ -319,7 +319,7 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
 
     @reactive.effect
     @reactive.event(input.view_hist_data, input.view_histogram)
-    def app_update_historynav():
+    def app_update_history_nav():
         tab = input.view_hist_data()
         update_nav(tab)
 

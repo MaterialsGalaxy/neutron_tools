@@ -457,7 +457,7 @@ def remove_inst_inputs():
 
 def view_hist():
     # view a specific subtree of the histogram in the histogram tab
-    print(select_view_hist())
+    print("select_view_hist()")
 
 
 def load_histogram(hist_name):
@@ -519,7 +519,7 @@ def update_plot(gpx, hist_name):
 
 def load_phase():
     # load the ui for phase data in the project tab TBC or unecessary
-    print(select_phase_choices())
+    print("select_phase_choices()")
 
 
 def set_hist_limits(hist_name, limits):
@@ -594,25 +594,25 @@ def update_history():
     hist_table = hist_frame[["hid", "name", "id"]]
     hist_data.set(hist_table)
     gpx_df = hist_table[hist_table["name"].str.endswith("gpx")]
-    choice_dict = dict(
+    gpx_choice_dict = dict(
         [
             (i, str(h) + ": " + fn)
             for i, h, fn in zip(gpx_df["id"], gpx_df["hid"], gpx_df["name"])
         ]
     )
 
-    choice_dict = dict(reversed(choice_dict.items()))
-    # choice_dict = {}
+    gpx_choice_dict = dict(reversed(gpx_choice_dict.items()))
+    # gpx_choice_dict = {}
     # for row in hist_table.itertuples():
-    #    choice_dict[row.id] = row.hid + ": " + row.name
+    #    gpx_choice_dict[row.id] = row.hid + ": " + row.name
 
-    select_gpx_choices.set(choice_dict)  # dictionary with {ID:name}
-    ui.update_select("selectgpx", choices=select_gpx_choices())
+    select_gpx_choices.set(gpx_choice_dict)  # dictionary with {ID:name}
+    ui.update_select("select_gpx", choices=select_gpx_choices())
 
 
 def view_proj():
     # view project data window TBC
-    print(view_proj_choices)
+    print("view_proj_choices")
 
 
 def load_project(id):
@@ -652,8 +652,8 @@ def load_project(id):
         constraints.set([])
 
         # update the phase/histogram selection uis
-        ui.update_select("selecthist", choices=select_hist_choices())
-        ui.update_select("selectphase", choices=select_phase_choices())
+        ui.update_select("select_hist", choices=select_hist_choices())
+        ui.update_select("select_phase", choices=select_phase_choices())
 
         # load data for a histogram/clear previous histogram data
         load_histogram(list(hist_names.keys())[0])
@@ -665,7 +665,7 @@ def save_inst_params(app_input):
     """
     # change this to change the full dictionary directly
     # some inputs filtered out so need a reference for which inputs to take
-    hist_name = app_input.selecthist()
+    hist_name = app_input.select_hist()
     h = gpx().histogram(hist_name)
     inst_dict_full = h.getHistEntryValue(["Instrument Parameters"])
     irl = app_input.inst_selection()
@@ -702,7 +702,7 @@ def save_samp_params(app_input):
     """
     collects sample parameter inputs and saves them to gpx
     """
-    hist_name = app_input.selecthist()
+    hist_name = app_input.select_hist()
     h = gpx().histogram(hist_name)
     sp = sample_params().copy()
 
@@ -767,7 +767,7 @@ def submit_out():
 
     # load the refined output project and update the UI
     load_project(id)
-    ui.update_select("selectgpx", selected=id)
+    ui.update_select("select_gpx", selected=id)
 
 
 def refresh_gpx_history():

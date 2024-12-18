@@ -60,7 +60,7 @@ def get_project(dataset_id, filep):
     history_id = os.environ["HISTORY_ID"]
     gi = get_galaxy_connection(history_id=history_id)
     gi.datasets.download_dataset(
-        dataset_id=dataset_id, file_path=filep, use_default_file_name=False
+        dataset_id=dataset_id, file_path=filep, use_default_filename=False
     )
 
 
