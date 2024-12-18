@@ -100,7 +100,7 @@ background_functions = {
 }
 
 
-def update_nav(tab):
+def update_nav(tab: str) -> None:
     """
     updates the tab viewed in the UI.
     The main UI uses a hidden navset so the menus
@@ -111,7 +111,7 @@ def update_nav(tab):
     ui.update_navs(id="tab", selected=tab)
 
 
-def add_constr(ctype, df, var_df):
+def add_constr(ctype: str, df: pd.DataFrame, var_df: pd.DataFrame) -> None:
     """
     wrapper function for adding equivalence or equation constraints
     equation constraints are forced to have a total of 1
@@ -144,7 +144,7 @@ def add_constr(ctype, df, var_df):
             gpx().add_EqnConstr(1, constr_vars, multlist=coefs)
 
 
-def build_constraints_df(phase_name):
+def build_constraints_df(phase_name: str) -> pd.DataFrame:
     """
     builds/populates the Dataframe of possible parameters
     to choose for phase constraints
@@ -177,13 +177,13 @@ def build_constraints_df(phase_name):
     return phase_constr_df
 
 
-def remove_constraint(id):
+def remove_constraint(id: str) -> None:
     constraints = load_phase_constraints(gpx())
     if isinstance(id, int) and id < len(constraints):
         constraints.pop(id)
 
 
-def show_phase_constr():
+def show_phase_constr() -> pd.DataFrame:
     """
     TBC reads constraint data from the gpx and re arranges them for UI output
     """
@@ -198,7 +198,7 @@ def show_phase_constr():
             for parameter in constraint:
                 if isinstance(parameter, list):
                     var_obj = parameter[1]
-                    var_name = var_obj.varname()
+                    var_name: str = var_obj.varname()
                     new_entry = new_entry + str(parameter[0]) + "*" + var_name + " + "
 
             new_entry = new_entry.strip("+ ")
@@ -223,7 +223,7 @@ def show_phase_constr():
     return current_constraints
 
 
-def save_atom_table(df, phase_name):
+def save_atom_table(df: pd.DataFrame, phase_name: str) -> None:
     """
     saves the edited atom dataframe
     currently only saves refinement flag edits to the gpx
@@ -244,7 +244,7 @@ def save_atom_table(df, phase_name):
             print("invalid flags")
 
 
-def atom_data(phase_name):
+def atom_data(phase_name: str) -> pd.DataFrame:
     """
     generates a pandas dataframe containing data for atoms
     in the selected phase.
@@ -254,7 +254,7 @@ def atom_data(phase_name):
 
     # initialise the dataframe
     atom_cols = ["Name", "type", "refine", "x", "y", "z", "frac", "multi", "Uiso"]
-    atom_frame = pd.DataFrame(columns=atom_cols)
+    atom_frame: pd.DataFrame = pd.DataFrame(columns=atom_cols)
 
     # populate the dataframe with data from the project
     for atom in phase.atoms():
@@ -275,9 +275,9 @@ def atom_data(phase_name):
     return atom_frame
 
 
-def load_bkg_data(hist_name):
+def load_bkg_data(hist_name: str) -> list[list, dict]:
     if hist_name != "init":
-        bkg_data = gpx().histogram(hist_name).Background
+        bkg_data: list[list, dict] = gpx().histogram(hist_name).Background
         return bkg_data
     else:
         return None
@@ -285,35 +285,35 @@ def load_bkg_data(hist_name):
     # current_bkg_func.set()
 
 
-def build_bkg_page(hist_name):
+def build_bkg_page(hist_name: str) -> None:
     bkg_data = load_bkg_data(hist_name)
     ui.update_select("background_function", selected=bkg_data[0][0])
     ui.update_checkbox("bkg_refine", value=bkg_data[0][1])
     ui.update_numeric("num_bkg_coefs", value=bkg_data[0][2])
 
 
-def set_bkg_func(hist_name, func):
+def set_bkg_func(hist_name: str, func_name: str) -> None:
     if hist_name != "init":
         bkg_data = load_bkg_data(hist_name)
-        bkg_data[0][0] = func
+        bkg_data[0][0] = func_name
 
 
-def set_bkg_refine(hist_name, flag):
+def set_bkg_refine(hist_name: str, flag: bool) -> None:
     if hist_name != "init":
         bkg_data = load_bkg_data(hist_name)
         bkg_data[0][1] = flag
 
 
-def set_bkg_coefs(hist_name, num):
+def set_bkg_coefs(hist_name: str, num_coefs: int) -> None:
     if hist_name != "init":
         bkg_data = load_bkg_data(hist_name)
-        bkg_data[0][2] = num
+        bkg_data[0][2] = num_coefs
         current_coefs = len(bkg_data[0]) - 3
-        if num > current_coefs:
-            bkg_data[0] = bkg_data[0] + [np.float64(0.0)] * (num - current_coefs)
+        if num_coefs > current_coefs:
+            bkg_data[0] = bkg_data[0] + [np.float64(0.0)] * (num_coefs - current_coefs)
 
 
-def build_bkg_coef_df(hist_name):
+def build_bkg_coef_df(hist_name: str) -> pd.DataFrame:
     if hist_name != "init":
         bkg_data = load_bkg_data(hist_name)
         coefs = bkg_data[0][3:]
@@ -321,7 +321,7 @@ def build_bkg_coef_df(hist_name):
         return bkg_coef_df
 
 
-def save_bkg_coefs(hist_name, coefs):
+def save_bkg_coefs(hist_name: str, coefs: list) -> None:
     if hist_name != "init":
         bkg_data = load_bkg_data(hist_name)
         try:
@@ -333,7 +333,7 @@ def save_bkg_coefs(hist_name, coefs):
             bkg_data[0][3:] = new_coefs
 
 
-def build_inst_page():
+def build_inst_page() -> None:
     """
     in development
     generate the instrument parameter UI dynamically
@@ -370,7 +370,7 @@ def build_inst_page():
                     previous = param
 
 
-def build_samp_page():
+def build_samp_page() -> None:
     # add updating the flag choices and filter which inputs to show
     # numerically or text aswell.
     ui.update_selectize(
@@ -448,24 +448,24 @@ def build_samp_page():
     samp_UI_list.set(sample_UI_list)
 
 
-def remove_samp_inputs():
+def remove_samp_inputs() -> None:
     if sample_params() is not None:
         for param in sample_params().keys():
             ui.remove_ui(selector="div:has(> " + "#" + param + ")")
 
 
-def remove_inst_inputs():
+def remove_inst_inputs() -> None:
     if inst_params() is not None:
         for param in inst_params().keys():
             ui.remove_ui(selector="div:has(> " + "#" + param + ")")
 
 
-def view_hist():
+def view_hist() -> None:
     # view a specific subtree of the histogram in the histogram tab
     print("select_view_hist()")
 
 
-def load_histogram(hist_name):
+def load_histogram(hist_name: str) -> None:
     """
     loads the selected histogram and updates the UI
     to reflect the new hsitograms data.
@@ -474,7 +474,7 @@ def load_histogram(hist_name):
     if hist_name != "init":
         # update the histogram 'data tree' in the sidebar
         h = gpx().histogram(hist_name)
-        data = h.data
+        data: dict = h.data
         options = {}
         for subheading in data:
             options[subheading] = subheading
@@ -497,10 +497,10 @@ def load_histogram(hist_name):
         # update the plots and the UI
         update_plot(gpx(), hist_name)
 
-        lim_min = min(x())
-        lim_max = max(x())
-        lim_low = h.Limits("lower")
-        lim_up = h.Limits("upper")
+        lim_min: float = min(x())
+        lim_max: float = max(x())
+        lim_low: float = h.Limits("lower")
+        lim_up: float = h.Limits("upper")
         ui.update_slider("limits", min=lim_min, max=lim_max, value=[lim_low, lim_up])
 
         # build the new UI
@@ -509,7 +509,7 @@ def load_histogram(hist_name):
         build_bkg_page(hist_name)
 
 
-def update_plot(gpx, hist_name):
+def update_plot(gpx: GSAS2Project, hist_name: str) -> None:
     """
     updates plot parameters for the powder hsitogram to ensure the
     output is not stale
@@ -522,18 +522,18 @@ def update_plot(gpx, hist_name):
     bkg.set(tbkg)
 
 
-def load_phase():
+def load_phase() -> None:
     # load the ui for phase data in the project tab TBC or unecessary
     print("select_phase_choices()")
 
 
-def set_hist_limits(hist_name, limits):
+def set_hist_limits(hist_name: str, limits: list) -> None:
     h = gpx().histogram(hist_name)
     h.Limits("lower", limits[0])
     h.Limits("upper", limits[1])
 
 
-def plot_powder(hist_name, limits):
+def plot_powder(hist_name: str, limits: list):
     """
     plots the powder histogram data from the current project
     """
@@ -588,14 +588,14 @@ def plot_powder(hist_name, limits):
     return fig
 
 
-def update_history():
+def update_history() -> None:
     """
     fetches history from galaxy to populate load project choices.
     uses pandas dataframes for shiny output rendering.
     """
     print("update_history triggered")
     history = gxhistory.gx_update_history()
-    hist_frame = pd.DataFrame(history)
+    hist_frame: pd.DataFrame = pd.DataFrame(history)
     hist_table = hist_frame[["hid", "name", "id"]]
     hist_data.set(hist_table)
     gpx_df = hist_table[hist_table["name"].str.endswith("gpx")]
@@ -615,26 +615,26 @@ def update_history():
     ui.update_select("select_gpx", choices=select_gpx_choices())
 
 
-def view_proj():
+def view_proj() -> None:
     # view project data window TBC
     print("view_proj_choices")
 
 
-def load_project(id):
+def load_project(id: str) -> None:
     if id != "init":
         # remove any dynamic UI items from previous project
         remove_inst_inputs()
         remove_samp_inputs()
 
         # get the file from galaxy and load the gsas project
-        hid_and_fn = select_gpx_choices()[id]
-        fn = hid_and_fn.split(": ")[1]
+        hid_and_fn: str = select_gpx_choices()[id]
+        fn: str = hid_and_fn.split(": ")[1]
 
-        location = "/var/shiny-server/shiny_test/work/"
+        location: str = "/var/shiny-server/shiny_test/work/"
         fp = os.path.join(location, fn)
         gxhistory.get_project(id, fp)
-        tgpx = gsas_load_gpx(fp, fn)
-        og_tgpx = gsas_load_gpx(fp, "og_" + fn)
+        tgpx: GSAS2Project = gsas_load_gpx(fp, fn)
+        og_tgpx: GSAS2Project = gsas_load_gpx(fp, "og_" + fn)
         current_gpx_id.set(id)
         current_gpx_fname.set(fn)
         # load the phase names for the sidebar selection
@@ -664,17 +664,17 @@ def load_project(id):
         load_histogram(list(hist_names.keys())[0])
 
 
-def save_inst_params(app_input):
+def save_inst_params(app_input) -> None:
     """
     collects instrument parameter inputs and saves them to gpx
     """
     # change this to change the full dictionary directly
     # some inputs filtered out so need a reference for which inputs to take
-    hist_name = app_input.select_hist()
+    hist_name: str = app_input.select_hist()
     h = gpx().histogram(hist_name)
-    inst_dict_full = h.getHistEntryValue(["Instrument Parameters"])
-    irl = app_input.inst_selection()
-    ip = inst_params().copy()
+    inst_dict_full: dict = h.getHistEntryValue(["Instrument Parameters"])
+    irl: list = app_input.inst_selection()
+    ip: dict = inst_params().copy()
 
     # set all flags to false
     for param in ip:
@@ -703,16 +703,16 @@ def save_inst_params(app_input):
     inst_ref_list.set(irl)
 
 
-def save_samp_params(app_input):
+def save_samp_params(app_input) -> None:
     """
     collects sample parameter inputs and saves them to gpx
     """
-    hist_name = app_input.select_hist()
+    hist_name: str = app_input.select_hist()
     h = gpx().histogram(hist_name)
-    sp = sample_params().copy()
+    sp: dict = sample_params().copy()
 
     # gets sample refinement input
-    srl = app_input.samp_selection()
+    srl: list = app_input.samp_selection()
 
     # set all flags to false
     for param in sp:
@@ -745,7 +745,7 @@ def save_samp_params(app_input):
     sample_params.set(sp)
 
 
-def submit_out():
+def submit_out() -> None:
     """
     saves project changes to file and submits to galaxy history
     runs static tool GSAS2_refinement_executor in the background
@@ -766,16 +766,16 @@ def submit_out():
 
     # load the history with the new refinement output gpx file
     update_history()
-    gpx_table = hist_data()[(hist_data()["name"].str.contains("gpx"))]
-    row_id = gpx_table["hid"].idxmax()
-    id = gpx_table.loc[row_id, "id"]
+    gpx_table: pd.DataFrame = hist_data()[(hist_data()["name"].str.contains("gpx"))]
+    row_id: int = gpx_table["hid"].idxmax()
+    id: str = gpx_table.loc[row_id, "id"]
 
     # load the refined output project and update the UI
     load_project(id)
     ui.update_select("select_gpx", selected=id)
 
 
-def refresh_gpx_history():
+def refresh_gpx_history() -> str:
     """Finds the API id of the latest files in the galaxy history.
 
     Returns:
@@ -783,12 +783,12 @@ def refresh_gpx_history():
     """
     time.sleep(2)
     update_history()
-    row_id = hist_data()["hid"].idxmax()
-    id = hist_data().loc[row_id, "id"]
+    row_id: int = hist_data()["hid"].idxmax()
+    id: str = hist_data().loc[row_id, "id"]
     return id
 
 
-def save_delta():
+def save_delta() -> None:
     diff = DeepDiff(og_gpx(), gpx(), exclude_paths="filename")
     delta = Delta(diff)
     with open("delta1", "wb") as dump_file:
