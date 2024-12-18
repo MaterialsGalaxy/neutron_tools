@@ -101,20 +101,22 @@ background_functions = {
 
 
 def update_nav(tab: str) -> None:
-    """
-    updates the tab viewed in the UI.
-    The main UI uses a hidden navset so the menus
-    can be navigated using the sidebar
+    """changes the nvaigation tab in the UI
 
+    Args:
+        tab (str): the id of the tab to change to
     """
     # set the tab in the main view from the sidebar controls
     ui.update_navs(id="tab", selected=tab)
 
 
 def add_constr(ctype: str, df: pd.DataFrame, var_df: pd.DataFrame) -> None:
-    """
-    wrapper function for adding equivalence or equation constraints
-    equation constraints are forced to have a total of 1
+    """adds a valid phase constraint to the GSASII project.
+
+    Args:
+        ctype (str): denotes the type of phase constraint
+        df (pd.DataFrame): contains the coefficients and variables' codes for the constraint
+        var_df (pd.DataFrame): a dataframe of variables which are allowed to be in the constraint
     """
     # add constraints to constraints list and to gpx
     constr_vars = df["code"].tolist()
@@ -145,10 +147,14 @@ def add_constr(ctype: str, df: pd.DataFrame, var_df: pd.DataFrame) -> None:
 
 
 def build_constraints_df(phase_name: str) -> pd.DataFrame:
-    """
-    builds/populates the Dataframe of possible parameters
-    to choose for phase constraints
-    used so users can make selections for constraint inputs
+    """Builds a Dataframe of variables which are allowed to be added to a phase constraint.
+    This data frame contains the variables' codes, phasenames, parameters and atom labels.
+
+    Args:
+        phase_name (str): the name of the phase of interest
+
+    Returns:
+        pd.DataFrame: The dataframe of variables
     """
     # initialise constraints
     constraint_cols = ["code", "phase", "parameter", "atom"]
@@ -177,15 +183,23 @@ def build_constraints_df(phase_name: str) -> pd.DataFrame:
     return phase_constr_df
 
 
-def remove_constraint(id: str) -> None:
+def remove_constraint(id: int) -> None:
+    """removes a phase constraint from the project with the given id
+
+    Args:
+        id (str): the index of the chosen constraint in the list of the project's phase constraints.
+    """
     constraints = load_phase_constraints(gpx())
     if isinstance(id, int) and id < len(constraints):
         constraints.pop(id)
 
 
 def show_phase_constr() -> pd.DataFrame:
-    """
-    TBC reads constraint data from the gpx and re arranges them for UI output
+    """Reads the current phase constraints from the GSASII project
+    and generates a readable table to be output to the UI.
+
+    Returns:
+        pd.DataFrame: A table of current phase constraints in the project
     """
     gpx().index_ids()
     constraints = load_phase_constraints(gpx())
@@ -224,9 +238,12 @@ def show_phase_constr() -> pd.DataFrame:
 
 
 def save_atom_table(df: pd.DataFrame, phase_name: str) -> None:
-    """
-    saves the edited atom dataframe
-    currently only saves refinement flag edits to the gpx
+    """Saves refinement flag settings for the phase atoms from the UI
+    to the GSASII project object.
+
+    Args:
+        df (pd.DataFrame): The dataframe of the phase atoms
+        phase_name (str): the name of the phase edited in the GSASII project
     """
 
     phase = gpx().phase(phase_name)
@@ -245,10 +262,15 @@ def save_atom_table(df: pd.DataFrame, phase_name: str) -> None:
 
 
 def atom_data(phase_name: str) -> pd.DataFrame:
-    """
-    generates a pandas dataframe containing data for atoms
-    in the selected phase.
-    used to render in the phase atom UI.
+    """Generates a dataframe for the atoms in the phase.
+    The dataframe contains the atoms': labels, types, refinement flags, unit cell coordinates,
+    site occupation fraction, multiplicity, and atomic displacement.
+
+    Args:
+        phase_name (str): name of the phase the atoms belong to
+
+    Returns:
+        pd.DataFrame: dataframe for the atoms in the phase
     """
     phase = gpx().phase(phase_name)
 
@@ -286,6 +308,11 @@ def load_bkg_data(hist_name: str) -> list[list, dict]:
 
 
 def build_bkg_page(hist_name: str) -> None:
+    """updates the UI elements for the histogram background.
+
+    Args:
+        hist_name (str): name of the histogram which provides the data
+    """
     bkg_data = load_bkg_data(hist_name)
     ui.update_select("background_function", selected=bkg_data[0][0])
     ui.update_checkbox("bkg_refine", value=bkg_data[0][1])
@@ -293,18 +320,39 @@ def build_bkg_page(hist_name: str) -> None:
 
 
 def set_bkg_func(hist_name: str, func_name: str) -> None:
+    """sets the background function type for the chosen histogram
+    in the GSASII project object
+
+    Args:
+        hist_name (str): name of the histogram to make changes to
+        func_name (str): name of the background function
+    """
     if hist_name != "init":
         bkg_data = load_bkg_data(hist_name)
         bkg_data[0][0] = func_name
 
 
 def set_bkg_refine(hist_name: str, flag: bool) -> None:
+    """Sets the refinement flag on or off for the chosen histogram in
+    the GSASII project.
+
+    Args:
+        hist_name (str): the name of the histogram being edited
+        flag (bool): the value of the refinement flag
+    """
     if hist_name != "init":
         bkg_data = load_bkg_data(hist_name)
         bkg_data[0][1] = flag
 
 
 def set_bkg_coefs(hist_name: str, num_coefs: int) -> None:
+    """sets the number of background coefficients for the chosen histogram
+    in the GSASII project object
+
+    Args:
+        hist_name (str): The name of the histogram being edited
+        num_coefs (int): the new number of background coefficients being set
+    """
     if hist_name != "init":
         bkg_data = load_bkg_data(hist_name)
         bkg_data[0][2] = num_coefs
@@ -314,6 +362,14 @@ def set_bkg_coefs(hist_name: str, num_coefs: int) -> None:
 
 
 def build_bkg_coef_df(hist_name: str) -> pd.DataFrame:
+    """generates a dataframe of the current background coefficients in the selected histogram
+
+    Args:
+        hist_name (str): Name of the histogram being examined
+
+    Returns:
+        pd.DataFrame: A table of coefficients to be output to the UI
+    """
     if hist_name != "init":
         bkg_data = load_bkg_data(hist_name)
         coefs = bkg_data[0][3:]
@@ -322,6 +378,13 @@ def build_bkg_coef_df(hist_name: str) -> pd.DataFrame:
 
 
 def save_bkg_coefs(hist_name: str, coefs: list) -> None:
+    """Saves a background coefficient list to the selected histogram
+    in the GSASII Project.
+
+    Args:
+        hist_name (str): name of the histogram being edited
+        coefs (list): the new list of background coefficients
+    """
     if hist_name != "init":
         bkg_data = load_bkg_data(hist_name)
         try:
@@ -334,11 +397,9 @@ def save_bkg_coefs(hist_name: str, coefs: list) -> None:
 
 
 def build_inst_page() -> None:
-    """
-    in development
-    generate the instrument parameter UI dynamically
-    needed as Continuous Wave and Time of Flight experiments
-    have different parameters
+    """Builds UI elements on the histogram instrument parameter page dynamically
+    depending on the contents of the "Instrument Parameters" dictionary of the GSASII project file.
+    Currently any parameters with names containing special characters will not have UI inputs built.
     """
     # update the refinement flags choices too
     # and filter which inputs to show numerically/text
@@ -371,6 +432,11 @@ def build_inst_page() -> None:
 
 
 def build_samp_page() -> None:
+    """Builds UI elements for the histogram sample parameters page dynamically depending on
+    the contents of the "Sample Parameters" dictionary in the GSASII project object. Currently
+    many parameters do not have UI elements built because of issues with special characters and access to
+    parameters in the GSASII object.
+    """
     # add updating the flag choices and filter which inputs to show
     # numerically or text aswell.
     ui.update_selectize(
@@ -449,26 +515,30 @@ def build_samp_page() -> None:
 
 
 def remove_samp_inputs() -> None:
+    """removes previously built UI elements in the histogram sample parameters page"""
     if sample_params() is not None:
         for param in sample_params().keys():
             ui.remove_ui(selector="div:has(> " + "#" + param + ")")
 
 
 def remove_inst_inputs() -> None:
+    """removes previously built UI elements on the Histogram Instrument parameters page."""
     if inst_params() is not None:
         for param in inst_params().keys():
             ui.remove_ui(selector="div:has(> " + "#" + param + ")")
 
 
 def view_hist() -> None:
+    """TBC"""
     # view a specific subtree of the histogram in the histogram tab
     print("select_view_hist()")
 
 
 def load_histogram(hist_name: str) -> None:
-    """
-    loads the selected histogram and updates the UI
-    to reflect the new hsitograms data.
+    """Loads all data for the UI histogram pages and updates the plots
+
+    Args:
+        hist_name (str): name of the selected histogram
     """
     # load the ui for hist data in the project tab
     if hist_name != "init":
@@ -510,9 +580,12 @@ def load_histogram(hist_name: str) -> None:
 
 
 def update_plot(gpx: GSAS2Project, hist_name: str) -> None:
-    """
-    updates plot parameters for the powder hsitogram to ensure the
-    output is not stale
+    """gets the data for plotting the selected histogram from the GSASII project object
+    and sets the corresponding reactive values to store them.
+
+    Args:
+        gpx (GSAS2Project): The GSASII project object of interest
+        hist_name (str): the name of the histogram of interest
     """
     tx, ty, tycalc, tdy, tbkg = hist_export(gpx, hist_name)
     x.set(tx)
@@ -528,14 +601,27 @@ def load_phase() -> None:
 
 
 def set_hist_limits(hist_name: str, limits: list) -> None:
+    """Sets histogram limits overwhich the refinement will be calculated. Changes are saved
+    to the GSASII Project object.
+
+    Args:
+        hist_name (str): name of the histogram being edited
+        limits (list): a list containing the lower and upper limits.
+    """
     h = gpx().histogram(hist_name)
     h.Limits("lower", limits[0])
     h.Limits("upper", limits[1])
 
 
 def plot_powder(hist_name: str, limits: list):
-    """
-    plots the powder histogram data from the current project
+    """generates a plotly express figure for the histogram data with the powder data itself, the refinement fit,
+    the background and the limit lines. The figure is used to output a plot to the UI
+
+    Args:
+        hist_name (str): The name of the histogram the figure is made for
+        limits (list): a list of the lower and upper limits of the refinement
+    Returns:
+        _type_: _description_
     """
     update_plot(gpx(), hist_name)
     pwdr_data = {
@@ -589,9 +675,8 @@ def plot_powder(hist_name: str, limits: list):
 
 
 def update_history() -> None:
-    """
-    fetches history from galaxy to populate load project choices.
-    uses pandas dataframes for shiny output rendering.
+    """gets the galaxy history from the galaxy instance and generates a history table for the UI ouput. This table is set as a reactive variable.
+    Also updates the UI choices for projects to load from the galaxy history.
     """
     print("update_history triggered")
     history = gxhistory.gx_update_history()
@@ -616,11 +701,19 @@ def update_history() -> None:
 
 
 def view_proj() -> None:
+    """tbd"""
     # view project data window TBC
     print("view_proj_choices")
 
 
 def load_project(id: str) -> None:
+    """Loads a GSASII project file from the galaxy history using its galaxy API id.
+    The file is saved in the interactive tool and the other UI pages are updated with
+    the new data from the selected project.
+
+    Args:
+        id (str): _description_
+    """
     if id != "init":
         # remove any dynamic UI items from previous project
         remove_inst_inputs()
@@ -665,8 +758,12 @@ def load_project(id: str) -> None:
 
 
 def save_inst_params(app_input) -> None:
-    """
-    collects instrument parameter inputs and saves them to gpx
+    """saves input instrument parameter values and refinement flags to the
+    GSASII project object.
+
+    Args:
+        app_input (_type_): the input object from the UI which contains all of the UIs inputs.
+        This object is iterated over to obtain all the input instrument parameter values.
     """
     # change this to change the full dictionary directly
     # some inputs filtered out so need a reference for which inputs to take
@@ -704,8 +801,11 @@ def save_inst_params(app_input) -> None:
 
 
 def save_samp_params(app_input) -> None:
-    """
-    collects sample parameter inputs and saves them to gpx
+    """Saves input sample parameters to the GSASII project object
+
+    Args:
+        app_input (_type_): the input object from the UI which contains all of the UIs inputs.
+        This object is iterated over to obtain all the input sample parameter values.
     """
     hist_name: str = app_input.select_hist()
     h = gpx().histogram(hist_name)
@@ -746,10 +846,8 @@ def save_samp_params(app_input) -> None:
 
 
 def submit_out() -> None:
-    """
-    saves project changes to file and submits to galaxy history
-    runs static tool GSAS2_refinement_executor in the background
-    loads the refined file back into the interactive tool on completion
+    """saves project changes to the .gpx file and submits any changes to the original file as a delta file to the galaxy history.
+    The static tool GSAS2_refinement_executor is then run in the background and the refined file is loaded back into the interactive tool on completion.
     """
     gpx().save()
     save_delta()
@@ -789,6 +887,7 @@ def refresh_gpx_history() -> str:
 
 
 def save_delta() -> None:
+    """saves the difference between the current project file being edited and its original from the galaxy history as a "delta" binary file."""
     diff = DeepDiff(og_gpx(), gpx(), exclude_paths="filename")
     delta = Delta(diff)
     with open("delta1", "wb") as dump_file:
