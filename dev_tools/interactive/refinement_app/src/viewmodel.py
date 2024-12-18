@@ -10,6 +10,7 @@ from gsasIImodel import (
     gsas_load_gpx,
     load_phase_constraints,
     load_histogram_parameters,
+    GSAS2Project,
 )
 import plotly.express as px
 import typing
@@ -31,7 +32,7 @@ samp_ref_list = reactive.value()
 sample_params = reactive.value(None)
 input_gpx_file = reactive.value()
 inst_choices = reactive.value()
-sanp_choices = reactive.value()
+samp_choices = reactive.value()
 samp_UI_list = reactive.value([])
 
 num_bkg_coefs = reactive.value()
@@ -341,7 +342,9 @@ def build_inst_page():
     """
     # update the refinement flags choices too
     # and filter which inputs to show numerically/text
-    ui.update_selectize("inst_selection", choices=inst_choices(), selected=inst_ref_list())
+    ui.update_selectize(
+        "inst_selection", choices=inst_choices(), selected=inst_ref_list()
+    )
     # previous = "inst_selection"
 
     # generate the new UI elements
@@ -370,7 +373,9 @@ def build_inst_page():
 def build_samp_page():
     # add updating the flag choices and filter which inputs to show
     # numerically or text aswell.
-    ui.update_selectize("samp_selection", choices=sanp_choices(), selected=samp_ref_list())
+    ui.update_selectize(
+        "samp_selection", choices=samp_choices(), selected=samp_ref_list()
+    )
     previous = "sample"
     sample_hidden_list = [
         "Materials",
@@ -486,7 +491,7 @@ def load_histogram(hist_name):
         inst_choices.set(hp[2])
         samp_ref_list.set(hp[3])
         sample_params.set(hp[4])
-        sanp_choices.set(hp[5])
+        samp_choices.set(hp[5])
         # change how parameters are loaded
 
         # update the plots and the UI

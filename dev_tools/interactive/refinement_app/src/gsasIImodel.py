@@ -1,8 +1,13 @@
 import numpy as np
 import GSASIIscriptable as G2sc  # type: ignore
+from typing import (
+    NewType,
+    type,
+)
 
+GSAS2Project = NewType("GSAS2Project", type[G2sc.G2Project])
 
-def load_phase_constraints(gpx):
+def load_phase_constraints(gpx: GSAS2Project) -> list:
     """
     load the phase constraints previously added to the project
     seems to not be readable
@@ -11,7 +16,7 @@ def load_phase_constraints(gpx):
     return phase_constraint_list
 
 
-def hist_export(gpx, histogram_name):
+def hist_export(gpx: GSAS2Project, histogram_name: str) -> tuple:
     """
     returns histogram data for plotting
     """
@@ -25,7 +30,7 @@ def hist_export(gpx, histogram_name):
     return x, y, ycalc, dy, bkg
 
 
-def load_histogram_parameters(gpx, histogram_name):
+def load_histogram_parameters(gpx: GSAS2Project, histogram_name: str) -> tuple:
     h = gpx.histogram(histogram_name)
     sample_dict = h.getHistEntryValue(["Sample Parameters"])
     inst_dict = h.getHistEntryValue(["Instrument Parameters"])[0]
@@ -67,7 +72,7 @@ def load_histogram_parameters(gpx, histogram_name):
     return (irl, ip, ic, srl, sp, sc)
 
 
-def gsas_load_gpx(input_gpx_file, fn):
+def gsas_load_gpx(input_gpx_file: str, fn: str) -> GSAS2Project:
     """loads gpx from input file and saves it to output file
     the current project is in outputfile so the loaded ones
     from the galaxy history remain unchanged"""

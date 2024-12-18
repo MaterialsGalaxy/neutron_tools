@@ -173,7 +173,7 @@ with ui.navset_hidden(id="tab"):
             with ui.nav_panel("atoms", value="atoms"):
 
                 @render.data_frame
-                @reactive.event(input.load_gpx, input.select_phase, input.save_atoms)
+                @reactive.event(input.load_gpx, input.select_phase, input.view_phase, input.save_atoms)
                 def render_atom_table():
                     return render.DataTable(
                         atom_data(input.select_phase()),
@@ -308,7 +308,7 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
     ui.input_action_button("view_phase", "View phase")
 
     @reactive.effect
-    @reactive.event(input.view_phase)
+    @reactive.event(input.view_phase, input.select_phase)
     def app_update_phase_nav():
         tab = "Phase"
         update_nav(tab)
