@@ -8,17 +8,30 @@ GSAS2Project = NewType("GSAS2Project", type[G2sc.G2Project])
 
 
 def load_phase_constraints(gpx: GSAS2Project) -> list:
-    """
-    load the phase constraints previously added to the project
-    seems to not be readable
+    """loads a list of phase constraints from a GSASII Project object
+
+    Args:
+        gpx (GSAS2Project): GSASII project object containing all data about the project
+
+    Returns:
+        list: a list of all the phase constraints in the project. Each constraint is itself a list
+        containing the constraint type, parameters, coefficients and refinement flag.
     """
     phase_constraint_list = gpx.get_Constraints("Phase")
     return phase_constraint_list
 
 
 def hist_export(gpx: GSAS2Project, histogram_name: str) -> tuple:
-    """
-    returns histogram data for plotting
+    """gathers the data required for plotting a histogram from the powder data
+    in the GSASII Project under histogram_name
+
+    Args:
+        gpx (GSAS2Project): GSASII project object containing all data about the project
+        histogram_name (str): name of the selected histogram in the project
+
+    Returns:
+        tuple: of numpy arrays of data for plotting: x values, y values, y-fit values,
+        residuals and background.
     """
     h = gpx.histogram(histogram_name)
     x = np.array(h.getdata("X"))
@@ -33,6 +46,19 @@ def hist_export(gpx: GSAS2Project, histogram_name: str) -> tuple:
 def load_histogram_parameters(
     gpx: GSAS2Project, histogram_name: str
 ) -> tuple[list, dict, dict, list, dict, dict]:
+    """gathers instrument and sample parameters data that can be accessed and changed in the app.
+    This function makes lists of active refinement flags in the instrument and sample parameter data.
+    Also dictionaries of parameters which can be refined are generated too.
+
+    Args:
+        gpx (GSAS2Project): GSASII project object containing all data about the project
+        histogram_name (str): name of the selected histogram in the project
+
+    Returns:
+        tuple[list, dict, dict, list, dict, dict]: [0,1,2] The instrument parameter data, [3,4,5] The sample parameter data
+        both sets start with the active refinement list, a parameters dictionary with the current values,
+        and a dictionary for the UI of parameters which can be refined.
+    """
     h = gpx.histogram(histogram_name)
     sample_dict: dict = h.getHistEntryValue(["Sample Parameters"])
     inst_dict: dict = h.getHistEntryValue(["Instrument Parameters"])[0]
@@ -83,9 +109,17 @@ def load_histogram_parameters(
 
 
 def gsas_load_gpx(input_gpx_file: str, fn: str) -> GSAS2Project:
-    """loads gpx from input file and saves it to output file
-    the current project is in outputfile so the loaded ones
-    from the galaxy history remain unchanged"""
+    """loads a GSASII project from input file and saves it to a new file with name "fn".
+    This is so any changes can be compared to the original later.
+
+    Args:
+        input_gpx_file (str): file path of the GSASII .gpx file to be loaded
+        fn (str): The name of the new file where changes will be saved.
+
+    Returns:
+        GSAS2Project: GSASII project object containing all data about the project.
+    """
+
     gpx = G2sc.G2Project(gpxfile=input_gpx_file, newgpx=fn)
     gpx.save()
     return gpx
