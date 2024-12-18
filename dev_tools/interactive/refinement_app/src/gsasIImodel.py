@@ -2,7 +2,6 @@ import numpy as np
 import GSASIIscriptable as G2sc  # type: ignore
 from typing import (
     NewType,
-    type,
 )
 
 GSAS2Project = NewType("GSAS2Project", type[G2sc.G2Project])
