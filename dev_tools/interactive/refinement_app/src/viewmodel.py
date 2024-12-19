@@ -428,6 +428,25 @@ def build_inst_page() -> None:
                     previous = param
 
 
+def build_instrument_df(hist_name) -> pd.DataFrame:
+    # get the instrument parameters from the GSASII project object
+    h = gpx().histogram(hist_name)
+    instrument_parameters:dict = h.getHistEntryValue(["Instrument Parameters"])[0]
+    instrument_df = pd.DataFrame(columns=["Parameter", "Value"])
+
+    for param, val in instrument_parameters.items():
+        no_input_list=["Source"]
+        if param not in no_input_list:
+            if isinstance(val, list):
+                df_value = val[1]
+            else:
+                continue
+            new_row = {"Parameter": param, "Value": df_value}
+            instrument_df.loc[len(instrument_df)] = new_row
+
+    return instrument_df
+
+
 def build_sample_df(hist_name:str) -> pd.DataFrame:
     """Builds a dataframe of the selected histograms Sample Parameters to be output to the UI.
 

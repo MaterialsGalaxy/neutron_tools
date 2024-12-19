@@ -40,6 +40,7 @@ from viewmodel import (
     save_inst_params,
     build_sample_df,
     save_sample_parameters,
+    build_instrument_df,
 )
 
 ui.page_opts(title="GSASII refinement", fillable=True)
@@ -164,6 +165,20 @@ with ui.navset_hidden(id="tab"):
             with ui.navset_hidden(id="instruments"):
                 with ui.nav_panel("Instrument Parameter Values"):
                     "Set values:"
+
+            @render.data_frame
+            @reactive.event(
+                input.load_gpx,
+                input.select_hist,
+                input.view_histogram,
+                )
+            def app_render_instrument_df():
+                instrument_df = build_instrument_df(input.select_hist())
+                return render.DataTable(
+                    instrument_df,
+                    editable=True,
+                    height=None,
+                )
 
             ui.input_action_button("save_inst", "save instrument parameters")
 
