@@ -464,7 +464,7 @@ def build_sample_df(hist_name:str) -> pd.DataFrame:
     return sample_df
 
 
-def save_sample_parameters(hist_name: str, sample_df: pd.DataFrame) -> None:
+def save_sample_parameters(hist_name: str, sample_df: pd.DataFrame, sample_refinements:list) -> None:
     """saves sample parameters from an input dataframe to the selected histogram in
     the GSASII project object.
 
@@ -474,6 +474,17 @@ def save_sample_parameters(hist_name: str, sample_df: pd.DataFrame) -> None:
     """
     h = gpx().histogram(hist_name)
     sample_parameters = h.getHistEntryValue(["Sample Parameters"])
+
+    # set all flags to false
+    for param, val in sample_parameters.items():
+        if isinstance(val, list):
+            if val[1]:
+                val[1] = False
+
+    # set the new chosen flags
+
+    for param in sample_refinements:
+        sample_parameters[param][1] = True
 
     # copy in parameter values row by row
     for row in sample_df.itertuples():
@@ -857,51 +868,6 @@ def save_inst_params(app_input) -> None:
     h.setHistEntryValue(["Instrument Parameters"], inst_dict_full)
     inst_params.set(ip)
     inst_ref_list.set(irl)
-
-
-def save_samp_params(app_input) -> None:
-    """Saves input sample parameters to the GSASII project object
-
-    Args:
-        app_input (_type_): the input object from the UI which contains all of the UIs inputs.
-        This object is iterated over to obtain all the input sample parameter values.
-    """
-    hist_name: str = app_input.select_hist()
-    h = gpx().histogram(hist_name)
-    sp: dict = sample_params().copy()
-
-    # gets sample refinement input
-    srl: list = app_input.samp_selection()
-
-    # set all flags to false
-    for param in sp:
-        if isinstance(sp[param], list):
-            if sp[param][1]:
-                sp[param][1] = False
-
-    # set the new chosen flags
-
-    for param in srl:
-        sp[param][1] = True
-
-    # set the new values
-    for param in sp:
-        if param in samp_UI_list():
-
-            if isinstance(sp[param], list):
-                sp[param][0] = getattr(app_input, param)()
-                print("a")
-            elif param == "Type":
-                sp[param] = getattr(app_input, param)()
-            else:
-                print("b")
-                sp[param] = getattr(app_input, param)()
-
-            h.setHistEntryValue(["Sample Parameters", param], sp[param])
-
-    # update the reactive values / global values
-    samp_ref_list.set(srl)
-    sample_params.set(sp)
 
 
 def submit_out() -> None:

@@ -39,7 +39,6 @@ from viewmodel import (
     remove_constraint,
     update_nav,
     save_inst_params,
-    save_samp_params,
     build_sample_df,
     save_sample_parameters,
 )
@@ -152,12 +151,8 @@ with ui.navset_hidden(id="tab"):
             )
             def app_save_sample_parameters():
                 input_sample_df = app_render_sample_df.data_view()
-                save_sample_parameters(input.select_hist(), input_sample_df)
+                save_sample_parameters(input.select_hist(), input_sample_df, input.samp_selection())
 
-            # @reactive.effect
-            # @reactive.event(input.save_samp)
-            # def app_save_samp():
-            #    save_samp_params(input)
 
             @render.code
             @reactive.event(input.save_samp)
