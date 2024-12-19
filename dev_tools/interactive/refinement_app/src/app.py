@@ -39,6 +39,7 @@ from viewmodel import (
     update_nav,
     save_inst_params,
     save_samp_params,
+    build_sample_df,
 )
 
 ui.page_opts(title="GSASII refinement", fillable=True)
@@ -128,6 +129,20 @@ with ui.navset_hidden(id="tab"):
                     #     ui.input_numeric(param, label, 0)
 
             ui.input_action_button("save_samp", "save sample parameters")
+
+            @render.data_frame
+            @reactive.event(
+                input.load_gpx,
+                input.select_hist,
+                input.view_histogram,
+                )
+            def app_render_sample_df():
+                sample_df = build_sample_df(input.select_hist())
+                return render.DataTable(
+                    sample_df,
+                    editable=True,
+                    height=None,
+                )
 
             @reactive.effect
             @reactive.event(input.save_samp)

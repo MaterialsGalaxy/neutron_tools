@@ -431,6 +431,29 @@ def build_inst_page() -> None:
                     previous = param
 
 
+def build_sample_df(hist_name:str) -> pd.DataFrame:
+    """Builds a dataframe of the selected histograms Sample Parameters to be output to the UI.
+
+    Args:
+        hist_name (str): Name of the selected histogram.
+
+    Returns:
+        pd.DataFrame: Table of Sample parameter values to be output to the UI.
+    """
+
+    # get the sample parameters from the GSASII project object
+    h = gpx().histogram(hist_name)
+    sample_parameters:dict = h.getHistEntryValue(["Sample Parameters"])
+    sample_df = pd.DataFrame(columns=["Parameter", "Value"])
+
+    # populate the dataframe with sample parameters and values
+    for param, val in sample_parameters.items():
+        new_row = {"Parameter": param, "Value": val[0]}
+        sample_df.loc[len(sample_df)] = new_row
+
+    return sample_df
+
+
 def build_samp_page() -> None:
     """Builds UI elements for the histogram sample parameters page dynamically depending on
     the contents of the "Sample Parameters" dictionary in the GSASII project object. Currently
