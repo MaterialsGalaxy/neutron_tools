@@ -37,10 +37,10 @@ from viewmodel import (
     add_constr,
     remove_constraint,
     update_nav,
-    save_inst_params,
     build_sample_df,
     save_sample_parameters,
     build_instrument_df,
+    save_instrument_parameters, 
 )
 
 ui.page_opts(title="GSASII refinement", fillable=True)
@@ -184,13 +184,18 @@ with ui.navset_hidden(id="tab"):
 
             @reactive.effect
             @reactive.event(input.save_inst)
-            def app_save_inst():
-                save_inst_params(input)
+            def app_save_instrument_parameters():
+                input_instrument_df = app_render_instrument_df.data_view()
+                save_instrument_parameters(input.select_hist(), input_instrument_df, input.inst_selection())
+            # @reactive.effect
+            # @reactive.event(input.save_inst)
+            # def app_save_inst():
+            #     save_inst_params(input)
 
             @render.code
             @reactive.event(input.save_inst)
             def app_render_save_inst():
-                return inst_params()
+                return gpx().histogram(input.select_hist()).getHistEntryValue(["Instrument Parameters"])[0]
 
     with ui.nav_panel("Phase", value="Phase"):
         with ui.navset_pill(id="phases"):

@@ -447,6 +447,34 @@ def build_instrument_df(hist_name) -> pd.DataFrame:
     return instrument_df
 
 
+def save_instrument_parameters(hist_name: str, instrument_df: pd.DataFrame, instrument_refinements:list) -> None:
+    h = gpx().histogram(hist_name)
+    instrument_parameters = h.getHistEntryValue(["Instrument Parameters"])[0]
+    # set all flags to false
+    for param, val in instrument_parameters.items():
+        if isinstance(val, list) and len(val) == 3:
+            if val[2]:
+                val[2] = False
+
+    # set the new chosen flags
+    for param in instrument_refinements:
+        instrument_parameters[param][2] = True
+
+    # copy in parameter values row by row
+    for row in instrument_df.itertuples():
+        param = row.Parameter
+        df_value = row.Value
+        val = instrument_parameters[param]
+
+        # type validation
+        if isinstance(val, list):
+            # set values in GSASII project object directly
+            val[1] = type(val[1])(df_value)
+        # else:
+            # these parameters have to be set in the project object through the setHistEntryValue method
+            # h.setHistEntryValue(["Instrument Parameters", param], type(val)(df_value))
+
+
 def build_sample_df(hist_name:str) -> pd.DataFrame:
     """Builds a dataframe of the selected histograms Sample Parameters to be output to the UI.
 
