@@ -149,7 +149,7 @@ with ui.navset_hidden(id="tab"):
             @render.code
             @reactive.event(input.save_samp)
             def app_render_save_samp():
-                return samp_UI_list(), gpx().histogram(input.select_hist()).getHistEntryValue(["Sample Parameters"])
+                return gpx().histogram(input.select_hist()).getHistEntryValue(["Sample Parameters"])
 
         with ui.nav_panel("Instrument Refinements", value="Instrument Parameters"):
             ui.input_selectize(
