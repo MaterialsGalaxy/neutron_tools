@@ -484,12 +484,12 @@ def save_sample_parameters(hist_name: str, sample_df: pd.DataFrame) -> None:
         # type validation
         if isinstance(val, list):
             val[0] = type(val[0])(df_value)
-        elif isinstance(val, (int, float)):
-            val = float(df_value)
-        elif isinstance(val, str):
-            val = df_value
+        # elif isinstance(val, (int, float)):
+
+        # elif isinstance(val, str):
+        #     val = df_value
         else:
-            continue
+            val = type(val)(df_value)
 
 
 def build_samp_page() -> None:
