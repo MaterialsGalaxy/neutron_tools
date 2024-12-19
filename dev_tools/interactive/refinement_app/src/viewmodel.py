@@ -9,7 +9,6 @@ from gsasIImodel import (
     hist_export,
     gsas_load_gpx,
     load_phase_constraints,
-    load_histogram_parameters,
     GSAS2Project,
 )
 import plotly.express as px
@@ -589,6 +588,7 @@ def load_histogram(hist_name: str) -> None:
         update_sample_refinements(hist_name)
         build_bkg_page(hist_name)
         update_instrument_refinements(hist_name)
+
 
 def update_plot(gpx: GSAS2Project, hist_name: str) -> None:
     """gets the data for plotting the selected histogram from the GSASII project object
