@@ -28,11 +28,8 @@ og_gpx = reactive.value()
 current_gpx_fname = reactive.value()
 inst_ref_list = reactive.value()
 inst_params = reactive.value(None)
-samp_ref_list = reactive.value()
-sample_params = reactive.value(None)
 input_gpx_file = reactive.value()
 inst_choices = reactive.value()
-samp_choices = reactive.value()
 samp_UI_list = reactive.value([])
 
 num_bkg_coefs = reactive.value()
@@ -501,11 +498,27 @@ def save_sample_parameters(hist_name: str, sample_df: pd.DataFrame, sample_refin
             h.setHistEntryValue(["Sample Parameters", param], type(val)(df_value))
 
 
-def remove_samp_inputs() -> None:
-    """removes previously built UI elements in the histogram sample parameters page"""
-    if sample_params() is not None:
-        for param in sample_params().keys():
-            ui.remove_ui(selector="div:has(> " + "#" + param + ")")
+def update_sample_refinements(hist_name: str) -> None:
+    h = gpx().histogram(hist_name)
+    sample_parameters = h.getHistEntryValue(["Sample Parameters"])
+    
+    # populating list of sample refinements that are already active
+    sample_refinement_choices = {}
+    sample_refinements = []
+    for param, val in sample_parameters.items():
+        # set sample choices dict for UI
+        if isinstance(val, list):
+            if isinstance(val[1], bool):
+                sample_refinement_choices[param] = param
+                if val[1]:
+                    sample_refinements.append(param)
+    
+    # update the UI
+    ui.update_selectize(
+        "samp_selection",
+        choices=sample_refinement_choices,
+        selected=sample_refinements,
+        )
 
 
 def remove_inst_inputs() -> None:
@@ -539,16 +552,12 @@ def load_histogram(hist_name: str) -> None:
         ui.update_select("view_hist_data", choices=select_view_hist())
         # delete old ui
         remove_inst_inputs()
-        remove_samp_inputs()
         # set the new histogram parameters for the UI
         # add flag choices dicts here
         hp = load_histogram_parameters(gpx(), hist_name)
         inst_ref_list.set(hp[0])
         inst_params.set(hp[1])
         inst_choices.set(hp[2])
-        samp_ref_list.set(hp[3])
-        sample_params.set(hp[4])
-        samp_choices.set(hp[5])
         # change how parameters are loaded
 
         # update the plots and the UI
@@ -561,9 +570,7 @@ def load_histogram(hist_name: str) -> None:
         ui.update_slider("limits", min=lim_min, max=lim_max, value=[lim_low, lim_up])
 
         # build the new UI
-        ui.update_selectize(
-        "samp_selection", choices=samp_choices(), selected=samp_ref_list()
-        )
+        update_sample_refinements(hist_name)
         build_inst_page()
         build_bkg_page(hist_name)
 
@@ -706,7 +713,6 @@ def load_project(id: str) -> None:
     if id != "init":
         # remove any dynamic UI items from previous project
         remove_inst_inputs()
-        remove_samp_inputs()
 
         # get the file from galaxy and load the gsas project
         hid_and_fn: str = select_gpx_choices()[id]

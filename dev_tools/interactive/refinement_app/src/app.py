@@ -11,7 +11,6 @@ from viewmodel import (
     view_proj_choices,
     inst_param_dict,
     samp_param_dict,
-    sample_params,
     gpx,
     inst_params,
     background_functions,
