@@ -799,49 +799,6 @@ def load_project(id: str) -> None:
         load_histogram(list(hist_names.keys())[0])
 
 
-def save_inst_params(app_input) -> None:
-    """saves input instrument parameter values and refinement flags to the
-    GSASII project object.
-
-    Args:
-        app_input (_type_): the input object from the UI which contains all of the UIs inputs.
-        This object is iterated over to obtain all the input instrument parameter values.
-    """
-    # change this to change the full dictionary directly
-    # some inputs filtered out so need a reference for which inputs to take
-    hist_name: str = app_input.select_hist()
-    h = gpx().histogram(hist_name)
-    inst_dict_full: dict = h.getHistEntryValue(["Instrument Parameters"])
-    irl: list = app_input.inst_selection()
-    ip: dict = inst_params().copy()
-
-    # set all flags to false
-    for param in ip:
-        if isinstance(ip[param], list):
-            if len(ip[param]) == 3:
-                if ip[param][2]:
-                    inst_dict_full[0][param][2] = False
-
-    # add new refinement flags
-
-    inst_ref_dict = {"Instrument Parameters": irl}
-    h.set_refinements(inst_ref_dict)
-
-    for param in irl:
-        inst_dict_full[0][param][2] = True
-
-    # add new set values
-    for param in ip:
-        if isinstance(ip[param], list):
-            if isinstance(ip[param][0], float) or isinstance(ip[param][1], float):
-                if param != "Polariz." and param != "SH/L":
-                    inst_dict_full[0][param][1] = getattr(app_input, param)()
-
-    h.setHistEntryValue(["Instrument Parameters"], inst_dict_full)
-    inst_params.set(ip)
-    inst_ref_list.set(irl)
-
-
 def submit_out() -> None:
     """saves project changes to the .gpx file and submits any changes to the original file as a delta file to the galaxy history.
     The static tool GSAS2_refinement_executor is then run in the background and the refined file is loaded back into the interactive tool on completion.

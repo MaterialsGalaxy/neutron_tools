@@ -12,7 +12,6 @@ from viewmodel import (
     inst_param_dict,
     samp_param_dict,
     gpx,
-    inst_params,
     background_functions,
     samp_UI_list,
     plot_powder,
@@ -187,10 +186,6 @@ with ui.navset_hidden(id="tab"):
             def app_save_instrument_parameters():
                 input_instrument_df = app_render_instrument_df.data_view()
                 save_instrument_parameters(input.select_hist(), input_instrument_df, input.inst_selection())
-            # @reactive.effect
-            # @reactive.event(input.save_inst)
-            # def app_save_inst():
-            #     save_inst_params(input)
 
             @render.code
             @reactive.event(input.save_inst)
