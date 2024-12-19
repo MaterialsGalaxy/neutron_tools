@@ -483,13 +483,11 @@ def save_sample_parameters(hist_name: str, sample_df: pd.DataFrame) -> None:
 
         # type validation
         if isinstance(val, list):
+            # set values in GSASII project object directly
             val[0] = type(val[0])(df_value)
-        # elif isinstance(val, (int, float)):
-
-        # elif isinstance(val, str):
-        #     val = df_value
         else:
-            val = type(val)(df_value)
+            # these parameters have to be set in the project object through the setHistEntryValue method
+            h.setHistEntryValue(["Sample Parameters", param], type(val)(df_value))
 
 
 def build_samp_page() -> None:
