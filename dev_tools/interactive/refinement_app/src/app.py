@@ -122,14 +122,6 @@ with ui.navset_hidden(id="tab"):
                 multiple=True,
                 selected=None,
             )
-            with ui.navset_hidden(id="sample"):
-                with ui.nav_panel(""):
-                    "Set Sample Parameter values:"
-
-                    # for param, label in samp_param_dict.items():
-                    #     ui.input_numeric(param, label, 0)
-
-            ui.input_action_button("save_samp", "save sample parameters")
 
             @render.data_frame
             @reactive.event(
@@ -144,6 +136,8 @@ with ui.navset_hidden(id="tab"):
                     editable=True,
                     height=None,
                 )
+            
+            ui.input_action_button("save_samp", "save sample parameters")
 
             @reactive.effect
             @reactive.event(

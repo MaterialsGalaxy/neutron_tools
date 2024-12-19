@@ -501,89 +501,6 @@ def save_sample_parameters(hist_name: str, sample_df: pd.DataFrame, sample_refin
             h.setHistEntryValue(["Sample Parameters", param], type(val)(df_value))
 
 
-def build_samp_page() -> None:
-    """Builds UI elements for the histogram sample parameters page dynamically depending on
-    the contents of the "Sample Parameters" dictionary in the GSASII project object. Currently
-    many parameters do not have UI elements built because of issues with special characters and access to
-    parameters in the GSASII object.
-    """
-    # add updating the flag choices and filter which inputs to show
-    # numerically or text aswell.
-    ui.update_selectize(
-        "samp_selection", choices=samp_choices(), selected=samp_ref_list()
-    )
-    previous = "sample"
-    sample_hidden_list = [
-        "Materials",
-        "Gonio. radius",
-        "FreePrm1",
-        "FreePrm2",
-        "FreePrm3",
-        "ranId",
-        "Time",
-        "Thick",
-        "Constrast",
-        "Trans",
-        "SlitLen",
-        "Shift",
-        "Transparency",
-        "Temperature",
-        "Pressure",
-        "Omega",
-        "Chi",
-        "Phi",
-        "Azimuth",
-    ]
-    sample_UI_list = []
-    for param, val in sample_params().items():
-        if param not in sample_hidden_list:
-            if isinstance(val, list):
-                if isinstance(val[0], float):
-                    ui.insert_ui(
-                        ui.input_numeric(id=param, label=param, value=val[0]),
-                        selector="#" + previous,
-                        where="afterEnd",
-                    )
-                    sample_UI_list.append(param)
-                    previous = param
-
-            if isinstance(val, float):
-                ui.insert_ui(
-                    ui.input_numeric(id=param, label=param, value=val),
-                    selector="#" + previous,
-                    where="afterEnd",
-                )
-                sample_UI_list.append(param)
-                previous = param
-
-            if param == "InstrName":
-                ui.insert_ui(
-                    ui.input_text(id=param, label="Instrument Name", value=val),
-                    selector="#" + previous,
-                    where="afterEnd",
-                )
-                sample_UI_list.append(param)
-                previous = param
-
-            if param == "Type":
-                ui.insert_ui(
-                    ui.input_select(
-                        id=param,
-                        label="Type:",
-                        choices={
-                            "Debye-Scherrer": "Debye-Scherrer",
-                            "Bragg-Brentano": "Bragg-Brentano",
-                        },
-                        selected=val,
-                    ),
-                    selector="#" + previous,
-                    where="afterEnd",
-                )
-                sample_UI_list.append(param)
-                previous = param
-    samp_UI_list.set(sample_UI_list)
-
-
 def remove_samp_inputs() -> None:
     """removes previously built UI elements in the histogram sample parameters page"""
     if sample_params() is not None:
@@ -644,7 +561,9 @@ def load_histogram(hist_name: str) -> None:
         ui.update_slider("limits", min=lim_min, max=lim_max, value=[lim_low, lim_up])
 
         # build the new UI
-        build_samp_page()
+        ui.update_selectize(
+        "samp_selection", choices=samp_choices(), selected=samp_ref_list()
+        )
         build_inst_page()
         build_bkg_page(hist_name)
 
