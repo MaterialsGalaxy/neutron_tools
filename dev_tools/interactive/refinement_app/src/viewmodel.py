@@ -448,8 +448,16 @@ def build_sample_df(hist_name:str) -> pd.DataFrame:
 
     # populate the dataframe with sample parameters and values
     for param, val in sample_parameters.items():
-        new_row = {"Parameter": param, "Value": val[0]}
-        sample_df.loc[len(sample_df)] = new_row
+        no_input_list = ["Materials"]
+        if param not in no_input_list:
+
+            if isinstance(val, list):
+                df_value = val[0]
+            elif isinstance(val, (str, float, int)):
+                df_value = val
+
+            new_row = {"Parameter": param, "Value": df_value}
+            sample_df.loc[len(sample_df)] = new_row
 
     return sample_df
 
