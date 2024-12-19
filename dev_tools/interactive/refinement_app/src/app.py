@@ -12,6 +12,7 @@ from viewmodel import (
     inst_param_dict,
     samp_param_dict,
     sample_params,
+    gpx,
     inst_params,
     background_functions,
     samp_UI_list,
@@ -40,6 +41,7 @@ from viewmodel import (
     save_inst_params,
     save_samp_params,
     build_sample_df,
+    save_sample_parameters,
 )
 
 ui.page_opts(title="GSASII refinement", fillable=True)
@@ -145,14 +147,22 @@ with ui.navset_hidden(id="tab"):
                 )
 
             @reactive.effect
-            @reactive.event(input.save_samp)
-            def app_save_samp():
-                save_samp_params(input)
+            @reactive.event(
+                input.save_samp
+            )
+            def app_save_sample_parameters():
+                input_sample_df = app_render_sample_df.data_view()
+                save_sample_parameters(input.select_hist(), input_sample_df)
+
+            # @reactive.effect
+            # @reactive.event(input.save_samp)
+            # def app_save_samp():
+            #    save_samp_params(input)
 
             @render.code
             @reactive.event(input.save_samp)
             def app_render_save_samp():
-                return samp_UI_list(), sample_params()
+                return samp_UI_list(), gpx().getHistEntryValue(["Sample Parameters"])
 
         with ui.nav_panel("Instrument Refinements", value="Instrument Parameters"):
             ui.input_selectize(

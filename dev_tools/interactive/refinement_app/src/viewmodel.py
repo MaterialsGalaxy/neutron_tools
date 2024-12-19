@@ -455,11 +455,41 @@ def build_sample_df(hist_name:str) -> pd.DataFrame:
                 df_value = val[0]
             elif isinstance(val, (str, float, int)):
                 df_value = val
+            else:
+                continue
 
             new_row = {"Parameter": param, "Value": df_value}
             sample_df.loc[len(sample_df)] = new_row
 
     return sample_df
+
+
+def save_sample_parameters(hist_name: str, sample_df: pd.DataFrame) -> None:
+    """saves sample parameters from an input dataframe to the selected histogram in
+    the GSASII project object.
+
+    Args:
+        hist_name (str): name of the selected histogram
+        sample_df (pd.DataFrame): Table of sample parameter values input from the UI
+    """
+    h = gpx().histogram(hist_name)
+    sample_parameters = h.getHistEntryValue(["Sample Parameters"])
+
+    # copy in parameter values row by row
+    for row in sample_df.itertuples():
+        param = row.Parameter
+        df_value = row.Value
+        val = sample_parameters[param]
+
+        # type validation
+        if isinstance(val, list):
+            val[0] = type(val[0])(df_value)
+        elif isinstance(val, (int, float)):
+            val = float(df_value)
+        elif isinstance(val, str):
+            val = df_value
+        else:
+            continue
 
 
 def build_samp_page() -> None:
