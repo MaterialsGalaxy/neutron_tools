@@ -26,11 +26,7 @@ these have to be passed as inputs to the function."""
 gpx = reactive.value()
 og_gpx = reactive.value()
 current_gpx_fname = reactive.value()
-inst_ref_list = reactive.value()
-inst_params = reactive.value(None)
 input_gpx_file = reactive.value()
-inst_choices = reactive.value()
-samp_UI_list = reactive.value([])
 
 num_bkg_coefs = reactive.value()
 current_bkg_func = reactive.value()
@@ -393,41 +389,6 @@ def save_bkg_coefs(hist_name: str, coefs: list) -> None:
             bkg_data[0][3:] = new_coefs
 
 
-def build_inst_page() -> None:
-    """Builds UI elements on the histogram instrument parameter page dynamically
-    depending on the contents of the "Instrument Parameters" dictionary of the GSASII project file.
-    Currently any parameters with names containing special characters will not have UI inputs built.
-    """
-    # update the refinement flags choices too
-    # and filter which inputs to show numerically/text
-    ui.update_selectize(
-        "inst_selection", choices=inst_choices(), selected=inst_ref_list()
-    )
-    # previous = "inst_selection"
-
-    # generate the new UI elements
-    # Ideally generate all directly from the gsas histogram object's
-    # instrument parameter dictionary
-    # finds previous element from selector, inserts new element after it
-    # requires removing too, unclear how this works
-
-    previous = "instruments"
-
-    # could make a dictionary of param keys to ui labels
-
-    for param, val in inst_params().items():
-        if isinstance(val, list):
-            if isinstance(val[0], float) or isinstance(val[1], float):
-                if param != "SH/L" and param != "Polariz.":
-
-                    ui.insert_ui(
-                        ui.input_numeric(id=param, label=param, value=val[1]),
-                        selector="#" + previous,
-                        where="afterEnd",
-                    )
-                    previous = param
-
-
 def build_instrument_df(hist_name) -> pd.DataFrame:
     # get the instrument parameters from the GSASII project object
     h = gpx().histogram(hist_name)
@@ -473,6 +434,30 @@ def save_instrument_parameters(hist_name: str, instrument_df: pd.DataFrame, inst
         # else:
             # these parameters have to be set in the project object through the setHistEntryValue method
             # h.setHistEntryValue(["Instrument Parameters", param], type(val)(df_value))
+
+
+def update_instrument_refinements(hist_name:str)-> None:
+    h = gpx().histogram(hist_name)
+    instrument_parameters= h.getHistEntryValue(["Instrument Parameters"])[0]
+
+    # populating list of sample refinements that are already active
+    instrument_refinement_choices = {}
+    instrument_refinements = []
+    no_refinements= ["Bank", "Source","Type"]
+    for param, val in instrument_parameters.items():
+        # set sample choices dict for UI
+        if param not in no_refinements:
+            if isinstance(val, list) and len(val) == 3:
+                if isinstance(val[1], (int, float)):
+                    instrument_refinement_choices[param] = param
+                    if val[2]:
+                        instrument_refinements.append(param)
+    
+    ui.update_selectize(
+        "inst_selection",
+        choices=instrument_refinement_choices,
+        selected=instrument_refinements, 
+    )
 
 
 def build_sample_df(hist_name:str) -> pd.DataFrame:
@@ -568,13 +553,6 @@ def update_sample_refinements(hist_name: str) -> None:
         )
 
 
-def remove_inst_inputs() -> None:
-    """removes previously built UI elements on the Histogram Instrument parameters page."""
-    if inst_params() is not None:
-        for param in inst_params().keys():
-            ui.remove_ui(selector="div:has(> " + "#" + param + ")")
-
-
 def view_hist() -> None:
     """TBC"""
     # view a specific subtree of the histogram in the histogram tab
@@ -597,15 +575,6 @@ def load_histogram(hist_name: str) -> None:
             options[subheading] = subheading
         select_view_hist.set(options)
         ui.update_select("view_hist_data", choices=select_view_hist())
-        # delete old ui
-        remove_inst_inputs()
-        # set the new histogram parameters for the UI
-        # add flag choices dicts here
-        hp = load_histogram_parameters(gpx(), hist_name)
-        inst_ref_list.set(hp[0])
-        inst_params.set(hp[1])
-        inst_choices.set(hp[2])
-        # change how parameters are loaded
 
         # update the plots and the UI
         update_plot(gpx(), hist_name)
@@ -618,9 +587,8 @@ def load_histogram(hist_name: str) -> None:
 
         # build the new UI
         update_sample_refinements(hist_name)
-        build_inst_page()
         build_bkg_page(hist_name)
-
+        update_instrument_refinements(hist_name)
 
 def update_plot(gpx: GSAS2Project, hist_name: str) -> None:
     """gets the data for plotting the selected histogram from the GSASII project object
@@ -758,8 +726,6 @@ def load_project(id: str) -> None:
         id (str): _description_
     """
     if id != "init":
-        # remove any dynamic UI items from previous project
-        remove_inst_inputs()
 
         # get the file from galaxy and load the gsas project
         hid_and_fn: str = select_gpx_choices()[id]

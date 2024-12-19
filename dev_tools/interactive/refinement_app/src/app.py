@@ -13,7 +13,6 @@ from viewmodel import (
     samp_param_dict,
     gpx,
     background_functions,
-    samp_UI_list,
     plot_powder,
     set_hist_limits,
     update_history,
