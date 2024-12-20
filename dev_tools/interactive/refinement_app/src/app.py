@@ -325,7 +325,7 @@ with ui.navset_pill(id="plot"):
         @render.data_frame
         @reactive.event(input.update_history, input.load_gpx)
         def render_update_history():
-            hist_table = get_update_history()[0]
+            hist_table = get_update_history()
             return render.DataTable(hist_table)
 
 

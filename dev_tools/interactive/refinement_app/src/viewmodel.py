@@ -739,10 +739,8 @@ def plot_powder(hist_name: str, limits: list):
     return fig
 
 
-def get_update_history() -> tuple[pd.DataFrame, dict]:
-    history = gxhistory.gx_update_history()
-    history_df: pd.DataFrame = pd.DataFrame(history)
-    history_table = history_df[["hid", "name", "id"]]
+def get_gpx_choices() -> dict:
+    history_table = get_update_history()
     gpx_df = history_table[history_table["name"].str.endswith("gpx")]
     gpx_choice_dict = dict(
         [
@@ -755,7 +753,15 @@ def get_update_history() -> tuple[pd.DataFrame, dict]:
     # gpx_choice_dict = {}
     # for row in history_table.itertuples():
     #    gpx_choice_dict[row.id] = row.hid + ": " + row.name
-    return history_table, gpx_choices
+    return gpx_choices
+
+
+def get_update_history() -> pd.DataFrame:
+    history = gxhistory.gx_update_history()
+    history_df: pd.DataFrame = pd.DataFrame(history)
+    history_table = history_df[["hid", "name", "id"]]
+
+    return history_table
 
 
 def update_history() -> None:
@@ -766,7 +772,7 @@ def update_history() -> None:
     """
     print("update_history triggered")
 
-    gpx_choices = get_update_history()[1]
+    gpx_choices = get_gpx_choices()
     select_gpx_choices.set(gpx_choices)  # dictionary with {ID:name}
     ui.update_select("select_gpx", choices=gpx_choices)
 
@@ -835,19 +841,19 @@ def submit_out() -> None:
     gxhistory.put("delta1")
 
     # wait for the file to save in galaxy and run refinement
-    id = refresh_gpx_history()
+    id = refresh_latest_history_entry_id()
     gxhistory.run_refinement(current_gpx_id(), id)
     # current_gpx_id.set(id)
 
     # wait for refinement to complete
-    id = refresh_gpx_history()
+    id = refresh_latest_history_entry_id()
     gxhistory.wait_for_dataset(id)
 
     # load the history with the new refinement output gpx file
-    hist_table = get_update_history()[0]
-    gpx_table: pd.DataFrame = hist_table[(hist_table["name"].str.contains("gpx"))]
-    row_id: int = gpx_table["hid"].idxmax()
-    id: str = gpx_table.loc[row_id, "id"]
+    id:str = list(get_gpx_choices())[0]
+    # gpx_table: pd.DataFrame = hist_table[(hist_table["name"].str.contains("gpx"))]
+    # row_id: int = gpx_table["hid"].idxmax()
+    # id: str = gpx_table.loc[row_id, "id"]
 
     # load the refined output project and update the UI
     update_history()
@@ -855,14 +861,14 @@ def submit_out() -> None:
     ui.update_select("select_gpx", selected=id)
 
 
-def refresh_gpx_history() -> str:
+def refresh_latest_history_entry_id() -> str:
     """Finds the API id of the latest files in the galaxy history.
 
     Returns:
-        str: Galaxy API ID for the msot recent event in the history.
+        str: Galaxy API ID for the msot recent entry in the history.
     """
     time.sleep(2)
-    hist_table = get_update_history()[0]
+    hist_table = get_update_history()
     row_id: int = hist_table["hid"].idxmax()
     id: str = hist_table.loc[row_id, "id"]
     return id
