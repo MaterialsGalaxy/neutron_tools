@@ -38,7 +38,7 @@ from viewmodel import (
     build_sample_df,
     save_sample_parameters,
     build_instrument_df,
-    save_instrument_parameters, 
+    save_instrument_parameters,
 )
 
 ui.page_opts(title="GSASII refinement", fillable=True)
@@ -126,7 +126,7 @@ with ui.navset_hidden(id="tab"):
                 input.load_gpx,
                 input.select_hist,
                 input.view_histogram,
-                )
+            )
             def app_render_sample_df():
                 sample_df = build_sample_df(input.select_hist())
                 return render.DataTable(
@@ -134,22 +134,25 @@ with ui.navset_hidden(id="tab"):
                     editable=True,
                     height=None,
                 )
-            
+
             ui.input_action_button("save_samp", "save sample parameters")
 
             @reactive.effect
-            @reactive.event(
-                input.save_samp
-            )
+            @reactive.event(input.save_samp)
             def app_save_sample_parameters():
                 input_sample_df = app_render_sample_df.data_view()
-                save_sample_parameters(input.select_hist(), input_sample_df, input.samp_selection())
-
+                save_sample_parameters(
+                    input.select_hist(), input_sample_df, input.samp_selection()
+                )
 
             @render.code
             @reactive.event(input.save_samp)
             def app_render_save_samp():
-                return gpx().histogram(input.select_hist()).getHistEntryValue(["Sample Parameters"])
+                return (
+                    gpx()
+                    .histogram(input.select_hist())
+                    .getHistEntryValue(["Sample Parameters"])
+                )
 
         with ui.nav_panel("Instrument Refinements", value="Instrument Parameters"):
             ui.input_selectize(
@@ -169,7 +172,7 @@ with ui.navset_hidden(id="tab"):
                 input.load_gpx,
                 input.select_hist,
                 input.view_histogram,
-                )
+            )
             def app_render_instrument_df():
                 instrument_df = build_instrument_df(input.select_hist())
                 return render.DataTable(
@@ -184,12 +187,18 @@ with ui.navset_hidden(id="tab"):
             @reactive.event(input.save_inst)
             def app_save_instrument_parameters():
                 input_instrument_df = app_render_instrument_df.data_view()
-                save_instrument_parameters(input.select_hist(), input_instrument_df, input.inst_selection())
+                save_instrument_parameters(
+                    input.select_hist(), input_instrument_df, input.inst_selection()
+                )
 
             @render.code
             @reactive.event(input.save_inst)
             def app_render_save_inst():
-                return gpx().histogram(input.select_hist()).getHistEntryValue(["Instrument Parameters"])[0]
+                return (
+                    gpx()
+                    .histogram(input.select_hist())
+                    .getHistEntryValue(["Instrument Parameters"])[0]
+                )
 
     with ui.nav_panel("Phase", value="Phase"):
         with ui.navset_pill(id="phases"):
