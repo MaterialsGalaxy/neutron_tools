@@ -24,7 +24,6 @@ these have to be passed as inputs to the function."""
 # as a side effect from reactive functions
 gpx = reactive.value()
 og_gpx = reactive.value()
-hist_data = reactive.value()
 current_gpx_id = reactive.value()
 
 # initial values for sidebar selections when no project is loaded
@@ -740,18 +739,11 @@ def plot_powder(hist_name: str, limits: list):
     return fig
 
 
-def update_history() -> None:
-    """gets the galaxy history from the galaxy instance
-    and generates a history table for the UI ouput.
-    This table is set as a reactive variable.
-    Also updates the UI choices for projects to load from the galaxy history.
-    """
-    print("update_history triggered")
+def get_update_history() -> tuple[pd.DataFrame, dict]:
     history = gxhistory.gx_update_history()
-    hist_frame: pd.DataFrame = pd.DataFrame(history)
-    hist_table = hist_frame[["hid", "name", "id"]]
-    hist_data.set(hist_table)
-    gpx_df = hist_table[hist_table["name"].str.endswith("gpx")]
+    history_df: pd.DataFrame = pd.DataFrame(history)
+    history_table = history_df[["hid", "name", "id"]]
+    gpx_df = history_table[history_table["name"].str.endswith("gpx")]
     gpx_choice_dict = dict(
         [
             (i, str(h) + ": " + fn)
@@ -759,13 +751,24 @@ def update_history() -> None:
         ]
     )
 
-    gpx_choice_dict = dict(reversed(gpx_choice_dict.items()))
+    gpx_choices = dict(reversed(gpx_choice_dict.items()))
     # gpx_choice_dict = {}
-    # for row in hist_table.itertuples():
+    # for row in history_table.itertuples():
     #    gpx_choice_dict[row.id] = row.hid + ": " + row.name
+    return history_table, gpx_choices
 
-    select_gpx_choices.set(gpx_choice_dict)  # dictionary with {ID:name}
-    ui.update_select("select_gpx", choices=select_gpx_choices())
+
+def update_history() -> None:
+    """gets the galaxy history from the galaxy instance
+    and generates a history table for the UI ouput.
+    This table is set as a reactive variable.
+    Also updates the UI choices for projects to load from the galaxy history.
+    """
+    print("update_history triggered")
+
+    gpx_choices = get_update_history()[1]
+    select_gpx_choices.set(gpx_choices)  # dictionary with {ID:name}
+    ui.update_select("select_gpx", choices=gpx_choices)
 
 
 def view_proj() -> None:
@@ -841,12 +844,13 @@ def submit_out() -> None:
     gxhistory.wait_for_dataset(id)
 
     # load the history with the new refinement output gpx file
-    update_history()
-    gpx_table: pd.DataFrame = hist_data()[(hist_data()["name"].str.contains("gpx"))]
+    hist_table = get_update_history()[0]
+    gpx_table: pd.DataFrame = hist_table[(hist_table["name"].str.contains("gpx"))]
     row_id: int = gpx_table["hid"].idxmax()
     id: str = gpx_table.loc[row_id, "id"]
 
     # load the refined output project and update the UI
+    update_history()
     load_project(id)
     ui.update_select("select_gpx", selected=id)
 
@@ -858,9 +862,9 @@ def refresh_gpx_history() -> str:
         str: Galaxy API ID for the msot recent event in the history.
     """
     time.sleep(2)
-    update_history()
-    row_id: int = hist_data()["hid"].idxmax()
-    id: str = hist_data().loc[row_id, "id"]
+    hist_table = get_update_history()[0]
+    row_id: int = hist_table["hid"].idxmax()
+    id: str = hist_table.loc[row_id, "id"]
     return id
 
 

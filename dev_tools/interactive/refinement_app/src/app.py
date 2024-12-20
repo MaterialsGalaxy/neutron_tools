@@ -3,7 +3,6 @@ from shiny.express import ui, input
 from shiny import reactive, render
 from shinywidgets import render_plotly
 from viewmodel import (
-    hist_data,
     gpx_choices,
     phase_choices,
     hist_choices,
@@ -16,6 +15,7 @@ from viewmodel import (
     plot_powder,
     set_hist_limits,
     update_history,
+    get_update_history,
     load_project,
     view_proj,
     load_phase,
@@ -325,7 +325,8 @@ with ui.navset_pill(id="plot"):
         @render.data_frame
         @reactive.event(input.update_history, input.load_gpx)
         def render_update_history():
-            return render.DataTable(hist_data())
+            hist_table = get_update_history()[0]
+            return render.DataTable(hist_table)
 
 
 with ui.sidebar(bg="#f8f8f8", position="left"):
