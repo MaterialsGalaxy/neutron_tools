@@ -82,12 +82,14 @@ def update_nav(tab: str) -> None:
     ui.update_navs(id="tab", selected=tab)
 
 
-def add_constr(constraint_type: str, constraint_df: pd.DataFrame, var_df: pd.DataFrame) -> None:
+def add_constr(
+    constraint_type: str, constraint_df: pd.DataFrame, var_df: pd.DataFrame
+) -> None:
     """adds a valid phase constraint to the GSASII project.
 
     Args:
-        ctype (str): denotes the type of phase constraint
-        pwdr_data_df (pd.DataFrame): selected constraint parameters and coefficients
+        constraint_type (str): denotes the type of phase constraint
+        constraint_df (pd.DataFrame): constraint parameters and coefficients
         var_df (pd.DataFrame): table of permitted constraint parameters
     """
     # add constraints to constraints list and to gpx
@@ -223,7 +225,6 @@ def save_atom_table(df: pd.DataFrame, phase_name: str) -> None:
     for atom in phase.atoms():
         atom_record = df.loc[df["Name"] == atom.label]
         refinement_flags = atom_record.iloc[0]["refine"]
-        # check_flags = refinement_flags.translate({ord(i): None for i in 'FXU'})
         check_flags = refinement_flags
         for f in "FXU":
             check_flags = check_flags.replace(f, "", 1)
@@ -247,15 +248,7 @@ def atom_data(phase_name: str) -> pd.DataFrame:
     phase = gpx().phase(phase_name)
 
     # initialise the dataframe
-    atom_cols = ["Name",
-                 "type",
-                 "refine",
-                 "x",
-                 "y",
-                 "z",
-                 "frac",
-                 "multi",
-                 "Uiso"]
+    atom_cols = ["Name", "type", "refine", "x", "y", "z", "frac", "multi", "Uiso"]
     atom_frame: pd.DataFrame = pd.DataFrame(columns=atom_cols)
 
     # populate the dataframe with data from the project
@@ -555,8 +548,7 @@ def save_sample_parameters(
         else:
             # these parameters have to be set in the project object
             # through the setHistEntryValue method
-            h.setHistEntryValue(["Sample Parameters", param],
-                                type(val)(df_value))
+            h.setHistEntryValue(["Sample Parameters", param], type(val)(df_value))
 
 
 def update_sample_refinements(hist_name: str) -> None:
@@ -612,11 +604,12 @@ def load_histogram(hist_name: str) -> None:
         lim_max: float = max(plot_data[0])
         lim_low: float = h.Limits("lower")
         lim_up: float = h.Limits("upper")
-        ui.update_slider("limits",
-                         min=lim_min,
-                         max=lim_max,
-                         value=[lim_low, lim_up],
-                         )
+        ui.update_slider(
+            "limits",
+            min=lim_min,
+            max=lim_max,
+            value=[lim_low, lim_up],
+        )
 
         # build the new UI
         update_sample_refinements(hist_name)
@@ -658,7 +651,8 @@ def plot_powder(hist_name: str, limits: list):
     pwdr_data_df = pd.DataFrame(pwdr_data)
     place_holder_df = pd.DataFrame([[0, 0]], columns=["2 Theta", "intensity"])
 
-    fig = px.scatter(place_holder_df,
+    fig = px.scatter(
+        place_holder_df,
         x="2 Theta",
         y="intensity",
         opacity=0,
@@ -722,6 +716,14 @@ def plot_powder(hist_name: str, limits: list):
 
 
 def get_gpx_choices() -> dict:
+    """creates a dictionary of GSASII projects in the galaxy history
+    which can be loaded into the interactive tool.
+
+    Returns:
+        dict: dictionary of GSASII project files in the galaxy history
+        with keys of their Galaxy API IDs and values of
+        "history IDs: filename"
+    """
     history_table = get_update_history()
     gpx_df = history_table[history_table["name"].str.endswith("gpx")]
     gpx_choice_dict = dict(
@@ -739,6 +741,13 @@ def get_gpx_choices() -> dict:
 
 
 def get_update_history() -> pd.DataFrame:
+    """gets the galaxy history from the galaxy instance and
+    creates a dataframe of the history entries with
+    History ids, names and Galaxy API ids.
+
+    Returns:
+        pd.DataFrame: dataframe of active entries in the galaxy history.
+    """
     history = gxhistory.gx_update_history()
     history_df: pd.DataFrame = pd.DataFrame(history)
     history_table = history_df[["hid", "name", "id"]]
@@ -747,10 +756,8 @@ def get_update_history() -> pd.DataFrame:
 
 
 def update_history() -> None:
-    """gets the galaxy history from the galaxy instance
-    and generates a history table for the UI ouput.
-    This table is set as a reactive variable.
-    Also updates the UI choices for projects to load from the galaxy history.
+    """gets the galaxy history from the galaxy instance and
+    updates the UI choices for projects to load from the galaxy history.
     """
     print("update_history triggered")
 
@@ -803,15 +810,18 @@ def load_project(id: str) -> None:
         load_histogram(list(hist_names.keys())[0])
 
 
-def submit_out(current_gpx_id) -> None:
+def submit_out(current_gpx_id: str) -> None:
     """saves project changes to the .gpx file
     and submits them as a delta file to the galaxy history.
     The static tool GSAS2_refinement_executor then runs in galaxy.
     The refined file is loaded back into the interactive tool on completion.
+
+    Args:
+        current_gpx_id (str): Galaxy API ID for the GSASII project file.
     """
-    
+
     gpx().save()
-    file_path:str = gpx().filename
+    file_path: str = gpx().filename
     file_name = os.path.basename(file_path)
     save_delta(file_name)
     gxhistory.put("delta1")
@@ -826,10 +836,7 @@ def submit_out(current_gpx_id) -> None:
     gxhistory.wait_for_dataset(id)
 
     # load the history with the new refinement output gpx file
-    id:str = list(get_gpx_choices())[0]
-    # gpx_table: pd.DataFrame = hist_table[(hist_table["name"].str.contains("gpx"))]
-    # row_id: int = gpx_table["hid"].idxmax()
-    # id: str = gpx_table.loc[row_id, "id"]
+    id: str = list(get_gpx_choices())[0]
 
     # load the refined output project and update the UI
     update_history()
@@ -841,7 +848,7 @@ def refresh_latest_history_entry_id() -> str:
     """Finds the API id of the latest files in the galaxy history.
 
     Returns:
-        str: Galaxy API ID for the msot recent entry in the history.
+        str: Galaxy API ID for the most recent entry in the history.
     """
     time.sleep(2)
     hist_table = get_update_history()
@@ -852,7 +859,11 @@ def refresh_latest_history_entry_id() -> str:
 
 def save_delta(file_name: str) -> None:
     """saves the difference between the current project file being edited
-    and its original from the galaxy history as a "delta" binary file."""
+    and its original from the galaxy history as a "delta" binary file.
+
+    Args:
+        file_name (str): name of the GSASII project file
+    """
     og_project_file = "og_" + file_name
     og_gpx = gsas_load_gpx(og_project_file, og_project_file)
     diff = DeepDiff(og_gpx, gpx(), exclude_paths="filename")
