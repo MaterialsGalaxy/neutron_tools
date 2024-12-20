@@ -24,21 +24,7 @@ these have to be passed as inputs to the function."""
 # as a side effect from reactive functions
 gpx = reactive.value()
 og_gpx = reactive.value()
-current_gpx_fname = reactive.value()
-input_gpx_file = reactive.value()
-
-num_bkg_coefs = reactive.value()
-current_bkg_func = reactive.value()
-
-x = reactive.value()
-y = reactive.value()
-ycalc = reactive.value()
-dy = reactive.value()
-bkg = reactive.value()
-
 hist_data = reactive.value()
-constraints = reactive.value()
-
 current_gpx_id = reactive.value()
 
 # initial values for sidebar selections when no project is loaded
@@ -131,10 +117,8 @@ def add_constr(ctype: str, df: pd.DataFrame, var_df: pd.DataFrame) -> None:
     # add the constriants to the gpx
     if valid:
         if ctype == "eqv":
-            constraints().append(["EQUIV", constr_vars, coefs])
             gpx().add_EquivConstr(constr_vars, multlist=coefs)
         elif ctype == "eqn":
-            constraints().append(["CONST", constr_vars, coefs])
             gpx().add_EqnConstr(1, constr_vars, multlist=coefs)
 
 
@@ -316,8 +300,6 @@ def load_bkg_data(hist_name: str) -> list[list, dict]:
         return bkg_data
     else:
         return None
-    # num_bkg_coefs.set()
-    # current_bkg_func.set()
 
 
 def build_bkg_page(hist_name: str) -> None:
@@ -638,10 +620,9 @@ def load_histogram(hist_name: str) -> None:
         ui.update_select("view_hist_data", choices=select_view_hist())
 
         # update the plots and the UI
-        update_plot(gpx(), hist_name)
-
-        lim_min: float = min(x())
-        lim_max: float = max(x())
+        plot_data = hist_export(gpx(), hist_name)
+        lim_min: float = min(plot_data[0])
+        lim_max: float = max(plot_data[0])
         lim_low: float = h.Limits("lower")
         lim_up: float = h.Limits("upper")
         ui.update_slider("limits",
@@ -655,22 +636,6 @@ def load_histogram(hist_name: str) -> None:
         build_bkg_page(hist_name)
         update_instrument_refinements(hist_name)
 
-
-def update_plot(gpx: GSAS2Project, hist_name: str) -> None:
-    """gets the data for plotting the selected histogram
-    from the GSASII project object
-    and sets the corresponding reactive values to store them.
-
-    Args:
-        gpx (GSAS2Project): The GSASII project object of interest
-        hist_name (str): the name of the histogram of interest
-    """
-    tx, ty, tycalc, tdy, tbkg = hist_export(gpx, hist_name)
-    x.set(tx)
-    y.set(ty)
-    ycalc.set(tycalc)
-    dy.set(tdy)
-    bkg.set(tbkg)
 
 
 def load_phase() -> None:
@@ -702,12 +667,12 @@ def plot_powder(hist_name: str, limits: list):
     Returns:
         _type_: _description_
     """
-    update_plot(gpx(), hist_name)
+    x, y, ycalc, dy, bkg = hist_export(gpx(), hist_name)
     pwdr_data = {
-        "2 Theta": x(),
-        "intensity": y(),
-        "fit": ycalc(),
-        "background": bkg(),
+        "2 Theta": x,
+        "intensity": y,
+        "fit": ycalc,
+        "background": bkg,
     }
     df = pd.DataFrame(pwdr_data)
     tdf = pd.DataFrame([[0, 0]], columns=["2 Theta", "intensity"])
@@ -831,7 +796,6 @@ def load_project(id: str) -> None:
         tgpx: GSAS2Project = gsas_load_gpx(fp, fn)
         og_tgpx: GSAS2Project = gsas_load_gpx(fp, "og_" + fn)
         current_gpx_id.set(id)
-        current_gpx_fname.set(fn)
         # load the phase names for the sidebar selection
         phase_names = {}
         for phase in tgpx.phases():
@@ -846,10 +810,8 @@ def load_project(id: str) -> None:
         select_hist_choices.set(hist_names)
 
         # set reactive variable values
-        input_gpx_file.set(fp)
         gpx.set(tgpx)
         og_gpx.set(og_tgpx)
-        constraints.set([])
 
         # update the phase/histogram selection uis
         ui.update_select("select_hist", choices=select_hist_choices())
