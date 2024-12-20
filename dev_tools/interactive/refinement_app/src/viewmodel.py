@@ -82,21 +82,21 @@ def update_nav(tab: str) -> None:
     ui.update_navs(id="tab", selected=tab)
 
 
-def add_constr(ctype: str, df: pd.DataFrame, var_df: pd.DataFrame) -> None:
+def add_constr(constraint_type: str, constraint_df: pd.DataFrame, var_df: pd.DataFrame) -> None:
     """adds a valid phase constraint to the GSASII project.
 
     Args:
         ctype (str): denotes the type of phase constraint
-        df (pd.DataFrame): selected constraint parameters and coefficients
+        pwdr_data_df (pd.DataFrame): selected constraint parameters and coefficients
         var_df (pd.DataFrame): table of permitted constraint parameters
     """
     # add constraints to constraints list and to gpx
-    constr_vars = df["code"].tolist()
-    constr_coefs = df["coefficients"].tolist()
+    constr_vars = constraint_df["code"].tolist()
+    constr_coefs = constraint_df["coefficients"].tolist()
 
     # validation
     valid = False
-    if len(df.index) >= 2:
+    if len(constraint_df.index) >= 2:
         vars_valid = set(constr_vars).issubset(set(var_df["code"].tolist()))
         if vars_valid:
             try:
@@ -110,9 +110,9 @@ def add_constr(ctype: str, df: pd.DataFrame, var_df: pd.DataFrame) -> None:
 
     # add the constriants to the gpx
     if valid:
-        if ctype == "eqv":
+        if constraint_type == "eqv":
             gpx().add_EquivConstr(constr_vars, multlist=coefs)
-        elif ctype == "eqn":
+        elif constraint_type == "eqn":
             gpx().add_EqnConstr(1, constr_vars, multlist=coefs)
 
 
@@ -222,13 +222,13 @@ def save_atom_table(df: pd.DataFrame, phase_name: str) -> None:
 
     for atom in phase.atoms():
         atom_record = df.loc[df["Name"] == atom.label]
-        flag = atom_record.iloc[0]["refine"]
-        # check_flag = flag.translate({ord(i): None for i in 'FXU'})
-        check_flag = flag
+        refinement_flags = atom_record.iloc[0]["refine"]
+        # check_flags = refinement_flags.translate({ord(i): None for i in 'FXU'})
+        check_flags = refinement_flags
         for f in "FXU":
-            check_flag = check_flag.replace(f, "", 1)
-        if check_flag == "":
-            atom.refinement_flags = flag
+            check_flags = check_flags.replace(f, "", 1)
+        if check_flags == "":
+            atom.refinement_flags = refinement_flags
         else:
             print("invalid flags")
 
@@ -321,7 +321,7 @@ def set_bkg_func(hist_name: str, func_name: str) -> None:
         bkg_data[0][0] = func_name
 
 
-def set_bkg_refine(hist_name: str, flag: bool) -> None:
+def set_bkg_refine(hist_name: str, refinement_flag: bool) -> None:
     """Sets the refinement flag on or off for the chosen histogram in
     the GSASII project object.
 
@@ -331,7 +331,7 @@ def set_bkg_refine(hist_name: str, flag: bool) -> None:
     """
     if hist_name != "init":
         bkg_data = load_bkg_data(hist_name)
-        bkg_data[0][1] = flag
+        bkg_data[0][1] = refinement_flag
 
 
 def set_bkg_coefs(hist_name: str, num_coefs: int) -> None:
@@ -531,7 +531,7 @@ def save_sample_parameters(
     h = gpx().histogram(hist_name)
     sample_parameters = h.getHistEntryValue(["Sample Parameters"])
 
-    # set all flags to false
+    # set all refinement flags to false
     for param, val in sample_parameters.items():
         if isinstance(val, list):
             if val[1]:
@@ -655,10 +655,10 @@ def plot_powder(hist_name: str, limits: list):
         "fit": ycalc,
         "background": bkg,
     }
-    df = pd.DataFrame(pwdr_data)
-    tdf = pd.DataFrame([[0, 0]], columns=["2 Theta", "intensity"])
+    pwdr_data_df = pd.DataFrame(pwdr_data)
+    place_holder_df = pd.DataFrame([[0, 0]], columns=["2 Theta", "intensity"])
 
-    fig = px.scatter(tdf,
+    fig = px.scatter(place_holder_df,
         x="2 Theta",
         y="intensity",
         opacity=0,
@@ -666,8 +666,8 @@ def plot_powder(hist_name: str, limits: list):
     )
 
     fig.add_scatter(
-        x=df["2 Theta"],
-        y=df["intensity"],
+        x=pwdr_data_df["2 Theta"],
+        y=pwdr_data_df["intensity"],
         mode="markers",
         opacity=0.8,
         name="powder data",
@@ -687,8 +687,8 @@ def plot_powder(hist_name: str, limits: list):
     )
 
     fig.add_scatter(
-        x=df["2 Theta"],
-        y=df["fit"],
+        x=pwdr_data_df["2 Theta"],
+        y=pwdr_data_df["fit"],
         mode="lines",
         opacity=1,
         name="fit",
@@ -696,8 +696,8 @@ def plot_powder(hist_name: str, limits: list):
     )
 
     fig.add_scatter(
-        x=df["2 Theta"],
-        y=df["background"],
+        x=pwdr_data_df["2 Theta"],
+        y=pwdr_data_df["background"],
         mode="lines",
         opacity=1,
         name="background",
@@ -778,7 +778,9 @@ def load_project(id: str) -> None:
         fp = os.path.join(location, fn)
         gxhistory.get_project(id, fp)
         tgpx: GSAS2Project = gsas_load_gpx(fp, fn)
-        og_tgpx: GSAS2Project = gsas_load_gpx(fp, "og_" + fn)
+
+        og_gpx: GSAS2Project = gsas_load_gpx(fp, "og_" + fn)
+        og_gpx.save()
         # load the phase names for the sidebar selection
         phase_names = {}
         for phase in tgpx.phases():
