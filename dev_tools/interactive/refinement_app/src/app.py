@@ -17,10 +17,7 @@ from viewmodel import (
     update_history,
     get_update_history,
     load_project,
-    view_proj,
-    load_phase,
     load_histogram,
-    view_hist,
     load_bkg_data,
     set_bkg_func,
     set_bkg_refine,
@@ -379,26 +376,11 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
         load_project(id)
 
     @reactive.effect
-    @reactive.event(input.view_project_data)
-    def app_view_proj():
-        view_proj()
-
-    @reactive.effect
-    @reactive.event(input.select_phase)
-    def app_load_phase():
-        load_phase()
-
-    @reactive.effect
     @reactive.event(input.select_hist)
     def app_load_histogram():
         load_histogram(input.select_hist())
 
     @reactive.effect
-    @reactive.event(input.view_hist_data)
-    def app_view_hist():
-        view_hist()
-
-    @reactive.effect
     @reactive.event(input.submit)
     def ui_submit_out():
-        submit_out()
+        submit_out(input.select_gpx())

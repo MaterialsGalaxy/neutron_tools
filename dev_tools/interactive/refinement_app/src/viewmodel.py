@@ -20,24 +20,19 @@ and processes all logic from the ui, GSASII and galaxy history models.
 note functions defined here cannot directly access inputs from view.
 these have to be passed as inputs to the function."""
 
-# reactive value parameters for anything that needs to be passed on
-# as a side effect from reactive functions
+# store the GSASII project object as a reactive value as it will be
+# edited as a side effect by all reactive functions.
 gpx = reactive.value()
-og_gpx = reactive.value()
-current_gpx_id = reactive.value()
 
 # initial values for sidebar selections when no project is loaded
 # reactive values for when projects are loaded
 gpx_choices = {"init": "update the history before loading a new project"}
-select_gpx_choices = reactive.value(gpx_choices)
 
 phase_choices = {"init": "Load a project before selecting a phase"}
-select_phase_choices = reactive.value(phase_choices)
 
 hist_choices = {"init": "Load a project before selecting a histogram"}
-select_hist_choices = reactive.value(hist_choices)
+
 view_hist_choices = {"init": "Load a project before selecting a histogram"}
-select_view_hist = reactive.value(view_hist_choices)
 
 view_proj_choices = {
     "Notebook": "Notebook",
@@ -595,12 +590,6 @@ def update_sample_refinements(hist_name: str) -> None:
     )
 
 
-def view_hist() -> None:
-    """TBC"""
-    # view a specific subtree of the histogram in the histogram tab
-    print("select_view_hist()")
-
-
 def load_histogram(hist_name: str) -> None:
     """Loads all data for the UI histogram pages and updates the plots
 
@@ -615,8 +604,7 @@ def load_histogram(hist_name: str) -> None:
         options = {}
         for subheading in data:
             options[subheading] = subheading
-        select_view_hist.set(options)
-        ui.update_select("view_hist_data", choices=select_view_hist())
+        ui.update_select("view_hist_data", choices=options)
 
         # update the plots and the UI
         plot_data = hist_export(gpx(), hist_name)
@@ -634,12 +622,6 @@ def load_histogram(hist_name: str) -> None:
         update_sample_refinements(hist_name)
         build_bkg_page(hist_name)
         update_instrument_refinements(hist_name)
-
-
-
-def load_phase() -> None:
-    # load the ui for phase data in the project tab TBC or unecessary
-    print("select_phase_choices()")
 
 
 def set_hist_limits(hist_name: str, limits: list) -> None:
@@ -677,11 +659,11 @@ def plot_powder(hist_name: str, limits: list):
     tdf = pd.DataFrame([[0, 0]], columns=["2 Theta", "intensity"])
 
     fig = px.scatter(tdf,
-                     x="2 Theta",
-                     y="intensity",
-                     opacity=0,
-                     title=hist_name,
-                     )
+        x="2 Theta",
+        y="intensity",
+        opacity=0,
+        title=hist_name,
+    )
 
     fig.add_scatter(
         x=df["2 Theta"],
@@ -773,14 +755,7 @@ def update_history() -> None:
     print("update_history triggered")
 
     gpx_choices = get_gpx_choices()
-    select_gpx_choices.set(gpx_choices)  # dictionary with {ID:name}
     ui.update_select("select_gpx", choices=gpx_choices)
-
-
-def view_proj() -> None:
-    """tbd"""
-    # view project data window TBC
-    print("view_proj_choices")
 
 
 def load_project(id: str) -> None:
@@ -796,7 +771,7 @@ def load_project(id: str) -> None:
     if id != "init":
 
         # get the file from galaxy and load the gsas project
-        hid_and_fn: str = select_gpx_choices()[id]
+        hid_and_fn: str = get_gpx_choices()[id]
         fn: str = hid_and_fn.split(": ")[1]
 
         location: str = "/var/shiny-server/shiny_test/work/"
@@ -804,45 +779,44 @@ def load_project(id: str) -> None:
         gxhistory.get_project(id, fp)
         tgpx: GSAS2Project = gsas_load_gpx(fp, fn)
         og_tgpx: GSAS2Project = gsas_load_gpx(fp, "og_" + fn)
-        current_gpx_id.set(id)
         # load the phase names for the sidebar selection
         phase_names = {}
         for phase in tgpx.phases():
             name = phase.name
             phase_names[name] = name
-        select_phase_choices.set(phase_names)
 
         # load the histogram names for sidebar selection
         hist_names = {}
         for hist in tgpx.histograms():
             hist_names[hist.name] = hist.name
-        select_hist_choices.set(hist_names)
 
         # set reactive variable values
         gpx.set(tgpx)
-        og_gpx.set(og_tgpx)
 
         # update the phase/histogram selection uis
-        ui.update_select("select_hist", choices=select_hist_choices())
-        ui.update_select("select_phase", choices=select_phase_choices())
+        ui.update_select("select_hist", choices=hist_names)
+        ui.update_select("select_phase", choices=phase_names)
 
         # load data for a histogram/clear previous histogram data
         load_histogram(list(hist_names.keys())[0])
 
 
-def submit_out() -> None:
+def submit_out(current_gpx_id) -> None:
     """saves project changes to the .gpx file
     and submits them as a delta file to the galaxy history.
     The static tool GSAS2_refinement_executor then runs in galaxy.
     The refined file is loaded back into the interactive tool on completion.
     """
+    
     gpx().save()
-    save_delta()
+    file_path:str = gpx().filename
+    file_name = os.path.basename(file_path)
+    save_delta(file_name)
     gxhistory.put("delta1")
 
     # wait for the file to save in galaxy and run refinement
     id = refresh_latest_history_entry_id()
-    gxhistory.run_refinement(current_gpx_id(), id)
+    gxhistory.run_refinement(current_gpx_id, id)
     # current_gpx_id.set(id)
 
     # wait for refinement to complete
@@ -874,10 +848,12 @@ def refresh_latest_history_entry_id() -> str:
     return id
 
 
-def save_delta() -> None:
+def save_delta(file_name: str) -> None:
     """saves the difference between the current project file being edited
     and its original from the galaxy history as a "delta" binary file."""
-    diff = DeepDiff(og_gpx(), gpx(), exclude_paths="filename")
+    og_project_file = "og_" + file_name
+    og_gpx = gsas_load_gpx(og_project_file, og_project_file)
+    diff = DeepDiff(og_gpx, gpx(), exclude_paths="filename")
     delta = Delta(diff)
     with open("delta1", "wb") as dump_file:
         delta.dump(dump_file)
