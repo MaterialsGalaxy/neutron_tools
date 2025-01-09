@@ -93,22 +93,22 @@ def add_constr(
         var_df (pd.DataFrame): table of permitted constraint parameters
     """
     # add constraints to constraints list and to gpx
-    constr_vars = constraint_df["code"].tolist()
-    constr_coefs = constraint_df["coefficients"].tolist()
+    constr_vars = constraint_df["Code"].tolist()
+    constr_coefs = constraint_df["Coefficients"].tolist()
 
     # validation
     valid = False
     if len(constraint_df.index) >= 2:
-        vars_valid = set(constr_vars).issubset(set(var_df["code"].tolist()))
+        vars_valid = set(constr_vars).issubset(set(var_df["Code"].tolist()))
         if vars_valid:
             try:
                 coefs = [float(c) for c in constr_coefs]
             except Exception:
-                print("invalid coefficients")
+                print("Invalid coefficients")
             else:
                 valid = True
         else:
-            print("invalid parameter name")
+            print("Invalid parameter name")
 
     # add the constriants to the gpx
     if valid:
@@ -129,7 +129,7 @@ def build_constraints_df(phase_name: str) -> pd.DataFrame:
         pd.DataFrame: The dataframe of variables
     """
     # initialise constraints
-    constraint_cols = ["code", "phase", "parameter", "atom"]
+    constraint_cols = ["Code", "Phase", "Parameter", "Atom"]
     phase_constr_df = pd.DataFrame(columns=constraint_cols)
 
     phase = gpx().phase(phase_name)
@@ -177,7 +177,7 @@ def show_phase_constr() -> pd.DataFrame:
     """
     gpx().index_ids()
     constraints = load_phase_constraints(gpx())
-    current_constraints = pd.DataFrame(columns=["current constraints"])
+    current_constraints = pd.DataFrame(columns=["Current constraints"])
     # rearrange the data for visualisation
     for constraint in constraints:
         # equation constraint
@@ -205,7 +205,7 @@ def show_phase_constr() -> pd.DataFrame:
 
         # add new entry to dataframe
         current_constraints.loc[len(current_constraints)] = {
-            "current constraints": new_entry,
+            "Current constraints": new_entry,
         }
 
     return current_constraints
@@ -224,14 +224,14 @@ def save_atom_table(df: pd.DataFrame, phase_name: str) -> None:
 
     for atom in phase.atoms():
         atom_record = df.loc[df["Name"] == atom.label]
-        refinement_flags = atom_record.iloc[0]["refine"]
+        refinement_flags = atom_record.iloc[0]["Refine"]
         check_flags = refinement_flags
         for f in "FXU":
             check_flags = check_flags.replace(f, "", 1)
         if check_flags == "":
             atom.refinement_flags = refinement_flags
         else:
-            print("invalid flags")
+            print("Invalid flags")
 
 
 def atom_data(phase_name: str) -> pd.DataFrame:
@@ -248,7 +248,7 @@ def atom_data(phase_name: str) -> pd.DataFrame:
     phase = gpx().phase(phase_name)
 
     # initialise the dataframe
-    atom_cols = ["Name", "type", "refine", "x", "y", "z", "frac", "multi", "Uiso"]
+    atom_cols = ["Name", "Type", "Refine", "X", "Y", "Z", "Frac", "Multi", "Uiso"]
     atom_frame: pd.DataFrame = pd.DataFrame(columns=atom_cols)
 
     # populate the dataframe with data from the project

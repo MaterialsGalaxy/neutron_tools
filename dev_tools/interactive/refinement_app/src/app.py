@@ -55,7 +55,7 @@ with ui.navset_hidden(id="tab"):
 
             ui.input_numeric(
                 "num_bkg_coefs",
-                "Number of Coefficients",
+                "Number of coefficients",
                 value=0,
             )
 
@@ -106,9 +106,9 @@ with ui.navset_hidden(id="tab"):
                     height=None,
                 )
 
-            ui.input_action_button("save_bkg_coefs", "Save Background Coefficients")
+            ui.input_action_button("save_bkg_coefs", "Save background coefficients")
 
-        with ui.nav_panel("Sample Parameters", value="Sample Parameters"):
+        with ui.nav_panel("Sample parameters", value="Sample Parameters"):
 
             ui.input_selectize(
                 "samp_selection",
@@ -132,7 +132,7 @@ with ui.navset_hidden(id="tab"):
                     height=None,
                 )
 
-            ui.input_action_button("save_samp", "save sample parameters")
+            ui.input_action_button("save_samp", "Save sample parameters")
 
             @reactive.effect
             @reactive.event(input.save_samp)
@@ -151,7 +151,7 @@ with ui.navset_hidden(id="tab"):
                     .getHistEntryValue(["Sample Parameters"])
                 )
 
-        with ui.nav_panel("Instrument Refinements", value="Instrument Parameters"):
+        with ui.nav_panel("Instrument refinements", value="Instrument Parameters"):
             ui.input_selectize(
                 "inst_selection",
                 "Select instrument parameters to refine:",
@@ -161,7 +161,7 @@ with ui.navset_hidden(id="tab"):
             )
 
             with ui.navset_hidden(id="instruments"):
-                with ui.nav_panel("Instrument Parameter Values"):
+                with ui.nav_panel("Instrument parameter values"):
                     "Set values:"
 
             @render.data_frame
@@ -178,7 +178,7 @@ with ui.navset_hidden(id="tab"):
                     height=None,
                 )
 
-            ui.input_action_button("save_inst", "save instrument parameters")
+            ui.input_action_button("save_inst", "Save instrument parameters")
 
             @reactive.effect
             @reactive.event(input.save_inst)
@@ -199,11 +199,11 @@ with ui.navset_hidden(id="tab"):
 
     with ui.nav_panel("Phase", value="Phase"):
         with ui.navset_pill(id="phases"):
-            with ui.nav_panel("general", value="phasegen"):
+            with ui.nav_panel("General", value="phasegen"):
                 "general"
-            with ui.nav_panel("data", value="phasedata"):
+            with ui.nav_panel("Data", value="phasedata"):
                 "data"
-            with ui.nav_panel("atoms", value="atoms"):
+            with ui.nav_panel("Atoms", value="atoms"):
 
                 @render.data_frame
                 @reactive.event(
@@ -237,16 +237,16 @@ with ui.navset_hidden(id="tab"):
             with ui.layout_column_wrap():
                 with ui.card():
                     ui.card_header("Add new constraint")
-                    constraint_types = {"eqv": "equivalence", "eqn": "equation"}
-                    ui.input_select("constr_type", "constraint type", constraint_types)
+                    constraint_types = {"eqv": "Equivalence", "eqn": "Equation"}
+                    ui.input_select("constr_type", "Constraint type", constraint_types)
 
                     @render.data_frame
                     def new_constr():
-                        codes = render_constr_table.data_view(selected=True)[["code"]]
-                        codes["coefficients"] = 1
+                        codes = render_constr_table.data_view(selected=True)[["Code"]]
+                        codes["Coefficients"] = 1
                         return render.DataTable(codes, height=None, editable=True)
 
-                    ui.input_action_button("add_constr", "add constraint")
+                    ui.input_action_button("add_constr", "Add constraint")
 
                     @render.data_frame
                     @reactive.event(input.add_constr, input.load_gpx, input.pop_constr)
@@ -267,26 +267,26 @@ with ui.navset_hidden(id="tab"):
                                 input.constr_type(), constr, render_constr_table.data()
                             )
 
-                    ui.input_action_button("pop_constr", "remove constraint")
+                    ui.input_action_button("pop_constr", "Remove constraint")
 
                     @reactive.effect
                     @reactive.event(input.pop_constr)
                     def app_remove_constr():
                         constr_df = app_show_phase_constr.data_view(selected=True)[
-                            ["current constraints"]
+                            ["Current constraints"]
                         ]
                         if not constr_df.empty:
-                            constr_val = constr_df["current constraints"].loc[
+                            constr_val = constr_df["Current constraints"].loc[
                                 constr_df.index[0]
                             ]
                             all_constr = app_show_phase_constr.data()
                             constr_id = all_constr.index[
-                                all_constr["current constraints"] == constr_val
+                                all_constr["Current constraints"] == constr_val
                             ].tolist()
                             remove_constraint(constr_id[0])
 
                 with ui.card():
-                    ui.card_header("select constraint parameters")
+                    ui.card_header("Select constraint parameters")
 
                     @render.data_frame
                     def render_constr_table():
@@ -298,12 +298,12 @@ with ui.navset_hidden(id="tab"):
 
         with ui.nav_panel("Restraints", value="Restraints"):
             "Restraints"
-        with ui.nav_panel("Rigid Bodies", value="Rigid Bodies"):
+        with ui.nav_panel("Rigid bodies", value="Rigid Bodies"):
             "Rigid bodies"
 
 # separate always visible section for plots
 with ui.navset_pill(id="plot"):
-    with ui.nav_panel("plots", value="plots"):
+    with ui.nav_panel("Plots", value="plots"):
 
         @render_plotly
         def plot():
@@ -328,9 +328,9 @@ with ui.navset_pill(id="plot"):
 
 with ui.sidebar(bg="#f8f8f8", position="left"):
 
-    ui.input_action_button("update_history", "update history")
+    ui.input_action_button("update_history", "Update history")
 
-    ui.input_select("select_gpx", "load GSASII project:", gpx_choices)
+    ui.input_select("select_gpx", "Load GSASII project:", gpx_choices)
     ui.input_task_button("load_gpx", "Load project")
 
     ui.input_select("view_project_data", "Project", view_proj_choices)
@@ -353,7 +353,7 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
         update_nav(tab)
 
     ui.input_select("select_hist", "Histogram", hist_choices)
-    ui.input_select("view_hist_data", "View Histogram data", view_hist_choices)
+    ui.input_select("view_hist_data", "View histogram data", view_hist_choices)
     ui.input_action_button("view_histogram", "View histogram")
 
     @reactive.effect
