@@ -331,7 +331,7 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
     ui.input_action_button("update_history", "update history")
 
     ui.input_select("select_gpx", "load GSASII project:", gpx_choices)
-    ui.input_action_button("load_gpx", "Load project")
+    ui.input_task_button("load_gpx", "Load project")
 
     ui.input_select("view_project_data", "Project", view_proj_choices)
 
@@ -362,7 +362,7 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
         tab = input.view_hist_data()
         update_nav(tab)
 
-    ui.input_action_button("submit", "Refine")
+    ui.input_task_button("submit", "Refine")
 
     @reactive.effect
     @reactive.event(input.update_history, ignore_none=False)
