@@ -9,12 +9,14 @@
         cd app/ &&
         touch $output &&
         mkdir portal &&
-        ln -s $cif_file '$cif_file.element_identifier' &&
+        #for $cif_file in $cif_files
+            ln -s $cif_file '$cif_file.element_identifier' &&
+        #end for
         ln -s $gsas_file '$gsas_file.element_identifier' &&
         ln -s $prm_file '$prm_file.element_identifier' &&
 
         python $__tool_directory__/gsas2_refinement_upload.py
-                --cif-filename '$cif_file.element_identifier'
+                --cif-filenames #for $cif_file in $cif_files  # '$cif_file.element_identifier' #end for #
                 --gsas-filename '$gsas_file.element_identifier'
                 --instrument-params-filename '$prm_file.element_identifier'
                 --scatter-type $scatter_type
@@ -22,7 +24,7 @@
         > >(tee -a $output) 2> >(tee -a $output >&2)
     ]]></command>
     <inputs>
-        <param name="cif_file" type="data" format="cif" label="CIF File"/>
+        <param name="cif_files" type="data" format="cif" multiple="true" label="CIF File"/>
         <param name="gsas_file" type="data" format="raw, gsa" label="GSAS File"/>
         <param name="prm_file" type="data" format="prm, instprm" label="Instrument Parameter File"/>
 

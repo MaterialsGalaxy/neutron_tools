@@ -22,7 +22,7 @@ import GSASIIscriptable as G2sc  # type: ignore
 
 
 def run_gsas2_fit(
-    structure_fn,
+    structure_fns,
     gsa_fn,
     prm_fn,
     output_stem_fn,
@@ -34,7 +34,7 @@ def run_gsas2_fit(
     """
     Parameters
     ----------
-    structure_fn: str
+    structure_fns:listt [str]
         input structure cif filename.
     gsa_fn: str
         input gsa filename.
@@ -102,12 +102,14 @@ def run_gsas2_fit(
 
     hists.append(hist1)
 
-    # step 2: add a phase and link it to the previous histograms
-    _ = gpx.add_phase(
-        structure_fn, phasename="structure", fmthint="CIF", histograms=hists
-    )
+    # step 2: add phases and link it to the previous histograms
+    for structure_fn in structure_fns:
+        phase_name = os.path.splitext(os.path.basename(structure_fn))[0]
+        gpx.add_phase(
+            structure_fn, phasename=phase_name, fmthint="CIF", histograms=hists
+        )
     print("phase loaded")
-    cell_i = gpx.phase("structure").get_cell()
+
 
     # step 3: increase # of cycles to improve convergence
     gpx.data["Controls"]["data"]["max cyc"] = num_cycles
@@ -174,13 +176,10 @@ def run_gsas2_fit(
     bkg = np.array(gpx.histogram(0).getdata("Background"))
 
     refs = gpx.histogram(0).reflections()
-    ref_list = refs["structure"]["RefList"]
 
     """output_cif_fn = os.path.join(
         os.getcwd(), "portal/", output_stem_fn + "_refined.cif"
     )
     gpx.phase("structure").export_CIF(output_cif_fn)"""
     
-    cell_r = gpx.phase("structure").get_cell()
-
-    return rw, x, y, ycalc, dy, bkg, cell_i, cell_r, ref_list
+    return rw, x, y, ycalc, dy, bkg
