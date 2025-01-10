@@ -70,10 +70,10 @@ def run_gsas2_fit(
 
     # create a readable text file detailing parameter changes
     flat_dicts = delta.to_flat_dicts()
-    delta_fp = os.path.join(os.getcwd(), "portal/", "parameters_changed.txt")
-    with open(delta_fp, "w") as delta_file:
+    updated_parameters_fp = os.path.join(os.getcwd(), "portal/", "parameters_updated.txt")
+    with open(updated_parameters_fp, "w") as updated_parameters_file:
         for change in flat_dicts:
-            delta_file.write(change['action'] + ": " + str(change["path"]) + " = " + str(change["value"]) + "\n")
+            updated_parameters_file.write(change['action'] + ": " + str(change["path"]) + " = " + str(change["value"]) + "\n")
 
     # check if the project got created
     if os.path.exists(proj_path):
