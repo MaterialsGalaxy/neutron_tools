@@ -26,7 +26,6 @@ def run_gsas2_fit(
     gsa_fns,
     prm_fns,
     output_stem_fn,
-    stype,
     output_path,
     num_cycles=5,
     init_vals: Union[None, Dict[str, Any]] = None,
