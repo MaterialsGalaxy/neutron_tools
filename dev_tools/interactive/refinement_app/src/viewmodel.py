@@ -819,14 +819,18 @@ def submit_out(current_gpx_id: str) -> None:
     Args:
         current_gpx_id (str): Galaxy API ID for the GSASII project file.
     """
-
+    # refresh history get history id add the HID to the name of the delta
     gpx().save()
     file_path: str = gpx().filename
     file_name = os.path.basename(file_path)
-    save_delta(file_name)
-    gxhistory.put("delta1")
+    history_table = get_update_history()
+    current_gpx_history_entry = history_table.loc[history_table["id"] == current_gpx_id]
+    history_id = str(current_gpx_history_entry['hid'].loc[current_gpx_history_entry.index[0]])
+ 
+    delta_file_name = save_delta(file_name, history_id)
+    gxhistory.put(delta_file_name)
 
-    # wait for the file to save in galaxy and run refinement
+    # wait for the delta file to save in galaxy and run refinement
     id = refresh_latest_history_entry_id()
     gxhistory.run_refinement(current_gpx_id, id)
     # current_gpx_id.set(id)
@@ -857,16 +861,22 @@ def refresh_latest_history_entry_id() -> str:
     return id
 
 
-def save_delta(file_name: str) -> None:
+def save_delta(file_name: str, history_id: str) -> str:
     """saves the difference between the current project file being edited
     and its original from the galaxy history as a "delta" binary file.
 
     Args:
         file_name (str): name of the GSASII project file
+        history_id (str): galaxy history id of the current GSASIIproject file which the Delta is taken from.
+    
+    Returns:
+        str: Delta file name to be output to the galaxy history
     """
     og_project_file = "og_" + file_name
     og_gpx = gsas_load_gpx(og_project_file, og_project_file)
     diff = DeepDiff(og_gpx, gpx(), exclude_paths="filename")
     delta = Delta(diff)
-    with open("delta1", "wb") as dump_file:
+    delta_file_name = "Delta_on_" + history_id
+    with open(delta_file_name, "wb") as dump_file:
         delta.dump(dump_file)
+    return delta_file_name
