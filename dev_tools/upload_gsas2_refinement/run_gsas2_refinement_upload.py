@@ -7,7 +7,7 @@ from typing import (
 )
 
 import numpy as np
-
+import shutil
 """
 change how GSASIIscriptable is imported for actual deployment
 locally i added:
@@ -74,7 +74,7 @@ def run_gsas2_fit(
     # start GSAS-II refinement
     # create a project file
 
-    proj_path = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_initial.gpx")
+    proj_path = os.path.join(os.getcwd(), output_stem_fn + "_initial.gpx")
 
     print(proj_path)
 
@@ -151,11 +151,17 @@ def run_gsas2_fit(
 
     # before fit, save project file first.
     # Then in the future, the refined project file will update this one.
-    gpx.save(os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.gpx"))
+    gpx.save(os.path.join(os.getcwd(), output_stem_fn + "_refined.gpx"))
 
     gpx.do_refinements(dictList)
     print("================")
 
+    gpx_output_file_path = os.path.join(os.getcwd(),"portal/", output_stem_fn + "_refined.gpx")
+    gpx.save(filename=gpx_output_file_path)
+
+    lst_file_path = os.path.join(os.getcwd(), output_stem_fn + "_refined.lst")
+    lst_output_file_path = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.lst")
+    shutil.copy(lst_file_path, lst_output_file_path)
     # save results data
 
     rw = gpx.histogram(0).get_wR() * 0.01
@@ -168,10 +174,11 @@ def run_gsas2_fit(
     refs = gpx.histogram(0).reflections()
     ref_list = refs["structure"]["RefList"]
 
-    output_cif_fn = os.path.join(
+    """output_cif_fn = os.path.join(
         os.getcwd(), "portal/", output_stem_fn + "_refined.cif"
     )
-    gpx.phase("structure").export_CIF(output_cif_fn)
+    gpx.phase("structure").export_CIF(output_cif_fn)"""
+    
     cell_r = gpx.phase("structure").get_cell()
 
     return rw, x, y, ycalc, dy, bkg, cell_i, cell_r, ref_list
