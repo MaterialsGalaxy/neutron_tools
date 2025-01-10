@@ -5,9 +5,9 @@ from run_gsas2_refinement_upload import run_gsas2_fit
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--cif-filenames", nargs="+", help="Name of CIF file to load (*.cif)", type=str)
-    parser.add_argument("-f", "--gsas-filename", help="Name of gsas file to load (*.gsa) ", type=str)
+    parser.add_argument("-f", "--gsas-filenames", nargs="+", help="Name of gsas file to load (*.gsa) ", type=str)
     parser.add_argument(
-        "-i", "--instrument-params-filename", help="Name of instrument parameters file to load (*.prm)", type=str
+        "-i", "--instrument-params-filenames", nargs="+", help="Name of instrument parameters file to load (*.prm)", type=str
     )
     parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
     parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
@@ -26,8 +26,8 @@ if __name__ == "__main__":
     # Run refinement
     run_gsas2_fit(
         args.cif_filenames,
-        args.gsas_filename,
-        args.instrument_params_filename,
+        args.gsas_filenames,
+        args.instrument_params_filenames,
         args.output_stem_name,
         args.scatter_type,
         args.output_directory,

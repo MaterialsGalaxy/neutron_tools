@@ -23,8 +23,8 @@ import GSASIIscriptable as G2sc  # type: ignore
 
 def run_gsas2_fit(
     structure_fns,
-    gsa_fn,
-    prm_fn,
+    gsa_fns,
+    prm_fns,
     output_stem_fn,
     stype,
     output_path,
@@ -34,11 +34,11 @@ def run_gsas2_fit(
     """
     Parameters
     ----------
-    structure_fns:listt [str]
+    structure_fns:list [str]
         input structure cif filename.
-    gsa_fn: str
+    gsa_fns: list[str]
         input gsa filename.
-    prm_fn: str
+    prm_fns: list [str]
         input instrument profile filename.
     output_stem_fn: str
         output stem filename.
@@ -87,26 +87,16 @@ def run_gsas2_fit(
         print("created project at path:", proj_path)
     else:
         print("no project created at path", proj_path)
+    # add histograms to project
+    for i , gsa_fn in enumerate(gsa_fns):
+        gpx.add_powder_histogram(gsa_fn, prm_fns[i])
 
-    # add histograms to the project
-    hists = []
-    if stype == "N":
-        print("heee!!!")
-        # debugging print statements
-        hist1 = gpx.add_powder_histogram(gsa_fn, prm_fn)
-        print("now!")
-    if stype == "X":
-        print("here! x-ray!!")
-        # prmFile = "pdfitc/utils/PDFNSLSII.instprm"
-        hist1 = gpx.add_powder_histogram(gsa_fn, prm_fn)
-
-    hists.append(hist1)
 
     # step 2: add phases and link it to the previous histograms
     for structure_fn in structure_fns:
         phase_name = os.path.splitext(os.path.basename(structure_fn))[0]
         gpx.add_phase(
-            structure_fn, phasename=phase_name, fmthint="CIF", histograms=hists
+            structure_fn, phasename=phase_name, fmthint="CIF", histograms=gpx.histograms()
         )
     print("phase loaded")
 
