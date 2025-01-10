@@ -156,6 +156,8 @@ def run_gsas2_fit(
     gpx.do_refinements(dictList)
     print("================")
 
+    # save necessary output files to the portal/ directory for galaxy data collection
+
     gpx_output_file_path = os.path.join(os.getcwd(),"portal/", output_stem_fn + "_refined.gpx")
     gpx.save(filename=gpx_output_file_path)
 
