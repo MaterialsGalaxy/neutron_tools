@@ -25,6 +25,7 @@ from viewmodel import (
     build_bkg_coef_df,
     save_bkg_coefs,
     submit_out,
+    generate_cifs,
     atom_data,
     save_atom_table,
     show_phase_constr,
@@ -367,6 +368,7 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
         update_nav(tab)
 
     ui.input_task_button("submit", "Refine")
+    ui.input_task_button("generate_cifs", "Generate ouputs")
 
     @reactive.effect
     @reactive.event(input.update_history, ignore_none=False)
@@ -388,3 +390,8 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
     @reactive.event(input.submit)
     def ui_submit_out():
         submit_out(input.select_gpx())
+
+    @reactive.effect
+    @reactive.event(input.generate_cifs)
+    def ui_generate_cifs():
+        generate_cifs(input.select_gpx())

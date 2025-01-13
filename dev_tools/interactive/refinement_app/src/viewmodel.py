@@ -885,3 +885,9 @@ def save_delta(file_name: str, history_id: str) -> str:
     with open(delta_file_name, "wb") as dump_file:
         delta.dump(dump_file)
     return delta_file_name
+
+def generate_cifs(current_gpx_id: str) -> None:
+    gxhistory.run_generate_cifs(current_gpx_id)
+    id = refresh_latest_history_entry_id()
+    gxhistory.wait_for_dataset(id)
+    update_history()
