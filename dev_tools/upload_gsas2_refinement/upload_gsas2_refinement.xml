@@ -39,6 +39,7 @@
         </collection>
     </outputs>
     <help>
-        A tool to run a GSAS2 Rietveld refinement.
+        A tool to upload required cif files, GSASII powder data files and instrument parameter files.
+        This tool will then create a GSASII project file which can be used to perform Rietveld refinements using the GSASII interactive refinement tool.
     </help>
 </tool>

@@ -28,6 +28,6 @@
         </collection>
     </outputs>
     <help>
-        A tool to run a GSAS2 Rietveld refinement.
+        A tool to run a GSAS2 Rietveld refinement on a GSASII project file. This tool is intended to be called from the GSASII interactive refinement tool. 
     </help>
 </tool>

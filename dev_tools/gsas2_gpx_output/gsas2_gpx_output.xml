@@ -1,5 +1,5 @@
 <tool id="gpx_gsas2_output" name="GSASII Refinement: ouput generator" profile="22.05" version="0.1.0">
-    <description>Tool for GSASII Rietveld refinement called from an interactive refinement tool</description>
+    <description>Tool for generating CIF files from a GSASII project file used after completion of a Rietveld refinement</description>
     <requirements></requirements>
     <command detect_errors="exit_code"><![CDATA[
         conda init bash &&
@@ -25,6 +25,6 @@
         </collection>
     </outputs>
     <help>
-        A tool to run a GSAS2 Rietveld refinement.
+        A tool to generate CIF files from a GSASII project file. This tool is intended to be called from the GSASII interactive refinement tool. 
     </help>
 </tool>
