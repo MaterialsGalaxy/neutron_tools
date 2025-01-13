@@ -21,6 +21,9 @@ def run_gsas2_fit(
     delta_fn,
     output_stem_fn,
     output_path,
+    output_gpx,
+    output_lst,
+    output_parameters,
     num_cycles=5,
 ):
     """
@@ -93,6 +96,11 @@ def run_gsas2_fit(
     lst_output_file_path = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.lst")
     shutil.copy(lst_file_path, lst_output_file_path)
     # save results data
+
+    # output files without dataset collection
+    shutil.copy(gpx_output_file_path, output_gpx)
+    shutil.copy(lst_file_path, output_lst)
+    shutil.copy(updated_parameters_fp, output_parameters)
 
     rw = gpx.histogram(0).get_wR() * 0.01
     x = np.array(gpx.histogram(0).getdata("X"))

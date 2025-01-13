@@ -14,7 +14,10 @@
         python $__tool_directory__/gsas2_gpx_refinement.py
                 --project-filename gsas_project.gpx
                 --delta-filename delta1
-                --output-directory /portal      
+                --output-directory /portal
+                --output-gpx $output_gpx
+                --output-lst $output_lst
+                --output-parameters $output_parameters      
         > >(tee -a $output) 2> >(tee -a $output >&2)
     ]]></command>
     <inputs>
@@ -23,9 +26,9 @@
     </inputs>
     <outputs>
         <data format="txt" name="output" label="GSAS2 console output"></data>
-        <collection type="list" name="output_collection1" label="GSAS2 refinement output">
-            <discover_datasets format="binary" pattern="__designation__" directory="app/portal" visible="true"/>
-        </collection>
+        <data format="binary" name="ouput_gpx" label="gsas2_refinement_refined.gpx"></data>
+        <data format="txt" name="output_lst" label="gsas2_refinement_refined.lst"></data>
+        <data format="txt" name="parameters" label="parameters_updated.txt"></data>
     </outputs>
     <help>
         A tool to run a GSAS2 Rietveld refinement on a GSASII project file. This tool is intended to be called from the GSASII interactive refinement tool. 

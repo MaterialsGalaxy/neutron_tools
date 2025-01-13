@@ -9,6 +9,10 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
     parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
     parser.add_argument("-n", "--num-cycles", help="Number of refinement cycles", type=int, default=5)
+    parser.add_argument("-a", "--output-gpx", help="Name of the gpx file to output", type=str)
+    parser.add_argument("-b", "--output-lst", help="Name of the lst file to output", type=str)
+    parser.add_argument("-c", "--output-parameters", help="Name of the parameters changed file to output", type=str)
+
     args = parser.parse_args()
 
     # Add key-word arguments
@@ -22,5 +26,8 @@ if __name__ == "__main__":
         args.delta_filename,
         args.output_stem_name,
         args.output_directory,
+        args.output_gpx,
+        args.ouput_lst,
+        args.output_parameters,
         **kwargs,
     )
