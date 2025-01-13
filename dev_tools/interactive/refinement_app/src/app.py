@@ -40,6 +40,10 @@ from viewmodel import (
 
 ui.page_opts(title="GSASII refinement", fillable=True)
 
+@render.ui
+def indicator_ui():
+    return ui.busy_indicators.use(spinners=False, pulse=True, fade=True)
+
 with ui.navset_hidden(id="tab"):
     # hidden can be switched to a menu or pillset, so the further nav_menu
     # elements can be left alone if we want to change it later.

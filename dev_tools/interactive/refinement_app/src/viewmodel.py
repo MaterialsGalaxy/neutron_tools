@@ -874,6 +874,11 @@ def save_delta(file_name: str, history_id: str) -> str:
     """
     og_project_file = "og_" + file_name
     og_gpx = gsas_load_gpx(og_project_file, og_project_file)
+
+    # ensure phase atom names are loaded
+    og_gpx.index_ids()
+    gpx().index_ids()
+
     diff = DeepDiff(og_gpx, gpx(), exclude_paths="filename")
     delta = Delta(diff)
     delta_file_name = "Delta_on_" + history_id
