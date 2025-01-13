@@ -13,7 +13,6 @@ This tutorial follows the same refinement process in the GSASII tutorial [CW Neu
 	- GSAS powder data file: **garnet.raw**
 	- instrument parameter file: **inst_d1a.prm**
 - input those files into the **GSASII Refinement Stage 1** tool under the **Tools under development** tab.
-- set the scatter type to **Neutron**
 - **run** the tool
 
 ### Step 2: Start the **interactive refinement demo** tool.
@@ -56,6 +55,7 @@ This tutorial follows the same refinement process in the GSASII tutorial [CW Neu
 - next we go back to the **sidebar** and press the **refine** button.
 	- this will save the changed values to galaxy as a delta file. The changes will be applied to the project file in galaxy as part of the proceeding refinement
 	- the refinement will then be performed in galaxy
+	- while processing, an purple pulsing line will appear at the top of the interactive tool window. During this time any inputs to the interactive tool will be delayed until the refinement process is completed. It is therefore advisable not to make any inputs while the purple line is present. 
 - once completed, the new project will be loaded automatically into the interactive tool.
 	- we should notice the plot changing and the selected project changing made clear by the change in the history id number
 - then we proceed to the next step
@@ -80,7 +80,7 @@ This tutorial follows the same refinement process in the GSASII tutorial [CW Neu
 
 ### Step 7: Refine instrument and sample parameters
 
-- Finally under **view histogram data** in the sidebar, select **instrument parameters**.
+- under **view histogram data** in the sidebar, select **instrument parameters**.
 - in this window we can see the current values of the parameters and change them. 
 	- we can also select parameters to refine by clicking the selection box under **select instrument parameters to refine**
 	- select **U** **V** and **W**
@@ -90,8 +90,14 @@ This tutorial follows the same refinement process in the GSASII tutorial [CW Neu
 	- add **DisplaceX** and **DisplaceY** to the refinement and press **save sample parameters**
 	- then press **Refine**.
 	- the refinement is now complete. 
-	- all the project files containing all the information about the workflow are saved in the galaxy history. 
-	- we can now close the interactive tool by closing the tab in the browser
-	- we then stop the tool running by going back to the galaxy instance **interactive tool** tab
-	- select the **checkbox** on the left side of the row for the **interactive_refinement** tool
-	- then press the **stop** button beneath the checkbox
+	- all the project files containing all the information about the workflow are saved in the galaxy history.
+
+### Step 8: Output the refined CIF files for the structure
+
+- Finally, we can generate refined CIF files for all fo the phases in our project.
+	- at the bottom of the sidebar press the **Generate outputs** button. 
+	- this will execute the static output generator tool in galaxy and produce the final refined CIF files directly in the galaxy history. 
+- we can now close the interactive tool by closing the tab in the browser
+- we then stop the tool running by going back to the galaxy instance **interactive tool** tab
+- select the **checkbox** on the left side of the row for the **interactive_refinement** tool
+- then press the **stop** button beneath the checkbox
