@@ -826,7 +826,7 @@ def submit_out(current_gpx_id: str) -> None:
     history_table = get_update_history()
     current_gpx_history_entry = history_table.loc[history_table["id"] == current_gpx_id]
     history_id = str(current_gpx_history_entry['hid'].loc[current_gpx_history_entry.index[0]])
- 
+
     delta_file_name = save_delta(file_name, history_id)
     gxhistory.put(delta_file_name)
 
@@ -867,8 +867,8 @@ def save_delta(file_name: str, history_id: str) -> str:
 
     Args:
         file_name (str): name of the GSASII project file
-        history_id (str): galaxy history id of the current GSASIIproject file which the Delta is taken from.
-    
+        history_id (str): galaxy history id of the current GSASII project file which the Delta is taken from.
+
     Returns:
         str: Delta file name to be output to the galaxy history
     """
@@ -886,7 +886,13 @@ def save_delta(file_name: str, history_id: str) -> str:
         delta.dump(dump_file)
     return delta_file_name
 
+
 def generate_cifs(current_gpx_id: str) -> None:
+    """Runs static output generator tool in galaxy to generate CIF files from a GSASII project. CIF files for all phases will be generated in the Galaxy history.
+
+    Args:
+        current_gpx_id (str): galaxy API id of the current GSASII project used to generate the CIF files.
+    """
     gxhistory.run_generate_cifs(current_gpx_id)
     id = refresh_latest_history_entry_id()
     gxhistory.wait_for_dataset(id)
