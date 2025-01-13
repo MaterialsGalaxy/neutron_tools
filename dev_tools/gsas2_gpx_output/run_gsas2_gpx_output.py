@@ -59,7 +59,7 @@ def run_gsas2_fit(
     # generate output CIF files
 
     for phase in gpx.phases():
-
+        print("Exporting phase: "+ phase.name)
         output_cif_fn = os.path.join(os.getcwd(),
                                     "portal/",phase.name +"_refined.cif")
         phase.export_CIF(output_cif_fn)
@@ -68,13 +68,12 @@ def run_gsas2_fit(
     print("================")
 
     # save results data
-
-    rw = gpx.histogram(0).get_wR() * 0.01
-    x = np.array(gpx.histogram(0).getdata("X"))
-    y = np.array(gpx.histogram(0).getdata("Yobs"))
-    ycalc = np.array(gpx.histogram(0).getdata("Ycalc"))
-    dy = np.array(gpx.histogram(0).getdata("Residual"))
-    bkg = np.array(gpx.histogram(0).getdata("Background"))
+    for histogram in gpx.histograms():
+        print("Exportting histogram: "+ histogram.name)
+        histogram_file_name = os.path.join(os.getcwd(), "portal/", histogram.name + "_refined")
+        histogram.Export(histogram_file_name, ".csv", "histogram CSV")
+    
+    print("================")
 
     refs = gpx.histogram(0).reflections()
     ref_list = refs[gpx.phases()[0].name]["RefList"]
@@ -82,4 +81,4 @@ def run_gsas2_fit(
    
     cell_r = gpx.phases()[0].get_cell()
 
-    return rw, x, y, ycalc, dy, bkg, cell_r, ref_list
+    return cell_r, ref_list

@@ -887,13 +887,13 @@ def save_delta(file_name: str, history_id: str) -> str:
     return delta_file_name
 
 
-def generate_cifs(current_gpx_id: str) -> None:
-    """Runs static output generator tool in galaxy to generate CIF files from a GSASII project. CIF files for all phases will be generated in the Galaxy history.
+def generate_outputs(current_gpx_id: str) -> None:
+    """Runs static output generator tool in galaxy to generate CIF files and histogram csv files from a GSASII project. Files will be generated in the Galaxy history.
 
     Args:
-        current_gpx_id (str): galaxy API id of the current GSASII project used to generate the CIF files.
+        current_gpx_id (str): galaxy API id of the current GSASII project used to generate the files.
     """
-    gxhistory.run_generate_cifs(current_gpx_id)
+    gxhistory.run_generate_outputs(current_gpx_id)
     id = refresh_latest_history_entry_id()
     gxhistory.wait_for_dataset(id)
     update_history()
