@@ -15,9 +15,9 @@
                 --project-filename gsas_project.gpx
                 --delta-filename delta1
                 --output-directory /portal
-                --output-gpx $output_gpx
-                --output-lst $output_lst
-                --output-parameters $output_parameters      
+                --output-gpx '$gpx'
+                --output-lst '$lst'
+                --output-parameters '$parameters'      
         > >(tee -a $output) 2> >(tee -a $output >&2)
     ]]></command>
     <inputs>
@@ -25,10 +25,10 @@
         <param name="delta" type="data" format="Binary" label="deltas from interactive tool" />
     </inputs>
     <outputs>
-        <data format="txt" name="output" label="GSAS2 console output"></data>
-        <data format="binary" name="ouput_gpx" label="gsas2_refinement_refined.gpx"></data>
-        <data format="txt" name="output_lst" label="gsas2_refinement_refined.lst"></data>
-        <data format="txt" name="parameters" label="parameters_updated.txt"></data>
+        <data format="txt" name="output" label="GSAS2 console output"/>
+        <data format="binary" name="gpx" label="gsas2_refinement_refined.gpx"/>
+        <data format="txt" name="lst" label="gsas2_refinement_refined.lst"/>
+        <data format="txt" name="parameters" label="parameters_updated.txt"/>
     </outputs>
     <help>
         A tool to run a GSAS2 Rietveld refinement on a GSASII project file. This tool is intended to be called from the GSASII interactive refinement tool. 

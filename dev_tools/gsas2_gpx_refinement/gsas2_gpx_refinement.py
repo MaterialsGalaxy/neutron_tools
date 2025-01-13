@@ -27,7 +27,7 @@ if __name__ == "__main__":
         args.output_stem_name,
         args.output_directory,
         args.output_gpx,
-        args.ouput_lst,
+        args.output_lst,
         args.output_parameters,
         **kwargs,
     )
