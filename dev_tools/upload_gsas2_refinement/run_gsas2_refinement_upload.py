@@ -93,9 +93,9 @@ def run_gsas2_fit(
 
     # step 2: add phases and link it to the previous histograms
     for structure_fn in structure_fns:
-        phase_name = os.path.splitext(os.path.basename(structure_fn))[0]
+        # phase_name = os.path.splitext(os.path.basename(structure_fn))[0]
         gpx.add_phase(
-            structure_fn, phasename=phase_name, fmthint="CIF", histograms=gpx.histograms()
+            structure_fn, fmthint="CIF", histograms=gpx.histograms()
         )
     print("phase loaded")
 
