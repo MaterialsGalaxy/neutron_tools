@@ -10,7 +10,6 @@ if __name__ == "__main__":
         "-i", "--instrument-params-filenames", nargs="+", help="Name of instrument parameters file to load (*.prm)", type=str
     )
     parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
-    parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
     parser.add_argument("-n", "--num-cycles", help="Number of refinement cycles", type=int)
     parser.add_argument("-v", "--initial-values", help="Initial values for refinement", type=str)
     parser.add_argument("-a", "--output-gpx", help="Name of the gpx file to output", type=str)
@@ -30,7 +29,6 @@ if __name__ == "__main__":
         args.gsas_filenames,
         args.instrument_params_filenames,
         args.output_stem_name,
-        args.output_directory,
         args.output_gpx,
         args.output_lst,
         **kwargs,

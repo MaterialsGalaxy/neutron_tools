@@ -26,7 +26,6 @@ def run_gsas2_fit(
     gsa_fns,
     prm_fns,
     output_stem_fn,
-    output_path,
     output_gpx,
     output_lst,
     num_cycles=5,
@@ -36,21 +35,17 @@ def run_gsas2_fit(
     Parameters
     ----------
     structure_fns:list [str]
-        input structure cif filename.
+        input structure cif filenames
     gsa_fns: list[str]
-        input gsa filename.
+        input gsa,raw powder data filenames
     prm_fns: list [str]
-        input instrument profile filename.
+        input instrument profile filenames
     output_stem_fn: str
         output stem filename.
-    stype: str
-        scattering type
-    xmin: float
-        minimum x value
-    xmax: float
-        maximum x value
-    output_path: str
-        path to put output files
+    ouput_gpx: str
+        path of the output GSASII project file
+    output_lst: str
+        path of the output GSASII refinement lst file
     num_cycles: int
         number of refinement cycles
     init_vals: dict
@@ -93,14 +88,12 @@ def run_gsas2_fit(
         gpx.add_powder_histogram(gsa_fn, prm_fns[i])
 
 
-    # step 2: add phases and link it to the previous histograms
+    # step 2: add phases and link it to the all histograms
     for structure_fn in structure_fns:
-        # phase_name = os.path.splitext(os.path.basename(structure_fn))[0]
         gpx.add_phase(
             structure_fn, fmthint="CIF", histograms=gpx.histograms()
         )
     print("phase loaded")
-
 
     # step 3: increase # of cycles to improve convergence
     gpx.data["Controls"]["data"]["max cyc"] = num_cycles
@@ -149,13 +142,8 @@ def run_gsas2_fit(
     gpx.do_refinements(dictList)
     print("================")
 
-    # save necessary output files to the portal/ directory for galaxy data collection
-
-    # gpx_output_file_path = os.path.join(os.getcwd(),"portal/", output_stem_fn + "_refined.gpx")
-    
-
+    # save necessary output files to output directories passed by galaxy
     lst_file_path = os.path.join(os.getcwd(), output_stem_fn + "_refined.lst")
-    # lst_output_file_path = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.lst")
     gpx.save(filename=output_gpx)
     shutil.copy(lst_file_path, output_lst)
 

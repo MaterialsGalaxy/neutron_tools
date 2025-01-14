@@ -21,7 +21,6 @@
                 --cif-filenames #for $cif_file in $cif_files  # '$cif_file.element_identifier' #end for #
                 --gsas-filename #for $p in $powder # '$p.gsas_file.element_identifier' #end for #
                 --instrument-params-filename #for $p in $powder # '$p.prm_file.element_identifier' #end for # 
-                --output-directory /portal
                 --output-gpx '$gpx'
                 --output-lst '$lst'
         > >(tee -a $output) 2> >(tee -a $output >&2)
