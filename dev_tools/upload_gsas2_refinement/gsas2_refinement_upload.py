@@ -13,6 +13,8 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
     parser.add_argument("-n", "--num-cycles", help="Number of refinement cycles", type=int)
     parser.add_argument("-v", "--initial-values", help="Initial values for refinement", type=str)
+    parser.add_argument("-a", "--output-gpx", help="Name of the gpx file to output", type=str)
+    parser.add_argument("-b", "--output-lst", help="Name of the lst file to output", type=str)
     args = parser.parse_args()
 
     # Add key-word arguments
@@ -29,5 +31,7 @@ if __name__ == "__main__":
         args.instrument_params_filenames,
         args.output_stem_name,
         args.output_directory,
+        args.output_gpx,
+        args.output_lst,
         **kwargs,
     )

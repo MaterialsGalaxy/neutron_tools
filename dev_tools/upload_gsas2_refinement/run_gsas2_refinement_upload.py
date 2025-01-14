@@ -27,6 +27,8 @@ def run_gsas2_fit(
     prm_fns,
     output_stem_fn,
     output_path,
+    output_gpx,
+    output_lst,
     num_cycles=5,
     init_vals: Union[None, Dict[str, Any]] = None,
 ):
@@ -149,26 +151,12 @@ def run_gsas2_fit(
 
     # save necessary output files to the portal/ directory for galaxy data collection
 
-    gpx_output_file_path = os.path.join(os.getcwd(),"portal/", output_stem_fn + "_refined.gpx")
-    gpx.save(filename=gpx_output_file_path)
+    # gpx_output_file_path = os.path.join(os.getcwd(),"portal/", output_stem_fn + "_refined.gpx")
+    
 
     lst_file_path = os.path.join(os.getcwd(), output_stem_fn + "_refined.lst")
-    lst_output_file_path = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.lst")
-    shutil.copy(lst_file_path, lst_output_file_path)
-    # save results data
+    # lst_output_file_path = os.path.join(os.getcwd(), "portal/", output_stem_fn + "_refined.lst")
+    gpx.save(filename=output_gpx)
+    shutil.copy(lst_file_path, output_lst)
 
-    rw = gpx.histogram(0).get_wR() * 0.01
-    x = np.array(gpx.histogram(0).getdata("X"))
-    y = np.array(gpx.histogram(0).getdata("Yobs"))
-    ycalc = np.array(gpx.histogram(0).getdata("Ycalc"))
-    dy = np.array(gpx.histogram(0).getdata("Residual"))
-    bkg = np.array(gpx.histogram(0).getdata("Background"))
-
-    refs = gpx.histogram(0).reflections()
-
-    """output_cif_fn = os.path.join(
-        os.getcwd(), "portal/", output_stem_fn + "_refined.cif"
-    )
-    gpx.phase("structure").export_CIF(output_cif_fn)"""
-    
-    return rw, x, y, ycalc, dy, bkg
+    return 0

@@ -22,6 +22,8 @@
                 --gsas-filename #for $p in $powder # '$p.gsas_file.element_identifier' #end for #
                 --instrument-params-filename #for $p in $powder # '$p.prm_file.element_identifier' #end for # 
                 --output-directory /portal
+                --output-gpx '$gpx'
+                --output-lst '$lst'
         > >(tee -a $output) 2> >(tee -a $output >&2)
     ]]></command>
     <inputs>
@@ -33,10 +35,9 @@
 
     </inputs>
     <outputs>
-        <data format="txt" name="output" label="GSAS2 console output"></data>
-        <collection type="list" name="output_collection1" label="GSAS2 refinement output">
-            <discover_datasets format="binary" pattern="__designation__" directory="app/portal" visible="true"/>
-        </collection>
+        <data format="txt" name="output" label="GSAS2 console output"/>
+        <data format="binary" name="gpx" label="gsas2_refinement_refined.gpx"/>
+        <data format="txt" name="lst" label="gsas2_refinement_refined.lst"/>
     </outputs>
     <help>
         A tool to upload required cif files, GSASII powder data files and instrument parameter files.
