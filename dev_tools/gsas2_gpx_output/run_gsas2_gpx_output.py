@@ -19,7 +19,6 @@ import GSASIIscriptable as G2sc  # type: ignore
 def run_gsas2_fit(
     project_fn,
     output_stem_fn,
-    output_path,
 ):
     """
     Parameters
@@ -28,8 +27,6 @@ def run_gsas2_fit(
         input GSAS .gpx project file name
     output_stem_fn: str
         output stem filename.
-    output_path: str
-        path to put output files
 
     Returns
     -------
@@ -69,7 +66,7 @@ def run_gsas2_fit(
 
     # save results data
     for histogram in gpx.histograms():
-        print("Exportting histogram: "+ histogram.name)
+        print("Exporting histogram: "+ histogram.name)
         histogram_file_name = os.path.join(os.getcwd(), "portal/csvs/", histogram.name + "_refined")
         histogram.Export(histogram_file_name, ".csv", "histogram CSV")
     

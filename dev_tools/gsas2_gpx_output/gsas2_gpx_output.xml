@@ -11,8 +11,7 @@
         mkdir -p portal/cifs portal/csvs &&
         ln -s $project gsas_project.gpx &&
         python $__tool_directory__/gsas2_gpx_output.py
-                --project-filename gsas_project.gpx
-                --output-directory /portal      
+                --project-filename gsas_project.gpx      
         > >(tee -a $output) 2> >(tee -a $output >&2)
     ]]></command>
     <inputs>
