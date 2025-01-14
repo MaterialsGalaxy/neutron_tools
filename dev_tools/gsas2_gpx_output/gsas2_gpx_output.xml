@@ -8,7 +8,7 @@
         mkdir app &&
         cd app/ &&
         touch $output &&
-        mkdir portal &&
+        mkdir -p portal/cifs portal/csvs &&
         ln -s $project gsas_project.gpx &&
         python $__tool_directory__/gsas2_gpx_output.py
                 --project-filename gsas_project.gpx
@@ -20,8 +20,11 @@
     </inputs>
     <outputs>
         <data format="txt" name="output" label="GSAS2 console output"></data>
-        <collection type="list" name="output_collection1" label="GSAS2 refinement output">
-            <discover_datasets format="binary" pattern="__designation__" directory="app/portal" visible="true"/>
+        <collection type="list" name="output_cifs" label="GSAS2 output CIFs">
+            <discover_datasets format="cif" pattern="__designation__" directory="app/portal/cifs" visible="true"/>
+        </collection>
+        <collection type="list" name="output_csvs" label="GSAS2 output histogram CSVs">
+            <discover_datasets format="csv" pattern="__designation__" directory="app/portal/csvs" visible="true"/>
         </collection>
     </outputs>
     <help>
