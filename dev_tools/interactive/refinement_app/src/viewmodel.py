@@ -123,10 +123,11 @@ def add_constr(
 
 
 def generate_new_random_ids(constr_vars: list) -> None:
-    # find the keys to the atom id and phase id
-        
-    # make a dictionary to new ids 
-    # loop through constraints and change the ids
+    """generates and applies new random ids to any phases and atoms referenced in a list of GSASII variable objects.
+
+    Args:
+        constr_vars (list): a list of GSASII variable objects with structure 'phasenum:histnum:variable:atomnum'. The list is used to define phase constraints in the GSASII project.
+    """
     atom_list = []
     phase_list = []
     for var in constr_vars:
@@ -147,7 +148,6 @@ def generate_new_random_ids(constr_vars: list) -> None:
         new_phase_rid = ran.randint(0, sys.maxsize)
         new_ids[phase_rid] = new_phase_rid
         gpx().data["Phases"][phase_name]["ranId"] = new_phase_rid
-        
 
     # generate new r_ids for the atoms involved.
     for atom_address in atom_list:
@@ -158,7 +158,7 @@ def generate_new_random_ids(constr_vars: list) -> None:
         new_atom_rid = ran.randint(0, sys.maxsize)
         new_ids[atom_rid] = new_atom_rid
         gpx().data["Phases"][phase_name]["Atoms"][atom_num][17] = new_atom_rid
-    
+
     # loop through constraints and edit the relevant ids
     phase_constraints = load_phase_constraints(gpx())
     for constraint in phase_constraints:
