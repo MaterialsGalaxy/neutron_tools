@@ -2,7 +2,7 @@ import os
 import sys
 import shutil
 import numpy as np
-from deepdiff import Delta
+from deepdiff import Delta, DeepDiff
 
 """
 change how GSASIIscriptable is imported for actual deployment
@@ -18,7 +18,7 @@ import GSASIIscriptable as G2sc  # type: ignore
 
 def run_gsas2_fit(
     project_fn,
-    delta_fn,
+    delta_fns,
     output_stem_fn,
     output_path,
     output_gpx,
@@ -31,8 +31,8 @@ def run_gsas2_fit(
     ----------
     project_fn: str
         input GSAS .gpx project file name
-    delta_fn: str
-        input delta file from deepdiff containing updates for GSASII project object
+    delta_fns: list str
+        input delta files from deepdiff containing updates for GSASII project object
     output_stem_fn: str
         output stem filename.
     output_path: str
@@ -58,15 +58,21 @@ def run_gsas2_fit(
 
     # load from input project save to new name and directory
     og_gpx = G2sc.G2Project(gpxfile=project_fn)
+    gpx = og_gpx
+    # apply deltas and save the new project.
+    for delta_fn in delta_fns:
+        delta = Delta(delta_path=delta_fn, safe_to_import={'GSASIIobj.G2VarObj', 'numpy.core.multiarray.scalar', 'numpy.dtype', 'numpy.float64'})
+        gpx = gpx + delta
+        gpx.save(filename=proj_path)
 
-    # apply delta and save the new project.
-    delta = Delta(delta_path=delta_fn, safe_to_import={'GSASIIobj.G2VarObj', 'numpy.core.multiarray.scalar', 'numpy.dtype', 'numpy.float64'})
-    gpx = og_gpx + delta
-    gpx.save(filename=proj_path)
-
+    # create the total delta as the differnce between the latest and original project
+    total_diff = DeepDiff(og_gpx, gpx, exclude_paths="filename")
+    total_delta = Delta(total_diff)
+    # get the gpx history id from the label of the first included delta file
+    gpx_hid = delta_fns[0].split("_")[2]
     # create a readable text file detailing parameter changes
-    flat_dicts = delta.to_flat_dicts()
-    updated_parameters_fp = os.path.join(os.getcwd(), "portal/", "parameters_updated.txt")
+    flat_dicts = total_delta.to_flat_dicts()
+    updated_parameters_fp = os.path.join(os.getcwd(), "portal/", "parameters_updated_on_"+gpx_hid+".txt")
     with open(updated_parameters_fp, "w") as updated_parameters_file:
         for change in flat_dicts:
             updated_parameters_file.write(change['action'] + ": " + str(change["path"]) + " = " + str(change["value"]) + "\n")

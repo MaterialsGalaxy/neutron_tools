@@ -10,10 +10,12 @@
         touch $output &&
         mkdir portal &&
         ln -s $project gsas_project.gpx &&
-        ln -s $delta delta1 &&
+        #for $delta in $deltas
+            ln -s $delta '$delta.element_identifier' &&
+        #end for
         python $__tool_directory__/gsas2_gpx_refinement.py
                 --project-filename gsas_project.gpx
-                --delta-filename delta1
+                --delta-filenames #for $delta in $deltas # '$delta.element_identifier' #end for #
                 --output-directory /portal
                 --output-gpx '$gpx'
                 --output-lst '$lst'
@@ -22,7 +24,7 @@
     ]]></command>
     <inputs>
         <param name="project" type="data" format="Binary" label="GSASII project file"/>
-        <param name="delta" type="data" format="Binary" label="deltas from interactive tool" />
+        <param name="deltas" type="data" format="Binary" multiple="true" label="deltas from interactive tool" />
     </inputs>
     <outputs>
         <data format="txt" name="output" label="GSAS2 console output"/>
