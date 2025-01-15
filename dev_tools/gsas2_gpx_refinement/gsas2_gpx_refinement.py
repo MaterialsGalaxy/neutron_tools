@@ -7,7 +7,6 @@ if __name__ == "__main__":
     parser.add_argument("-f", "--project-filename", help="Name of the GSASII project file to load (*.gpx)", type=str)
     parser.add_argument("-d", "--delta-filenames", nargs="+", help="Name of the delta file to load", type=str)
     parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
-    parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
     parser.add_argument("-n", "--num-cycles", help="Number of refinement cycles", type=int, default=5)
     parser.add_argument("-a", "--output-gpx", help="Name of the gpx file to output", type=str)
     parser.add_argument("-b", "--output-lst", help="Name of the lst file to output", type=str)
@@ -25,7 +24,6 @@ if __name__ == "__main__":
         args.project_filename,
         args.delta_filenames,
         args.output_stem_name,
-        args.output_directory,
         args.output_gpx,
         args.output_lst,
         args.output_parameters,

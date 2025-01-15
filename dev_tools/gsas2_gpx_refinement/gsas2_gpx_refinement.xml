@@ -16,7 +16,6 @@
         python $__tool_directory__/gsas2_gpx_refinement.py
                 --project-filename gsas_project.gpx
                 --delta-filenames #for $delta in $deltas # '$delta.element_identifier' #end for #
-                --output-directory /portal
                 --output-gpx '$gpx'
                 --output-lst '$lst'
                 --output-parameters '$parameters'      
