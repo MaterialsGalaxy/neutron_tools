@@ -8,6 +8,7 @@ from viewmodel import (
     hist_choices,
     view_hist_choices,
     view_proj_choices,
+    diffractometer_choices,
     inst_param_dict,
     samp_param_dict,
     gpx,
@@ -117,6 +118,7 @@ with ui.navset_hidden(id="tab"):
         with ui.nav_panel("Sample parameters", value="Sample Parameters"):
             with ui.layout_column_wrap():
                 with ui.card():
+                    ui.card_header("Sample parameters to be refined")
                     ui.input_selectize(
                         "samp_selection",
                         "Select sample parameters to refine:",
@@ -124,6 +126,20 @@ with ui.navset_hidden(id="tab"):
                         multiple=True,
                         selected=None,
                     )
+                    ui.input_select("samp_type", "Diffractometer type", choices=diffractometer_choices)
+                    ui.input_action_button("save_samp", "Save all sample/experiment parameters")
+                    
+                    @reactive.effect
+                    @reactive.event(input.save_samp)
+                    def app_save_sample_parameters():
+                        input_sample_df = app_render_sample_df.data_view()
+                        input_sample_notes_df = app_render_sample_notes_df.data_view()
+                        save_sample_parameters(
+                            input.select_hist(), input.samp_type(), input_sample_df, input_sample_notes_df, input.samp_selection()
+                        )
+
+                with ui.card():
+                    ui.card_header("Sample refinement parameter values")
 
                     @render.data_frame
                     @reactive.event(
@@ -140,6 +156,7 @@ with ui.navset_hidden(id="tab"):
                         )
    
                 with ui.card():
+                    ui.card_header("Experiment note parameters")
                     @render.data_frame
                     @reactive.event(
                         input.load_gpx,
@@ -153,17 +170,6 @@ with ui.navset_hidden(id="tab"):
                             editable=True,
                             height=None,
                         )
-
-            ui.input_action_button("save_samp", "Save sample parameters")
-
-            @reactive.effect
-            @reactive.event(input.save_samp)
-            def app_save_sample_parameters():
-                input_sample_df = app_render_sample_df.data_view()
-                input_sample_notes_df = app_render_sample_notes_df.data_view()
-                save_sample_parameters(
-                    input.select_hist(), input_sample_df, input_sample_notes_df, input.samp_selection()
-                )
 
             @render.code
             @reactive.event(input.save_samp)

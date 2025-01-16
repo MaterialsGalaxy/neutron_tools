@@ -36,6 +36,11 @@ hist_choices = {"init": "Load a project before selecting a histogram"}
 
 view_hist_choices = {"init": "Load a project before selecting a histogram"}
 
+diffractometer_choices = {
+    "Debye-Scherrer": "Debye-Scherrer",
+    "Bragg-Brentano": "Bragg-Brentano",
+}
+
 view_proj_choices = {
     "Notebook": "Notebook",
     "Controls": "Controls",
@@ -563,7 +568,7 @@ def build_sample_df(hist_name: str) -> pd.DataFrame:
     sample_parameters: dict = h.getHistEntryValue(["Sample Parameters"])
     sample_df = pd.DataFrame(columns=["Parameter", "Value"])
 
-    no_input_list = ["Materials", "ranId", "Temperature", "Pressure", "Time", "FreePrm1", "FreePrm2", "FreePrm3"]
+    no_input_list = ["Type", "Materials", "ranId", "Temperature", "Pressure", "Time", "FreePrm1", "FreePrm2", "FreePrm3"]
     if sample_parameters["Type"] == "Debye-Scherrer":
         no_input_ds = ["Thick", "Constrast", "Trans", "SlitLen"]
         no_input_list.extend(no_input_ds)
@@ -589,7 +594,7 @@ def build_sample_df(hist_name: str) -> pd.DataFrame:
 
 
 def save_sample_parameters(
-    hist_name: str, sample_df: pd.DataFrame, sample_notes_df: pd.DataFrame, sample_refinements: list
+    hist_name: str, diffractometer_type: str, sample_df: pd.DataFrame, sample_notes_df: pd.DataFrame, sample_refinements: list
 ) -> None:
     """saves sample parameters from an input dataframe
     to the selected histogram in the GSASII project object.
@@ -601,7 +606,8 @@ def save_sample_parameters(
 
     h = gpx().histogram(hist_name)
     sample_parameters = h.getHistEntryValue(["Sample Parameters"])
-
+    # save diffractometer type
+    h.setHistEntryValue(["Sample Parameters", "Type"], diffractometer_type)
     # save the sample notes
     # copy in parameter values row by row
     for row in sample_notes_df.itertuples():
@@ -667,6 +673,11 @@ def update_sample_refinements(hist_name: str) -> None:
         "samp_selection",
         choices=sample_refinement_choices,
         selected=sample_refinements,
+    )
+
+    ui.update_select(
+        "samp_type",
+        selected=sample_parameters["Type"],
     )
 
 
