@@ -125,9 +125,10 @@ with ui.navset_hidden(id="tab"):
                         samp_param_dict,
                         multiple=True,
                         selected=None,
+                        width = "100%",
                     )
-                    ui.input_select("samp_type", "Diffractometer type", choices=diffractometer_choices)
-                    ui.input_action_button("save_samp", "Save all sample/experiment parameters")
+                    ui.input_select("samp_type", "Diffractometer type", choices=diffractometer_choices, width='100%')
+                    ui.input_action_button("save_samp", "Save all sample/experiment parameters", width = "100%")
                     
                     @reactive.effect
                     @reactive.event(input.save_samp)
