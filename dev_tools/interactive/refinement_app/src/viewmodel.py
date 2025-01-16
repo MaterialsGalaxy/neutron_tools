@@ -535,6 +535,18 @@ def update_instrument_refinements(hist_name: str) -> None:
     )
 
 
+def build_sample_notes_df(hist_name: str) -> pd.DataFrame:
+    h = gpx().histogram(hist_name)
+    sample_parameters: dict = h.getHistEntryValue(["Sample Parameters"])
+    sample_notes_df = pd.DataFrame(columns=["Parameter", "Value"])
+    note_parameters = ["Temperature", "Pressure", "Time", "FreePrm1", "FreePrm2", "FreePrm3"]
+    for param in note_parameters:
+        df_value = sample_parameters[param]
+        new_row = {"Parameter": param, "Value": df_value}
+        sample_notes_df.loc[len(sample_notes_df)] = new_row
+
+    return sample_notes_df
+
 def build_sample_df(hist_name: str) -> pd.DataFrame:
     """Builds a dataframe of the selected histograms Sample Parameters
     to be output to the UI.
@@ -551,7 +563,7 @@ def build_sample_df(hist_name: str) -> pd.DataFrame:
     sample_parameters: dict = h.getHistEntryValue(["Sample Parameters"])
     sample_df = pd.DataFrame(columns=["Parameter", "Value"])
 
-    no_input_list = ["Materials", "ranId"]
+    no_input_list = ["Materials", "ranId", "Temperature", "Pressure", "Time", "FreePrm1", "FreePrm2", "FreePrm3"]
     if sample_parameters["Type"] == "Debye-Scherrer":
         no_input_ds = ["Thick", "Constrast", "Trans", "SlitLen"]
         no_input_list.extend(no_input_ds)
@@ -577,7 +589,7 @@ def build_sample_df(hist_name: str) -> pd.DataFrame:
 
 
 def save_sample_parameters(
-    hist_name: str, sample_df: pd.DataFrame, sample_refinements: list
+    hist_name: str, sample_df: pd.DataFrame, sample_notes_df: pd.DataFrame, sample_refinements: list
 ) -> None:
     """saves sample parameters from an input dataframe
     to the selected histogram in the GSASII project object.
@@ -586,8 +598,17 @@ def save_sample_parameters(
         hist_name (str): name of the selected histogram
         sample_df (pd.DataFrame): sample parameter values input from the UI
     """
+
     h = gpx().histogram(hist_name)
     sample_parameters = h.getHistEntryValue(["Sample Parameters"])
+
+    # save the sample notes
+    # copy in parameter values row by row
+    for row in sample_notes_df.itertuples():
+        param = row.Parameter
+        df_value = row.Value
+        val = sample_parameters[param]
+        h.setHistEntryValue(["Sample Parameters", param], type(val)(df_value))
 
     # set all refinement flags to false
     for param, val in sample_parameters.items():

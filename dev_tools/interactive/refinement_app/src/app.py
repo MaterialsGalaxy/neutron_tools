@@ -34,6 +34,7 @@ from viewmodel import (
     remove_constraint,
     update_nav,
     build_sample_df,
+    build_sample_notes_df,
     save_sample_parameters,
     build_instrument_df,
     save_instrument_parameters,
@@ -114,28 +115,44 @@ with ui.navset_hidden(id="tab"):
             ui.input_action_button("save_bkg_coefs", "Save background coefficients")
 
         with ui.nav_panel("Sample parameters", value="Sample Parameters"):
+            with ui.layout_column_wrap():
+                with ui.card():
+                    ui.input_selectize(
+                        "samp_selection",
+                        "Select sample parameters to refine:",
+                        samp_param_dict,
+                        multiple=True,
+                        selected=None,
+                    )
 
-            ui.input_selectize(
-                "samp_selection",
-                "Select sample parameters to refine:",
-                samp_param_dict,
-                multiple=True,
-                selected=None,
-            )
-
-            @render.data_frame
-            @reactive.event(
-                input.load_gpx,
-                input.select_hist,
-                input.view_histogram,
-            )
-            def app_render_sample_df():
-                sample_df = build_sample_df(input.select_hist())
-                return render.DataTable(
-                    sample_df,
-                    editable=True,
-                    height=None,
-                )
+                    @render.data_frame
+                    @reactive.event(
+                        input.load_gpx,
+                        input.select_hist,
+                        input.view_histogram,
+                    )
+                    def app_render_sample_df():
+                        sample_df = build_sample_df(input.select_hist())
+                        return render.DataTable(
+                            sample_df,
+                            editable=True,
+                            height=None,
+                        )
+   
+                with ui.card():
+                    @render.data_frame
+                    @reactive.event(
+                        input.load_gpx,
+                        input.select_hist,
+                        input.view_histogram,
+                    )
+                    def app_render_sample_notes_df():
+                        sample_notes_df = build_sample_notes_df(input.select_hist())
+                        return render.DataTable(
+                            sample_notes_df,
+                            editable=True,
+                            height=None,
+                        )
 
             ui.input_action_button("save_samp", "Save sample parameters")
 
@@ -143,8 +160,9 @@ with ui.navset_hidden(id="tab"):
             @reactive.event(input.save_samp)
             def app_save_sample_parameters():
                 input_sample_df = app_render_sample_df.data_view()
+                input_sample_notes_df = app_render_sample_notes_df.data_view()
                 save_sample_parameters(
-                    input.select_hist(), input_sample_df, input.samp_selection()
+                    input.select_hist(), input_sample_df, input_sample_notes_df, input.samp_selection()
                 )
 
             @render.code
