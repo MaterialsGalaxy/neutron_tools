@@ -551,9 +551,16 @@ def build_sample_df(hist_name: str) -> pd.DataFrame:
     sample_parameters: dict = h.getHistEntryValue(["Sample Parameters"])
     sample_df = pd.DataFrame(columns=["Parameter", "Value"])
 
+    no_input_list = ["Materials", "ranId"]
+    if sample_parameters["Type"] == "Debye-Scherrer":
+        no_input_ds = ["Thick", "Constrast", "Trans", "SlitLen"]
+        no_input_list.extend(no_input_ds)
+    elif sample_parameters["Type"] == "Bragg-Brentano":
+        no_input_bb = ["Absorption"]
+        no_input_list.extend(no_input_bb)
     # populate the dataframe with sample parameters and values
     for param, val in sample_parameters.items():
-        no_input_list = ["Materials"]
+        
         if param not in no_input_list:
 
             if isinstance(val, list):
@@ -624,13 +631,15 @@ def update_sample_refinements(hist_name: str) -> None:
     # populating list of sample refinements that are already active
     sample_refinement_choices = {}
     sample_refinements = []
+    prevent_refinements = ["Materials", "Azimuth"]
     for param, val in sample_parameters.items():
-        # set sample choices dict for UI
-        if isinstance(val, list):
-            if isinstance(val[1], bool):
-                sample_refinement_choices[param] = param
-                if val[1]:
-                    sample_refinements.append(param)
+        if param not in prevent_refinements:
+            # set sample choices dict for UI
+            if isinstance(val, list):
+                if isinstance(val[1], bool):
+                    sample_refinement_choices[param] = param
+                    if val[1]:
+                        sample_refinements.append(param)
 
     # update the UI
     ui.update_selectize(
