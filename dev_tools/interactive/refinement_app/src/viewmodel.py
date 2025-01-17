@@ -443,7 +443,19 @@ def save_bkg_coefs(hist_name: str, coefs: list) -> None:
             bkg_data[0][3:] = new_coefs
 
 
-def build_instrument_df(hist_name) -> pd.DataFrame:
+def build_instrument_df(hist_name:str) -> pd.DataFrame:
+    h = gpx().histogram(hist_name)
+    instrument_parameters: dict = h.getHistEntryValue(["Instrument Parameters"])[0]
+    instrument_df = pd.DataFrame(columns=["Parameter", "Value"])
+    input_list = ["X", "Y", "Z", "Zero", "Azimuth", "Type", "Bank"]
+    for param in input_list:
+        df_value = instrument_parameters[param][1]
+        new_row = {"Parameter": param, "Value": df_value}
+        instrument_df.loc[len(instrument_df)] = new_row
+    return instrument_df
+
+
+def build_instrument_type_df(hist_name) -> pd.DataFrame:
     """Builds a dataframe of instrument parameter values
     taken from the selected GSASII Project object histogram.
     The returned dataframe is used to be output to the UI.
@@ -458,9 +470,8 @@ def build_instrument_df(hist_name) -> pd.DataFrame:
     h = gpx().histogram(hist_name)
     instrument_parameters: dict = h.getHistEntryValue(["Instrument Parameters"])[0]
     instrument_df = pd.DataFrame(columns=["Parameter", "Value"])
-
+    no_input_list = ["Source", "X", "Y", "Z", "Zero", "Azimuth", "Type", "Bank"]
     for param, val in instrument_parameters.items():
-        no_input_list = ["Source"]
         if param not in no_input_list:
             if isinstance(val, list):
                 df_value = val[1]
@@ -473,7 +484,7 @@ def build_instrument_df(hist_name) -> pd.DataFrame:
 
 
 def save_instrument_parameters(
-    hist_name: str, instrument_df: pd.DataFrame, instrument_refinements: list
+    hist_name: str, instrument_df:pd.DataFrame, instrument_type_df: pd.DataFrame, instrument_refinements: list
 ) -> None:
     """Saves instrument parameters and refinement parameters
     from an input Dataframe and refinement parameter list
@@ -481,7 +492,7 @@ def save_instrument_parameters(
 
     Args:
         hist_name (str): The name of the selected histogram.
-        instrument_df (pd.DataFrame): The input instrument parameters values.
+        instrument_type_df (pd.DataFrame): The input instrument parameters values.
         instrument_refinements (list): The parameters to be refined.
     """
     h = gpx().histogram(hist_name)
@@ -496,16 +507,17 @@ def save_instrument_parameters(
     for param in instrument_refinements:
         instrument_parameters[param][2] = True
 
-    # copy in parameter values row by row
-    for row in instrument_df.itertuples():
-        param = row.Parameter
-        df_value = row.Value
-        val = instrument_parameters[param]
+    for df in [instrument_df, instrument_type_df]:
+        # copy in parameter values row by row
+        for row in df.itertuples():
+            param = row.Parameter
+            df_value = row.Value
+            val = instrument_parameters[param]
 
-        # type validation
-        if isinstance(val, list):
-            # set values in GSASII project object directly
-            val[1] = type(val[1])(df_value)
+            # type validation
+            if isinstance(val, list):
+                # set values in GSASII project object directly
+                val[1] = type(val[1])(df_value)
 
 
 def update_instrument_refinements(hist_name: str) -> None:
@@ -523,7 +535,7 @@ def update_instrument_refinements(hist_name: str) -> None:
     # populating list of sample refinements that are already active
     instrument_refinement_choices = {}
     instrument_refinements = []
-    no_refinements = ["Bank", "Source", "Type"]
+    no_refinements = ["Bank", "Source", "Type", "Azimuth", "Lam1", "Lam2", "2-theta", "fltPath"]
     for param, val in instrument_parameters.items():
         # set sample choices dict for UI
         if param not in no_refinements:

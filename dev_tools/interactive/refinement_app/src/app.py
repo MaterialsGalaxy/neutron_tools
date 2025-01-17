@@ -38,6 +38,7 @@ from viewmodel import (
     build_sample_notes_df,
     save_sample_parameters,
     build_instrument_df,
+    build_instrument_type_df,
     save_instrument_parameters,
 )
 
@@ -182,41 +183,62 @@ with ui.navset_hidden(id="tab"):
                 )
 
         with ui.nav_panel("Instrument refinements", value="Instrument Parameters"):
-            ui.input_selectize(
-                "inst_selection",
-                "Select instrument parameters to refine:",
-                inst_param_dict,
-                multiple=True,
-                selected=None,
-            )
+            with ui.layout_column_wrap():
+                with ui.card():
+                    ui.card_header("Instrument parameters to be refined")
+                    ui.input_selectize(
+                        "inst_selection",
+                        "Select instrument parameters to refine:",
+                        inst_param_dict,
+                        multiple=True,
+                        selected=None,
+                        width = "100%",
+                    )
 
-            with ui.navset_hidden(id="instruments"):
-                with ui.nav_panel("Instrument parameter values"):
-                    "Set values:"
+                    ui.input_action_button("save_inst", "Save all instrument parameters and refinements", width = "100%")
 
-            @render.data_frame
-            @reactive.event(
-                input.load_gpx,
-                input.select_hist,
-                input.view_histogram,
-            )
-            def app_render_instrument_df():
-                instrument_df = build_instrument_df(input.select_hist())
-                return render.DataTable(
-                    instrument_df,
-                    editable=True,
-                    height=None,
-                )
+                    @reactive.effect
+                    @reactive.event(input.save_inst)
+                    def app_save_instrument_parameters():
+                        input_instrument_type_df = app_render_instrument_type_df.data_view()
+                        input_instrument_df = app_render_instrument_df.data_view()
+                        save_instrument_parameters(
+                            input.select_hist(), input_instrument_df, input_instrument_type_df, input.inst_selection()
+                        )
 
-            ui.input_action_button("save_inst", "Save instrument parameters")
+                with ui.card():
+                    ui.card_header("Instrument parameter values")
+                    
+                    @render.data_frame
+                    @reactive.event(
+                        input.load_gpx,
+                        input.select_hist,
+                        input.view_histogram,
+                    )
+                    def app_render_instrument_df():
+                        instrument_df = build_instrument_df(input.select_hist())
+                        return render.DataTable(
+                            instrument_df,
+                            editable=True,
+                            height=None,
+                        )
 
-            @reactive.effect
-            @reactive.event(input.save_inst)
-            def app_save_instrument_parameters():
-                input_instrument_df = app_render_instrument_df.data_view()
-                save_instrument_parameters(
-                    input.select_hist(), input_instrument_df, input.inst_selection()
-                )
+                with ui.card():
+                    ui.card_header("Instrument type parameter values")
+                    @render.data_frame
+                    @reactive.event(
+                        input.load_gpx,
+                        input.select_hist,
+                        input.view_histogram,
+                    )
+                    def app_render_instrument_type_df():
+                        instrument_df = build_instrument_type_df(input.select_hist())
+                        return render.DataTable(
+                            instrument_df,
+                            editable=True,
+                            height=None,
+                        )
+                    
 
             @render.code
             @reactive.event(input.save_inst)
