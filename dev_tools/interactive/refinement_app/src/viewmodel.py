@@ -842,26 +842,35 @@ def plot_powder(hist_name: str, limits: list):
     Returns:
         _type_: _description_
     """
+
     x, y, ycalc, dy, bkg = hist_export(gpx(), hist_name)
+    h = gpx().histogram(hist_name)
+    instrument_type = h.getHistEntryValue(["Instrument Parameters"])[0]["Type"][1]
+    if instrument_type == "PNT":
+        x_label = "TOF"
+    else:
+        x_label = "2 Theta"
+
     pwdr_data = {
-        "2 Theta": x,
+        "x": x,
         "intensity": y,
         "fit": ycalc,
         "background": bkg,
     }
     pwdr_data_df = pd.DataFrame(pwdr_data)
-    place_holder_df = pd.DataFrame([[0, 0]], columns=["2 Theta", "intensity"])
+    place_holder_df = pd.DataFrame([[0, 0]], columns=["x", "intensity"])
 
     fig = px.scatter(
         place_holder_df,
-        x="2 Theta",
+        x="x",
         y="intensity",
         opacity=0,
         title=hist_name,
+        labels = {"x": x_label},
     )
 
     fig.add_scatter(
-        x=pwdr_data_df["2 Theta"],
+        x=pwdr_data_df["x"],
         y=pwdr_data_df["intensity"],
         mode="markers",
         opacity=0.8,
@@ -882,7 +891,7 @@ def plot_powder(hist_name: str, limits: list):
     )
 
     fig.add_scatter(
-        x=pwdr_data_df["2 Theta"],
+        x=pwdr_data_df["x"],
         y=pwdr_data_df["fit"],
         mode="lines",
         opacity=1,
@@ -891,7 +900,7 @@ def plot_powder(hist_name: str, limits: list):
     )
 
     fig.add_scatter(
-        x=pwdr_data_df["2 Theta"],
+        x=pwdr_data_df["x"],
         y=pwdr_data_df["background"],
         mode="lines",
         opacity=1,
