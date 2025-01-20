@@ -133,6 +133,8 @@ parameter_keys_to_labels = {
     "difA": "difA", 
     "difB": "difB", 
     "difC": "difC",
+    "fltPath": "Flight path",
+    "2-theta": "2-theta",
 }
 
 parameter_labels_to_keys = {v: k for k, v in parameter_keys_to_labels.items()}
@@ -505,10 +507,19 @@ def save_bkg_coefs(hist_name: str, coefs: list) -> None:
 def render_instrument_text(hist_name:str) -> str:
     h = gpx().histogram(hist_name)
     instrument_parameters: dict = h.getHistEntryValue(["Instrument Parameters"])[0]
-    instrument_type = instrument_parameters["Type"][1]
-    instrument_bank = str(instrument_parameters["Bank"][1])
+    instrument_type = "?"
+    if "Type" in instrument_parameters:
+        instrument_type = instrument_parameters["Type"][1]
+    instrument_bank = "?"
+    if "Bank" in instrument_parameters:
+        instrument_bank = str(instrument_parameters["Bank"][1])
+    output_text = "Histogram type: " + instrument_type + " Bank: " + instrument_bank +"\n"
+    if instrument_type == "PNT":
+        flight_path = str(instrument_parameters["fltPath"][1])
+        two_theta = str(instrument_parameters["2-theta"][1])
+        output_text = output_text + "Flight path: " + flight_path + " 2-theta: " + two_theta
 
-    return "Histogram type: " + instrument_type + " Bank: " + instrument_bank
+    return output_text
 
 
 def build_instrument_df(hist_name:str) -> pd.DataFrame:
@@ -539,7 +550,7 @@ def build_instrument_type_df(hist_name) -> pd.DataFrame:
     h = gpx().histogram(hist_name)
     instrument_parameters: dict = h.getHistEntryValue(["Instrument Parameters"])[0]
     instrument_df = pd.DataFrame(columns=["Parameter", "Value"])
-    no_input_list = ["Source", "X", "Y", "Z", "Zero", "Azimuth", "Type", "Bank"]
+    no_input_list = ["Source", "X", "Y", "Z", "Zero", "Azimuth", "Type", "Bank", "fltPath", "2-theta"]
     for param, val in instrument_parameters.items():
         if param not in no_input_list:
             if isinstance(val, list):
@@ -615,10 +626,10 @@ def update_instrument_refinements(hist_name: str) -> None:
                     instrument_refinement_choices[param] = parameter_keys_to_labels[param]
                     if val[2]:
                         instrument_refinements.append(param)
-
+    sorted_choices = {key: value for key, value in sorted(instrument_refinement_choices.items())}
     ui.update_selectize(
         "inst_selection",
-        choices=instrument_refinement_choices,
+        choices=sorted_choices,
         selected=instrument_refinements,
     )
 
@@ -758,11 +769,11 @@ def update_sample_refinements(hist_name: str) -> None:
                     sample_refinement_choices[param] = parameter_keys_to_labels[param]
                     if val[1]:
                         sample_refinements.append(param)
-
+    sorted_choices = {key: value for key, value in sorted(sample_refinement_choices.items())}
     # update the UI
     ui.update_selectize(
         "samp_selection",
-        choices=sample_refinement_choices,
+        choices=sorted_choices,
         selected=sample_refinements,
     )
 
