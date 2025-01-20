@@ -16,7 +16,7 @@ import typing
 import time
 import random as ran
 import sys
-
+from scipy import constants
 """contains all reactive events functions and variables
 and processes all logic from the ui, GSASII and galaxy history models.
 note functions defined here cannot directly access inputs from view.
@@ -47,6 +47,11 @@ view_proj_choices = {
     "Constraints": "Constraints",
     "Restraints": "Restraints",
     "Rigid Bodies": "Rigid Bodies",
+}
+
+axis_choices = {
+    "x": "default",
+    "Q": "Q",
 }
 
 inst_param_dict = {
@@ -831,7 +836,21 @@ def set_hist_limits(hist_name: str, limits: list) -> None:
     h.Limits("upper", limits[1])
 
 
-def plot_powder(hist_name: str, limits: list):
+def TOF_to_Q(data: pd.DataFrame| float, hist_name: str) -> pd.DataFrame|float:
+        h = gpx().histogram(hist_name)
+        two_theta = h.getHistEntryValue(["Instrument Parameters"])[0]["2-theta"][1]
+        flight_path = h.getHistEntryValue(["Instrument Parameters"])[0]["fltPath"][1]
+        a = (np.sin(two_theta/2))*4*np.pi*flight_path*constants.m_n/constants.h
+        return a / data
+
+
+def CW_to_Q(data: pd.DataFrame| float, hist_name: str) -> pd.DataFrame|float:
+        h = gpx().histogram(hist_name)
+        wavelength = h.getHistEntryValue(["Instrument Parameters"])[0]["Lam"][1]
+        b = ((4.0* np.pi)/wavelength)
+        return b * np.sin(data/2.0)
+
+def plot_powder(hist_name: str, limits: list, x_axis:str ="x"):
     """generates a plotly express figure for the histogram data
     with the powder data, the fit, the background and the limit lines.
     The figure is used to output a plot to the UI.
@@ -846,11 +865,6 @@ def plot_powder(hist_name: str, limits: list):
     x, y, ycalc, dy, bkg = hist_export(gpx(), hist_name)
     h = gpx().histogram(hist_name)
     instrument_type = h.getHistEntryValue(["Instrument Parameters"])[0]["Type"][1]
-    if instrument_type == "PNT":
-        x_label = "TOF"
-    else:
-        x_label = "2 Theta"
-
     pwdr_data = {
         "x": x,
         "intensity": y,
@@ -858,6 +872,19 @@ def plot_powder(hist_name: str, limits: list):
         "background": bkg,
     }
     pwdr_data_df = pd.DataFrame(pwdr_data)
+    if instrument_type == "PNT":
+        x_label = "TOF"
+        if x_axis == "Q":
+            pwdr_data_df["Q"] = TOF_to_Q(pwdr_data_df["x"], hist_name)
+            x_label = "Q"
+    else:
+        x_label = "2 Theta"
+        if x_axis == "Q":
+            pwdr_data_df["Q"] = CW_to_Q(pwdr_data_df["x"], hist_name)
+            x_label ="Q"
+
+
+
     place_holder_df = pd.DataFrame([[0, 0]], columns=["x", "intensity"])
 
     fig = px.scatter(
@@ -870,7 +897,7 @@ def plot_powder(hist_name: str, limits: list):
     )
 
     fig.add_scatter(
-        x=pwdr_data_df["x"],
+        x=pwdr_data_df[x_axis],
         y=pwdr_data_df["intensity"],
         mode="markers",
         opacity=0.8,
@@ -891,7 +918,7 @@ def plot_powder(hist_name: str, limits: list):
     )
 
     fig.add_scatter(
-        x=pwdr_data_df["x"],
+        x=pwdr_data_df[x_axis],
         y=pwdr_data_df["fit"],
         mode="lines",
         opacity=1,
@@ -900,7 +927,7 @@ def plot_powder(hist_name: str, limits: list):
     )
 
     fig.add_scatter(
-        x=pwdr_data_df["x"],
+        x=pwdr_data_df[x_axis],
         y=pwdr_data_df["background"],
         mode="lines",
         opacity=1,
@@ -908,7 +935,7 @@ def plot_powder(hist_name: str, limits: list):
         zorder=1,
     )
 
-    fig.add_vline(
+    """    fig.add_vline(
         x=limits[0],
         line_width=3,
         line_dash="dash",
@@ -920,7 +947,7 @@ def plot_powder(hist_name: str, limits: list):
         line_width=3,
         line_dash="dash",
         line_color="green",
-    )
+    )"""
 
     return fig
 

@@ -9,6 +9,7 @@ from viewmodel import (
     view_hist_choices,
     view_proj_choices,
     diffractometer_choices,
+    axis_choices,
     inst_param_dict,
     samp_param_dict,
     gpx,
@@ -369,9 +370,9 @@ with ui.navset_pill(id="plot"):
 
         @render_plotly
         def plot():
-            fig = plot_powder(input.select_hist(), input.limits())
+            fig = plot_powder(input.select_hist(), input.limits(), input.x_axis())
             return fig
-
+        ui.input_select("x_axis", "select x axis", choices=axis_choices, selected="x")
         ui.input_slider("limits", "Set limits", min=0, max=1, value=[0, 1])
 
         @reactive.effect
