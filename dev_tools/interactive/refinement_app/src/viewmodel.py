@@ -840,7 +840,7 @@ def TOF_to_Q(data: pd.DataFrame| float, hist_name: str) -> pd.DataFrame|float:
         h = gpx().histogram(hist_name)
         two_theta = h.getHistEntryValue(["Instrument Parameters"])[0]["2-theta"][1]
         flight_path = h.getHistEntryValue(["Instrument Parameters"])[0]["fltPath"][1]
-        a = (np.sin(two_theta/2))*4*np.pi*flight_path*constants.m_n/constants.h
+        a = (np.sin(two_theta*np.pi/360))*4*np.pi*flight_path*constants.m_n/constants.h
         return a / data
 
 
@@ -848,7 +848,7 @@ def CW_to_Q(data: pd.DataFrame| float, hist_name: str) -> pd.DataFrame|float:
         h = gpx().histogram(hist_name)
         wavelength = h.getHistEntryValue(["Instrument Parameters"])[0]["Lam"][1]
         b = ((4.0* np.pi)/wavelength)
-        return b * np.sin(data/2.0)
+        return b * np.sin(data*np.pi/360)
 
 def plot_powder(hist_name: str, limits: list, x_axis:str ="x"):
     """generates a plotly express figure for the histogram data
