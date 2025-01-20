@@ -40,6 +40,7 @@ from viewmodel import (
     build_instrument_df,
     build_instrument_type_df,
     save_instrument_parameters,
+    render_instrument_text,
 )
 
 ui.page_opts(title="GSASII refinement", fillable=True)
@@ -186,6 +187,15 @@ with ui.navset_hidden(id="tab"):
             with ui.layout_column_wrap():
                 with ui.card():
                     ui.card_header("Instrument parameters to be refined")
+                    @render.text
+                    @reactive.event(
+                        input.load_gpx,
+                        input.select_hist,
+                        input.view_histogram,
+                        )
+                    def app_render_instrument_text():
+                        return render_instrument_text(input.select_hist())
+
                     ui.input_selectize(
                         "inst_selection",
                         "Select instrument parameters to refine:",

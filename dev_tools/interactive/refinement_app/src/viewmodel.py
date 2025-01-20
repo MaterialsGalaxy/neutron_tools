@@ -443,11 +443,20 @@ def save_bkg_coefs(hist_name: str, coefs: list) -> None:
             bkg_data[0][3:] = new_coefs
 
 
+def render_instrument_text(hist_name:str) -> str:
+    h = gpx().histogram(hist_name)
+    instrument_parameters: dict = h.getHistEntryValue(["Instrument Parameters"])[0]
+    instrument_type = instrument_parameters["Type"][1]
+    instrument_bank = str(instrument_parameters["Bank"][1])
+
+    return "Histogram type: " + instrument_type + " Bank: " + instrument_bank
+
+
 def build_instrument_df(hist_name:str) -> pd.DataFrame:
     h = gpx().histogram(hist_name)
     instrument_parameters: dict = h.getHistEntryValue(["Instrument Parameters"])[0]
     instrument_df = pd.DataFrame(columns=["Parameter", "Value"])
-    input_list = ["X", "Y", "Z", "Zero", "Azimuth", "Type", "Bank"]
+    input_list = ["X", "Y", "Z", "Zero", "Azimuth"]
     for param in input_list:
         df_value = instrument_parameters[param][1]
         new_row = {"Parameter": param, "Value": df_value}
