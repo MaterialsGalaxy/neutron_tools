@@ -841,7 +841,7 @@ def TOF_to_Q(data: pd.DataFrame| float, hist_name: str) -> pd.DataFrame|float:
         two_theta = h.getHistEntryValue(["Instrument Parameters"])[0]["2-theta"][1]
         flight_path = h.getHistEntryValue(["Instrument Parameters"])[0]["fltPath"][1]
         a = (np.sin(two_theta*np.pi/360))*4*np.pi*flight_path*constants.m_n/constants.h
-        return a / data
+        return a / (data*10000)
 
 
 def CW_to_Q(data: pd.DataFrame| float, hist_name: str) -> pd.DataFrame|float:
@@ -861,7 +861,7 @@ def plot_powder(hist_name: str, limits: list, x_axis:str ="x"):
     Returns:
         _type_: _description_
     """
-
+    plot_limits = limits
     x, y, ycalc, dy, bkg = hist_export(gpx(), hist_name)
     h = gpx().histogram(hist_name)
     instrument_type = h.getHistEntryValue(["Instrument Parameters"])[0]["Type"][1]
@@ -877,11 +877,13 @@ def plot_powder(hist_name: str, limits: list, x_axis:str ="x"):
         if x_axis == "Q":
             pwdr_data_df["Q"] = TOF_to_Q(pwdr_data_df["x"], hist_name)
             x_label = "Q"
+            plot_limits = [TOF_to_Q(l, hist_name) for l in limits]
     else:
         x_label = "2 Theta"
         if x_axis == "Q":
             pwdr_data_df["Q"] = CW_to_Q(pwdr_data_df["x"], hist_name)
             x_label ="Q"
+            plot_limits = [CW_to_Q(l, hist_name) for l in limits]
 
 
 
@@ -935,19 +937,19 @@ def plot_powder(hist_name: str, limits: list, x_axis:str ="x"):
         zorder=1,
     )
 
-    """    fig.add_vline(
-        x=limits[0],
+    fig.add_vline(
+        x=plot_limits[0],
         line_width=3,
         line_dash="dash",
         line_color="green",
     )
 
     fig.add_vline(
-        x=limits[1],
+        x=plot_limits[1],
         line_width=3,
         line_dash="dash",
         line_color="green",
-    )"""
+    )
 
     return fig
 
