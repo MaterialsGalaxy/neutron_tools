@@ -589,12 +589,12 @@ def build_sample_df(hist_name: str) -> pd.DataFrame:
     sample_parameters: dict = h.getHistEntryValue(["Sample Parameters"])
     sample_df = pd.DataFrame(columns=["Parameter", "Value"])
 
-    no_input_list = ["Type", "Materials", "ranId", "Temperature", "Pressure", "Time", "FreePrm1", "FreePrm2", "FreePrm3"]
+    no_input_list = ["Type", "Materials", "ranId", "Temperature", "Pressure", "Time", "FreePrm1", "FreePrm2", "FreePrm3", "Thick", "Contrast", "SlitLen"]
     if sample_parameters["Type"] == "Debye-Scherrer":
-        no_input_ds = ["Thick", "Constrast", "Trans", "SlitLen"]
+        no_input_ds = ["Trans", "SurfaceRoughA", "SurfaceRoughB", "Shift", "Transparency"]
         no_input_list.extend(no_input_ds)
     elif sample_parameters["Type"] == "Bragg-Brentano":
-        no_input_bb = ["Absorption"]
+        no_input_bb = ["Absorption", "DisplaceX", "DisplaceY"]
         no_input_list.extend(no_input_bb)
     # populate the dataframe with sample parameters and values
     for param, val in sample_parameters.items():
@@ -680,6 +680,11 @@ def update_sample_refinements(hist_name: str) -> None:
     sample_refinement_choices = {}
     sample_refinements = []
     prevent_refinements = ["Materials", "Azimuth"]
+    if sample_parameters["Type"] == "Debye-Scherrer":
+        prevent_refinements.extend(["Trans", "SurfRoughA", "SurfRoughB", "Transparency", "Shift"])
+    elif sample_parameters["Type"] == "Bragg-Brentano":
+        prevent_refinements.extend(["Absorption", "DisplaceX", "DisplaceY"])
+
     for param, val in sample_parameters.items():
         if param not in prevent_refinements:
             # set sample choices dict for UI
