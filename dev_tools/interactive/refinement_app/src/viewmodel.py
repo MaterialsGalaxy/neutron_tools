@@ -78,6 +78,65 @@ background_functions = {
     "log interpolate": "log interpolate",
 }
 
+parameter_keys_to_labels = {
+    "Absorption": "Sample absorption", 
+    "Constrast": "Constrast",
+    "DisplaceX": "Sample X displ. perp. to beam",
+    "DisplaceY": "Sample Y displ. || to beam",
+    "Gonio. radius": "Goniometer radius (mm)",
+    "Omega": "Goniometer omega",
+    "Chi": "Goniometer chi",
+    "Phi": "Goniometer phi",
+    "Azimuth": "Detector azimuth",
+    "SurfRoughA": "Surface roughness A",
+    "SurfRoughB": "Surface roughness B",
+    "Shift": "Sample dispalcement",
+    "Transparency": "Sample transparency",
+    "Scale": "Histogram scale factor",
+    "InstrName": "Instrument name",
+    "Temperature": "Sample temperature (K)",
+    "Pressure": "Sample pressure (MPa)",
+    "Time": "Clock time (s)",
+    "FreePrm1": "Sample humidity (%)",
+    "FreePrm2": "Sample voltage (V)",
+    "FreePrm3": "Applied load (MN)",
+    "ranId": "Random ID",
+    "Type": "Type",
+    "Materials": "Materials",
+    "Thick": "Sample Thickness",
+    "Trans": "Transmission (meas)",
+    "SlitLen": "Slit length",
+    "Lam": "Lam",
+    "Lam1":"Lam1",
+    "Lam2":"Lam2",
+    "Zero": "Zero",
+    "I(L2)/I(L1)":"I(L2)/I(L1)",
+    "Polariz.":"Polariz.", 
+    "U": "U",
+    "V": "V",
+    "W": "W",
+    "X": "X",
+    "Y": "Y",
+    "Z": "Z",
+    "SH/L": "SH/L",
+    "Azimuth": "Azimuth",
+    "Source": "Source", 
+    "Bank": "Bank", 
+    "alpha": "alpha", 
+    "beta-0": "beta-0", 
+    "beta-1": "beta-1",  
+    "beta-q": "beta-q", 
+    "sig-0": "sig-0", 
+    "sig-1": "sig-1", 
+    "sig-2": "sig-2", 
+    "sig-q": "sig-q", 
+    "difA": "difA", 
+    "difB": "difB", 
+    "difC": "difC",
+}
+
+parameter_labels_to_keys = {v: k for k, v in parameter_keys_to_labels.items()}
+
 
 def update_nav(tab: str) -> None:
     """changes the nvaigation tab in the UI
@@ -459,7 +518,8 @@ def build_instrument_df(hist_name:str) -> pd.DataFrame:
     input_list = ["X", "Y", "Z", "Zero", "Azimuth"]
     for param in input_list:
         df_value = instrument_parameters[param][1]
-        new_row = {"Parameter": param, "Value": df_value}
+        param_label = parameter_keys_to_labels[param]
+        new_row = {"Parameter": param_label, "Value": df_value}
         instrument_df.loc[len(instrument_df)] = new_row
     return instrument_df
 
@@ -486,7 +546,8 @@ def build_instrument_type_df(hist_name) -> pd.DataFrame:
                 df_value = val[1]
             else:
                 continue
-            new_row = {"Parameter": param, "Value": df_value}
+            param_label = parameter_keys_to_labels[param]
+            new_row = {"Parameter": param_label, "Value": df_value}
             instrument_df.loc[len(instrument_df)] = new_row
 
     return instrument_df
@@ -519,7 +580,8 @@ def save_instrument_parameters(
     for df in [instrument_df, instrument_type_df]:
         # copy in parameter values row by row
         for row in df.itertuples():
-            param = row.Parameter
+            param_label = row.Parameter
+            param= parameter_labels_to_keys[param_label]
             df_value = row.Value
             val = instrument_parameters[param]
 
@@ -550,7 +612,7 @@ def update_instrument_refinements(hist_name: str) -> None:
         if param not in no_refinements:
             if isinstance(val, list) and len(val) == 3:
                 if isinstance(val[1], (int, float)):
-                    instrument_refinement_choices[param] = param
+                    instrument_refinement_choices[param] = parameter_keys_to_labels[param]
                     if val[2]:
                         instrument_refinements.append(param)
 
@@ -568,7 +630,8 @@ def build_sample_notes_df(hist_name: str) -> pd.DataFrame:
     note_parameters = ["Temperature", "Pressure", "Time", "FreePrm1", "FreePrm2", "FreePrm3"]
     for param in note_parameters:
         df_value = sample_parameters[param]
-        new_row = {"Parameter": param, "Value": df_value}
+        param_label = parameter_keys_to_labels[param]
+        new_row = {"Parameter": param_label, "Value": df_value}
         sample_notes_df.loc[len(sample_notes_df)] = new_row
 
     return sample_notes_df
@@ -607,8 +670,8 @@ def build_sample_df(hist_name: str) -> pd.DataFrame:
                 df_value = val
             else:
                 continue
-
-            new_row = {"Parameter": param, "Value": df_value}
+            param_label = parameter_keys_to_labels[param]
+            new_row = {"Parameter": param_label, "Value": df_value}
             sample_df.loc[len(sample_df)] = new_row
 
     return sample_df
@@ -632,7 +695,8 @@ def save_sample_parameters(
     # save the sample notes
     # copy in parameter values row by row
     for row in sample_notes_df.itertuples():
-        param = row.Parameter
+        param_label = row.Parameter
+        param = parameter_labels_to_keys[param_label]
         df_value = row.Value
         val = sample_parameters[param]
         h.setHistEntryValue(["Sample Parameters", param], type(val)(df_value))
@@ -650,7 +714,8 @@ def save_sample_parameters(
 
     # copy in parameter values row by row
     for row in sample_df.itertuples():
-        param = row.Parameter
+        param_label = row.Parameter
+        param = parameter_labels_to_keys[param_label]
         df_value = row.Value
         val = sample_parameters[param]
 
@@ -690,7 +755,7 @@ def update_sample_refinements(hist_name: str) -> None:
             # set sample choices dict for UI
             if isinstance(val, list):
                 if isinstance(val[1], bool):
-                    sample_refinement_choices[param] = param
+                    sample_refinement_choices[param] = parameter_keys_to_labels[param]
                     if val[1]:
                         sample_refinements.append(param)
 
