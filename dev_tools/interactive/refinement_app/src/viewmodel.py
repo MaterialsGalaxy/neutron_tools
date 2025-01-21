@@ -954,6 +954,10 @@ def plot_powder(hist_name: str, limits: list, x_axis:str ="x"):
     return fig
 
 
+def update_limits_axis(hist_name:str, limits: list, x_axis:str) -> None:
+    # hide the limits in normal space 
+    # show the limits in q space slider
+
 def get_gpx_choices() -> dict:
     """creates a dictionary of GSASII projects in the galaxy history
     which can be loaded into the interactive tool.
