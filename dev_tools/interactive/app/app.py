@@ -12,6 +12,7 @@ with ui.sidebar():
 
 ui.input_action_button("submit", "submit to history")
 
+
 @render.text
 @reactive.event(input.submit)
 def counter():
@@ -35,7 +36,7 @@ def text():
 
 @render.text
 def text2():
-    environvars = os.environ['HISTORY_ID']
+    environvars = os.environ["HISTORY_ID"]
     if environvars is None:
         result = " environment variables not found"
     else:

@@ -56,20 +56,22 @@ def run_gsas2_fit(
     # generate output CIF files
 
     for phase in gpx.phases():
-        print("Exporting phase: "+ phase.name)
-        output_cif_fn = os.path.join(os.getcwd(),
-                                    "portal/cifs/",phase.name +"_refined.cif")
+        print("Exporting phase: " + phase.name)
+        output_cif_fn = os.path.join(
+            os.getcwd(), "portal/cifs/", phase.name + "_refined.cif"
+        )
         phase.export_CIF(output_cif_fn)
-    
 
     print("================")
 
     # save results data
     for histogram in gpx.histograms():
-        print("Exporting histogram: "+ histogram.name)
-        histogram_file_name = os.path.join(os.getcwd(), "portal/csvs/", histogram.name + "_refined")
+        print("Exporting histogram: " + histogram.name)
+        histogram_file_name = os.path.join(
+            os.getcwd(), "portal/csvs/", histogram.name + "_refined"
+        )
         histogram.Export(histogram_file_name, ".csv", "histogram CSV")
-    
+
     print("================")
 
     return 0

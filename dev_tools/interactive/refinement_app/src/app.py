@@ -45,9 +45,11 @@ from viewmodel import (
 
 ui.page_opts(title="GSASII refinement", fillable=True)
 
+
 @render.ui
 def indicator_ui():
     return ui.busy_indicators.use(spinners=False, pulse=True, fade=True)
+
 
 with ui.navset_hidden(id="tab"):
     # hidden can be switched to a menu or pillset, so the further nav_menu
@@ -127,18 +129,31 @@ with ui.navset_hidden(id="tab"):
                         samp_param_dict,
                         multiple=True,
                         selected=None,
-                        width = "100%",
+                        width="100%",
                     )
-                    ui.input_select("samp_type", "Diffractometer type", choices=diffractometer_choices, width='100%')
-                    ui.input_action_button("save_samp", "Save all sample/experiment parameters", width = "100%")
-                    
+                    ui.input_select(
+                        "samp_type",
+                        "Diffractometer type",
+                        choices=diffractometer_choices,
+                        width="100%",
+                    )
+                    ui.input_action_button(
+                        "save_samp",
+                        "Save all sample/experiment parameters",
+                        width="100%",
+                    )
+
                     @reactive.effect
                     @reactive.event(input.save_samp)
                     def app_save_sample_parameters():
                         input_sample_df = app_render_sample_df.data_view()
                         input_sample_notes_df = app_render_sample_notes_df.data_view()
                         save_sample_parameters(
-                            input.select_hist(), input.samp_type(), input_sample_df, input_sample_notes_df, input.samp_selection()
+                            input.select_hist(),
+                            input.samp_type(),
+                            input_sample_df,
+                            input_sample_notes_df,
+                            input.samp_selection(),
                         )
 
                 with ui.card():
@@ -157,9 +172,10 @@ with ui.navset_hidden(id="tab"):
                             editable=True,
                             height=None,
                         )
-   
+
                 with ui.card():
                     ui.card_header("Experiment note parameters")
+
                     @render.data_frame
                     @reactive.event(
                         input.load_gpx,
@@ -187,12 +203,13 @@ with ui.navset_hidden(id="tab"):
             with ui.layout_column_wrap():
                 with ui.card():
                     ui.card_header("Instrument parameters to be refined")
+
                     @render.text
                     @reactive.event(
                         input.load_gpx,
                         input.select_hist,
                         input.view_histogram,
-                        )
+                    )
                     def app_render_instrument_text():
                         return render_instrument_text(input.select_hist())
 
@@ -202,23 +219,32 @@ with ui.navset_hidden(id="tab"):
                         inst_param_dict,
                         multiple=True,
                         selected=None,
-                        width = "100%",
+                        width="100%",
                     )
 
-                    ui.input_action_button("save_inst", "Save all instrument parameters and refinements", width = "100%")
+                    ui.input_action_button(
+                        "save_inst",
+                        "Save all instrument parameters and refinements",
+                        width="100%",
+                    )
 
                     @reactive.effect
                     @reactive.event(input.save_inst)
                     def app_save_instrument_parameters():
-                        input_instrument_type_df = app_render_instrument_type_df.data_view()
+                        input_instrument_type_df = (
+                            app_render_instrument_type_df.data_view()
+                        )
                         input_instrument_df = app_render_instrument_df.data_view()
                         save_instrument_parameters(
-                            input.select_hist(), input_instrument_df, input_instrument_type_df, input.inst_selection()
+                            input.select_hist(),
+                            input_instrument_df,
+                            input_instrument_type_df,
+                            input.inst_selection(),
                         )
 
                 with ui.card():
                     ui.card_header("Instrument parameter values")
-                    
+
                     @render.data_frame
                     @reactive.event(
                         input.load_gpx,
@@ -235,6 +261,7 @@ with ui.navset_hidden(id="tab"):
 
                 with ui.card():
                     ui.card_header("Instrument type parameter values")
+
                     @render.data_frame
                     @reactive.event(
                         input.load_gpx,
@@ -248,7 +275,6 @@ with ui.navset_hidden(id="tab"):
                             editable=True,
                             height=None,
                         )
-                    
 
             @render.code
             @reactive.event(input.save_inst)

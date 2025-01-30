@@ -4,20 +4,76 @@ from run_gsas2_sample_instrument_fit import run_gsas2_fit
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-f", "--project-filename", help="Name of the GSASII project file to load (*.gpx)", type=str)
-    parser.add_argument("-t", "--histogram-type", help="type of powder diffraction histogram (TOF or CW)", type=str)
-
-    parser.add_argument("-s", "--sample-refinements", help="sample parameters GSASII will refine", type=str)
-    parser.add_argument("-i", "--instrument-refinements", help="instrument parameters GSASII will refine", type=str)
     parser.add_argument(
-        "-a", "--instrument-parameters", help="instrument parameter key names to set", nargs="+", type=str
+        "-f",
+        "--project-filename",
+        help="Name of the GSASII project file to load (*.gpx)",
+        type=str,
     )
-    parser.add_argument("-b", "--instrument-values", help="instrument parameter values to set", nargs="+", type=float)
-    parser.add_argument("-c", "--sample-parameters", help="sample parameter key names to set", nargs="+", type=str)
-    parser.add_argument("-v", "--sample-values", help="sample parameter values to set", nargs="+", type=float)
-    parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
-    parser.add_argument("-p", "--output-directory", help="Output directory name", type=str, default="/portal")
-    parser.add_argument("-n", "--num-cycles", help="Number of refinement cycles", type=int)
+    parser.add_argument(
+        "-t",
+        "--histogram-type",
+        help="type of powder diffraction histogram (TOF or CW)",
+        type=str,
+    )
+
+    parser.add_argument(
+        "-s",
+        "--sample-refinements",
+        help="sample parameters GSASII will refine",
+        type=str,
+    )
+    parser.add_argument(
+        "-i",
+        "--instrument-refinements",
+        help="instrument parameters GSASII will refine",
+        type=str,
+    )
+    parser.add_argument(
+        "-a",
+        "--instrument-parameters",
+        help="instrument parameter key names to set",
+        nargs="+",
+        type=str,
+    )
+    parser.add_argument(
+        "-b",
+        "--instrument-values",
+        help="instrument parameter values to set",
+        nargs="+",
+        type=float,
+    )
+    parser.add_argument(
+        "-c",
+        "--sample-parameters",
+        help="sample parameter key names to set",
+        nargs="+",
+        type=str,
+    )
+    parser.add_argument(
+        "-v",
+        "--sample-values",
+        help="sample parameter values to set",
+        nargs="+",
+        type=float,
+    )
+    parser.add_argument(
+        "-o",
+        "--output-stem-name",
+        help="Output stem name",
+        type=str,
+        default="gsas2_refinement",
+    )
+    parser.add_argument(
+        "-p",
+        "--output-directory",
+        help="Output directory name",
+        type=str,
+        default="/portal",
+    )
+    parser.add_argument(
+        "-n", "--num-cycles", help="Number of refinement cycles", type=int
+    )
     # parser.add_argument('-v', '--initial-values', help='Initial values for refinement', type=str)
     args = parser.parse_args()
 

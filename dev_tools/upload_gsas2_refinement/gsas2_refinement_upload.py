@@ -4,16 +4,46 @@ from run_gsas2_refinement_upload import run_gsas2_fit
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--cif-filenames", nargs="+", help="Name of CIF file to load (*.cif)", type=str)
-    parser.add_argument("-f", "--gsas-filenames", nargs="+", help="Name of gsas file to load (*.gsa) ", type=str)
     parser.add_argument(
-        "-i", "--instrument-params-filenames", nargs="+", help="Name of instrument parameters file to load (*.prm)", type=str
+        "-c",
+        "--cif-filenames",
+        nargs="+",
+        help="Name of CIF file to load (*.cif)",
+        type=str,
     )
-    parser.add_argument("-o", "--output-stem-name", help="Output stem name", type=str, default="gsas2_refinement")
-    parser.add_argument("-n", "--num-cycles", help="Number of refinement cycles", type=int)
-    parser.add_argument("-v", "--initial-values", help="Initial values for refinement", type=str)
-    parser.add_argument("-a", "--output-gpx", help="Name of the gpx file to output", type=str)
-    parser.add_argument("-b", "--output-lst", help="Name of the lst file to output", type=str)
+    parser.add_argument(
+        "-f",
+        "--gsas-filenames",
+        nargs="+",
+        help="Name of gsas file to load (*.gsa) ",
+        type=str,
+    )
+    parser.add_argument(
+        "-i",
+        "--instrument-params-filenames",
+        nargs="+",
+        help="Name of instrument parameters file to load (*.prm)",
+        type=str,
+    )
+    parser.add_argument(
+        "-o",
+        "--output-stem-name",
+        help="Output stem name",
+        type=str,
+        default="gsas2_refinement",
+    )
+    parser.add_argument(
+        "-n", "--num-cycles", help="Number of refinement cycles", type=int
+    )
+    parser.add_argument(
+        "-v", "--initial-values", help="Initial values for refinement", type=str
+    )
+    parser.add_argument(
+        "-a", "--output-gpx", help="Name of the gpx file to output", type=str
+    )
+    parser.add_argument(
+        "-b", "--output-lst", help="Name of the lst file to output", type=str
+    )
     args = parser.parse_args()
 
     # Add key-word arguments

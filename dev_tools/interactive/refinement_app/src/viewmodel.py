@@ -79,7 +79,7 @@ background_functions = {
 }
 
 parameter_keys_to_labels = {
-    "Absorption": "Sample absorption", 
+    "Absorption": "Sample absorption",
     "Constrast": "Constrast",
     "DisplaceX": "Sample X displ. perp. to beam",
     "DisplaceY": "Sample Y displ. || to beam",
@@ -107,11 +107,11 @@ parameter_keys_to_labels = {
     "Trans": "Transmission (meas)",
     "SlitLen": "Slit length",
     "Lam": "Lam",
-    "Lam1":"Lam1",
-    "Lam2":"Lam2",
+    "Lam1": "Lam1",
+    "Lam2": "Lam2",
     "Zero": "Zero",
-    "I(L2)/I(L1)":"I(L2)/I(L1)",
-    "Polariz.":"Polariz.", 
+    "I(L2)/I(L1)": "I(L2)/I(L1)",
+    "Polariz.": "Polariz.",
     "U": "U",
     "V": "V",
     "W": "W",
@@ -120,18 +120,18 @@ parameter_keys_to_labels = {
     "Z": "Z",
     "SH/L": "SH/L",
     "Azimuth": "Azimuth",
-    "Source": "Source", 
-    "Bank": "Bank", 
-    "alpha": "alpha", 
-    "beta-0": "beta-0", 
-    "beta-1": "beta-1",  
-    "beta-q": "beta-q", 
-    "sig-0": "sig-0", 
-    "sig-1": "sig-1", 
-    "sig-2": "sig-2", 
-    "sig-q": "sig-q", 
-    "difA": "difA", 
-    "difB": "difB", 
+    "Source": "Source",
+    "Bank": "Bank",
+    "alpha": "alpha",
+    "beta-0": "beta-0",
+    "beta-1": "beta-1",
+    "beta-q": "beta-q",
+    "sig-0": "sig-0",
+    "sig-1": "sig-1",
+    "sig-2": "sig-2",
+    "sig-q": "sig-q",
+    "difA": "difA",
+    "difB": "difB",
     "difC": "difC",
     "fltPath": "Flight path",
     "2-theta": "2-theta",
@@ -504,7 +504,7 @@ def save_bkg_coefs(hist_name: str, coefs: list) -> None:
             bkg_data[0][3:] = new_coefs
 
 
-def render_instrument_text(hist_name:str) -> str:
+def render_instrument_text(hist_name: str) -> str:
     h = gpx().histogram(hist_name)
     instrument_parameters: dict = h.getHistEntryValue(["Instrument Parameters"])[0]
     instrument_type = "?"
@@ -513,16 +513,20 @@ def render_instrument_text(hist_name:str) -> str:
     instrument_bank = "?"
     if "Bank" in instrument_parameters:
         instrument_bank = str(instrument_parameters["Bank"][1])
-    output_text = "Histogram type: " + instrument_type + " Bank: " + instrument_bank +"\n"
+    output_text = (
+        "Histogram type: " + instrument_type + " Bank: " + instrument_bank + "\n"
+    )
     if instrument_type == "PNT":
         flight_path = str(instrument_parameters["fltPath"][1])
         two_theta = str(instrument_parameters["2-theta"][1])
-        output_text = output_text + "Flight path: " + flight_path + " 2-theta: " + two_theta
+        output_text = (
+            output_text + "Flight path: " + flight_path + " 2-theta: " + two_theta
+        )
 
     return output_text
 
 
-def build_instrument_df(hist_name:str) -> pd.DataFrame:
+def build_instrument_df(hist_name: str) -> pd.DataFrame:
     h = gpx().histogram(hist_name)
     instrument_parameters: dict = h.getHistEntryValue(["Instrument Parameters"])[0]
     instrument_df = pd.DataFrame(columns=["Parameter", "Value"])
@@ -550,7 +554,18 @@ def build_instrument_type_df(hist_name) -> pd.DataFrame:
     h = gpx().histogram(hist_name)
     instrument_parameters: dict = h.getHistEntryValue(["Instrument Parameters"])[0]
     instrument_df = pd.DataFrame(columns=["Parameter", "Value"])
-    no_input_list = ["Source", "X", "Y", "Z", "Zero", "Azimuth", "Type", "Bank", "fltPath", "2-theta"]
+    no_input_list = [
+        "Source",
+        "X",
+        "Y",
+        "Z",
+        "Zero",
+        "Azimuth",
+        "Type",
+        "Bank",
+        "fltPath",
+        "2-theta",
+    ]
     for param, val in instrument_parameters.items():
         if param not in no_input_list:
             if isinstance(val, list):
@@ -565,7 +580,10 @@ def build_instrument_type_df(hist_name) -> pd.DataFrame:
 
 
 def save_instrument_parameters(
-    hist_name: str, instrument_df:pd.DataFrame, instrument_type_df: pd.DataFrame, instrument_refinements: list
+    hist_name: str,
+    instrument_df: pd.DataFrame,
+    instrument_type_df: pd.DataFrame,
+    instrument_refinements: list,
 ) -> None:
     """Saves instrument parameters and refinement parameters
     from an input Dataframe and refinement parameter list
@@ -592,7 +610,7 @@ def save_instrument_parameters(
         # copy in parameter values row by row
         for row in df.itertuples():
             param_label = row.Parameter
-            param= parameter_labels_to_keys[param_label]
+            param = parameter_labels_to_keys[param_label]
             df_value = row.Value
             val = instrument_parameters[param]
 
@@ -617,16 +635,29 @@ def update_instrument_refinements(hist_name: str) -> None:
     # populating list of sample refinements that are already active
     instrument_refinement_choices = {}
     instrument_refinements = []
-    no_refinements = ["Bank", "Source", "Type", "Azimuth", "Lam1", "Lam2", "2-theta", "fltPath"]
+    no_refinements = [
+        "Bank",
+        "Source",
+        "Type",
+        "Azimuth",
+        "Lam1",
+        "Lam2",
+        "2-theta",
+        "fltPath",
+    ]
     for param, val in instrument_parameters.items():
         # set sample choices dict for UI
         if param not in no_refinements:
             if isinstance(val, list) and len(val) == 3:
                 if isinstance(val[1], (int, float)):
-                    instrument_refinement_choices[param] = parameter_keys_to_labels[param]
+                    instrument_refinement_choices[param] = parameter_keys_to_labels[
+                        param
+                    ]
                     if val[2]:
                         instrument_refinements.append(param)
-    sorted_choices = {key: value for key, value in sorted(instrument_refinement_choices.items())}
+    sorted_choices = {
+        key: value for key, value in sorted(instrument_refinement_choices.items())
+    }
     ui.update_selectize(
         "inst_selection",
         choices=sorted_choices,
@@ -638,7 +669,14 @@ def build_sample_notes_df(hist_name: str) -> pd.DataFrame:
     h = gpx().histogram(hist_name)
     sample_parameters: dict = h.getHistEntryValue(["Sample Parameters"])
     sample_notes_df = pd.DataFrame(columns=["Parameter", "Value"])
-    note_parameters = ["Temperature", "Pressure", "Time", "FreePrm1", "FreePrm2", "FreePrm3"]
+    note_parameters = [
+        "Temperature",
+        "Pressure",
+        "Time",
+        "FreePrm1",
+        "FreePrm2",
+        "FreePrm3",
+    ]
     for param in note_parameters:
         df_value = sample_parameters[param]
         param_label = parameter_keys_to_labels[param]
@@ -646,6 +684,7 @@ def build_sample_notes_df(hist_name: str) -> pd.DataFrame:
         sample_notes_df.loc[len(sample_notes_df)] = new_row
 
     return sample_notes_df
+
 
 def build_sample_df(hist_name: str) -> pd.DataFrame:
     """Builds a dataframe of the selected histograms Sample Parameters
@@ -663,16 +702,35 @@ def build_sample_df(hist_name: str) -> pd.DataFrame:
     sample_parameters: dict = h.getHistEntryValue(["Sample Parameters"])
     sample_df = pd.DataFrame(columns=["Parameter", "Value"])
 
-    no_input_list = ["Type", "Materials", "ranId", "Temperature", "Pressure", "Time", "FreePrm1", "FreePrm2", "FreePrm3", "Thick", "Contrast", "SlitLen"]
+    no_input_list = [
+        "Type",
+        "Materials",
+        "ranId",
+        "Temperature",
+        "Pressure",
+        "Time",
+        "FreePrm1",
+        "FreePrm2",
+        "FreePrm3",
+        "Thick",
+        "Contrast",
+        "SlitLen",
+    ]
     if sample_parameters["Type"] == "Debye-Scherrer":
-        no_input_ds = ["Trans", "SurfaceRoughA", "SurfaceRoughB", "Shift", "Transparency"]
+        no_input_ds = [
+            "Trans",
+            "SurfaceRoughA",
+            "SurfaceRoughB",
+            "Shift",
+            "Transparency",
+        ]
         no_input_list.extend(no_input_ds)
     elif sample_parameters["Type"] == "Bragg-Brentano":
         no_input_bb = ["Absorption", "DisplaceX", "DisplaceY"]
         no_input_list.extend(no_input_bb)
     # populate the dataframe with sample parameters and values
     for param, val in sample_parameters.items():
-        
+
         if param not in no_input_list:
 
             if isinstance(val, list):
@@ -689,7 +747,11 @@ def build_sample_df(hist_name: str) -> pd.DataFrame:
 
 
 def save_sample_parameters(
-    hist_name: str, diffractometer_type: str, sample_df: pd.DataFrame, sample_notes_df: pd.DataFrame, sample_refinements: list
+    hist_name: str,
+    diffractometer_type: str,
+    sample_df: pd.DataFrame,
+    sample_notes_df: pd.DataFrame,
+    sample_refinements: list,
 ) -> None:
     """saves sample parameters from an input dataframe
     to the selected histogram in the GSASII project object.
@@ -757,7 +819,9 @@ def update_sample_refinements(hist_name: str) -> None:
     sample_refinements = []
     prevent_refinements = ["Materials", "Azimuth"]
     if sample_parameters["Type"] == "Debye-Scherrer":
-        prevent_refinements.extend(["Trans", "SurfRoughA", "SurfRoughB", "Transparency", "Shift"])
+        prevent_refinements.extend(
+            ["Trans", "SurfRoughA", "SurfRoughB", "Transparency", "Shift"]
+        )
     elif sample_parameters["Type"] == "Bragg-Brentano":
         prevent_refinements.extend(["Absorption", "DisplaceX", "DisplaceY"])
 
@@ -769,7 +833,9 @@ def update_sample_refinements(hist_name: str) -> None:
                     sample_refinement_choices[param] = parameter_keys_to_labels[param]
                     if val[1]:
                         sample_refinements.append(param)
-    sorted_choices = {key: value for key, value in sorted(sample_refinement_choices.items())}
+    sorted_choices = {
+        key: value for key, value in sorted(sample_refinement_choices.items())
+    }
     # update the UI
     ui.update_selectize(
         "samp_selection",
@@ -866,7 +932,7 @@ def plot_powder(hist_name: str, limits: list):
         y="intensity",
         opacity=0,
         title=hist_name,
-        labels = {"x": x_label},
+        labels={"x": x_label},
     )
 
     fig.add_scatter(
@@ -1035,7 +1101,9 @@ def submit_out(current_gpx_id: str) -> None:
     file_name = os.path.basename(file_path)
     history_table = get_update_history()
     current_gpx_history_entry = history_table.loc[history_table["id"] == current_gpx_id]
-    history_id = str(current_gpx_history_entry['hid'].loc[current_gpx_history_entry.index[0]])
+    history_id = str(
+        current_gpx_history_entry["hid"].loc[current_gpx_history_entry.index[0]]
+    )
 
     delta_file_name = save_delta(file_name, history_id)
     gxhistory.put(delta_file_name)

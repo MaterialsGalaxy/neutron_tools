@@ -80,7 +80,7 @@ def get_project(dataset_id: str, filep: str) -> None:
     )
 
 
-def run_generate_outputs(dataset_id:str) -> None:
+def run_generate_outputs(dataset_id: str) -> None:
     """runs the GSASII refinement: output generator tool in galaxy using the selected GSASII project file. CIF and CSV files will be output into the Galaxy history.
 
     Args:

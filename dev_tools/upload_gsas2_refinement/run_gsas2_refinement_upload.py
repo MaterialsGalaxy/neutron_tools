@@ -8,6 +8,7 @@ from typing import (
 
 import numpy as np
 import shutil
+
 """
 change how GSASIIscriptable is imported for actual deployment
 locally i added:
@@ -84,15 +85,12 @@ def run_gsas2_fit(
     else:
         print("no project created at path", proj_path)
     # add histograms to project
-    for i , gsa_fn in enumerate(gsa_fns):
+    for i, gsa_fn in enumerate(gsa_fns):
         gpx.add_powder_histogram(gsa_fn, prm_fns[i])
-
 
     # step 2: add phases and link it to the all histograms
     for structure_fn in structure_fns:
-        gpx.add_phase(
-            structure_fn, fmthint="CIF", histograms=gpx.histograms()
-        )
+        gpx.add_phase(structure_fn, fmthint="CIF", histograms=gpx.histograms())
     print("phase loaded")
 
     # step 3: increase # of cycles to improve convergence
