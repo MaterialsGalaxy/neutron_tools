@@ -47,6 +47,7 @@ RUN pip install --upgrade -r requirements.txt
 
 ENV PYTHONPATH="~/miniconda3/envs/GSASII/GSAS-II/GSASII"
 USER root
+COPY src/. /srv/shiny-server/
 COPY src/shiny-server.sh /usr/bin/shiny-server.sh
 RUN chmod 777 /usr/bin/shiny-server.sh
 
