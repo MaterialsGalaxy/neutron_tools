@@ -11,7 +11,8 @@ locally i added:
 in the tool xml commands to get this to work
 """
 # import G2script as G2sc
-sys.path.append("/home/dxp41838/miniconda3/envs/GSASII/GSAS-II/GSASII")
+gsas2_scriptable_path = os.path.join(os.environ["CONDA_PREFIX"], "GSAS-II/GSASII")
+sys.path.append(gsas2_scriptable_path)
 # needed to "find" GSAS-II modules
 import GSASIIscriptable as G2sc  # type: ignore
 
@@ -56,22 +57,20 @@ def run_gsas2_fit(
     # generate output CIF files
 
     for phase in gpx.phases():
-        print("Exporting phase: " + phase.name)
-        output_cif_fn = os.path.join(
-            os.getcwd(), "portal/cifs/", phase.name + "_refined.cif"
-        )
+        print("Exporting phase: "+ phase.name)
+        output_cif_fn = os.path.join(os.getcwd(),
+                                    "portal/cifs/",phase.name +"_refined.cif")
         phase.export_CIF(output_cif_fn)
+    
 
     print("================")
 
     # save results data
     for histogram in gpx.histograms():
-        print("Exporting histogram: " + histogram.name)
-        histogram_file_name = os.path.join(
-            os.getcwd(), "portal/csvs/", histogram.name + "_refined"
-        )
+        print("Exporting histogram: "+ histogram.name)
+        histogram_file_name = os.path.join(os.getcwd(), "portal/csvs/", histogram.name + "_refined")
         histogram.Export(histogram_file_name, ".csv", "histogram CSV")
-
+    
     print("================")
 
     return 0

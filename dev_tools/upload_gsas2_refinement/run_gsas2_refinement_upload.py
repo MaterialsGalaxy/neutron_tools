@@ -8,7 +8,6 @@ from typing import (
 
 import numpy as np
 import shutil
-
 """
 change how GSASIIscriptable is imported for actual deployment
 locally i added:
@@ -17,7 +16,8 @@ in the tool xml commands to get this to work
 """
 
 # import G2script as G2sc
-sys.path.append("/home/dxp41838/miniconda3/envs/GSASII/GSAS-II/GSASII")
+gsas2_scriptable_path = os.path.join(os.environ["CONDA_PREFIX"], "GSAS-II/GSASII")
+sys.path.append(gsas2_scriptable_path)
 # needed to "find" GSAS-II modules
 import GSASIIscriptable as G2sc  # type: ignore
 
@@ -85,12 +85,15 @@ def run_gsas2_fit(
     else:
         print("no project created at path", proj_path)
     # add histograms to project
-    for i, gsa_fn in enumerate(gsa_fns):
+    for i , gsa_fn in enumerate(gsa_fns):
         gpx.add_powder_histogram(gsa_fn, prm_fns[i])
+
 
     # step 2: add phases and link it to the all histograms
     for structure_fn in structure_fns:
-        gpx.add_phase(structure_fn, fmthint="CIF", histograms=gpx.histograms())
+        gpx.add_phase(
+            structure_fn, fmthint="CIF", histograms=gpx.histograms()
+        )
     print("phase loaded")
 
     # step 3: increase # of cycles to improve convergence

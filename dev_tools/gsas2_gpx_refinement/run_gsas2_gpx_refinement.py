@@ -11,7 +11,8 @@ locally i added:
 in the tool xml commands to get this to work
 """
 # import G2script as G2sc
-sys.path.append("/home/dxp41838/miniconda3/envs/GSASII/GSAS-II/GSASII")
+gsas2_scriptable_path = os.path.join(os.environ["CONDA_PREFIX"], "GSAS-II/GSASII")
+sys.path.append(gsas2_scriptable_path)
 # needed to "find" GSAS-II modules
 import GSASIIscriptable as G2sc  # type: ignore
 
@@ -64,15 +65,7 @@ def run_gsas2_fit(
     gpx = og_gpx
     # apply deltas and save the new project.
     for delta_fn in delta_fns:
-        delta = Delta(
-            delta_path=delta_fn,
-            safe_to_import={
-                "GSASIIobj.G2VarObj",
-                "numpy.core.multiarray.scalar",
-                "numpy.dtype",
-                "numpy.float64",
-            },
-        )
+        delta = Delta(delta_path=delta_fn, safe_to_import={'GSASIIobj.G2VarObj', 'numpy.core.multiarray.scalar', 'numpy.dtype', 'numpy.float64'})
         gpx = gpx + delta
         gpx.save(filename=proj_path)
 
@@ -81,19 +74,10 @@ def run_gsas2_fit(
     total_delta = Delta(total_diff)
     # create a readable text file detailing parameter changes
     flat_dicts = total_delta.to_flat_dicts()
-    updated_parameters_fp = os.path.join(
-        os.getcwd(), "portal/", "parameters_updated.txt"
-    )
+    updated_parameters_fp = os.path.join(os.getcwd(), "portal/", "parameters_updated.txt")
     with open(updated_parameters_fp, "w") as updated_parameters_file:
         for change in flat_dicts:
-            updated_parameters_file.write(
-                change["action"]
-                + ": "
-                + str(change["path"])
-                + " = "
-                + str(change["value"])
-                + "\n"
-            )
+            updated_parameters_file.write(change['action'] + ": " + str(change["path"]) + " = " + str(change["value"]) + "\n")
 
     # check if the project got created
     if os.path.exists(proj_path):

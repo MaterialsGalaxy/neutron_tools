@@ -1,10 +1,10 @@
 <tool id="gpx_gsas2" name="GSASII Refinement: Interactive executor" profile="22.05" version="0.1.0">
     <description>Tool for GSASII Rietveld refinement called from an interactive refinement tool</description>
-    <requirements></requirements>
+    <requirements>
+        <requirement type="package" version="8.1.1">conda-forge::deepdiff</requirement>
+        <requirement type="package" version="5.1.0">briantoby::gsas2pkg</requirement>
+    </requirements>
     <command detect_errors="exit_code"><![CDATA[
-        conda init bash &&
-        source ../home/.bashrc &&
-        conda activate GSASII &&
         mkdir app &&
         cd app/ &&
         touch $output &&
