@@ -20,7 +20,10 @@
     </environment_variables>
 
     <command><![CDATA[
-        cp -r $__tool_directory__/src/. /srv/shiny-server/ &&
+        cp $__tool_directory__/src/app.py /srv/shiny-server/ &&
+        cp $__tool_directory__/src/gsasIImodel.py /srv/shiny-server/ &&
+        cp $__tool_directory__/src/gxhistory.py /srv/shiny-server/ &&
+        cp $__tool_directory__/src/viewmodel.py /srv/shiny-server/ &&
         cp $__tool_directory__/src/shiny-server.sh /usr/bin/shiny-server.sh &&
         /usr/bin/shiny-server.sh
     ]]>
