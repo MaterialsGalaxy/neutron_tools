@@ -77,12 +77,12 @@ background_functions = {
     "inv interpolate": "inv interpolate",
     "log interpolate": "log interpolate",
 }
-
+Pwrm1 = chr(0x207b)+chr(0x0b9)
 parameter_keys_to_labels = {
-    "Absorption": "Sample absorption",
+    "Absorption": u'Sample absorption (\xb5\xb7r)',
     "Constrast": "Constrast",
-    "DisplaceX": "Sample X displ. perp. to beam",
-    "DisplaceY": "Sample Y displ. || to beam",
+    "DisplaceX": u'Sample X displ. perp. to beam (\xb5m)',
+    "DisplaceY": u'Sample Y displ. || to beam (\xb5m)',
     "Gonio. radius": "Goniometer radius (mm)",
     "Omega": "Goniometer omega",
     "Chi": "Goniometer chi",
@@ -90,8 +90,8 @@ parameter_keys_to_labels = {
     "Azimuth": "Detector azimuth",
     "SurfRoughA": "Surface roughness A",
     "SurfRoughB": "Surface roughness B",
-    "Shift": "Sample dispalcement",
-    "Transparency": "Sample transparency",
+    "Shift": u'Sample displacement(\xb5m)',
+    "Transparency": u'Sample transparency(1/\xb5eff, cm)',
     "Scale": "Histogram scale factor",
     "InstrName": "Instrument name",
     "Temperature": "Sample temperature (K)",
@@ -105,8 +105,8 @@ parameter_keys_to_labels = {
     "Materials": "Materials",
     "Thick": "Sample Thickness",
     "Trans": "Transmission (meas)",
-    "SlitLen": "Slit length",
-    "Lam": "Lam",
+    "SlitLen": u'Slit length (Q,\xc5'+Pwrm1+')',
+    "Lam": u'Lam (\xc5)',
     "Lam1": "Lam1",
     "Lam2": "Lam2",
     "Zero": "Zero",
