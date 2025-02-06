@@ -1,4 +1,4 @@
-<tool id="gpx_gsas2_output" name="GSASII Refinement: ouput generator" profile="22.05" version="0.1.0">
+<tool id="gpx_gsas2_output" name="GSASII Refinement: Output Generator" profile="22.05" version="0.1.0">
     <description>Tool for generating CIF files from a GSASII project file used after completion of a Rietveld refinement</description>
     <requirements>
         <requirement type="package" version="8.1.1">conda-forge::deepdiff</requirement>

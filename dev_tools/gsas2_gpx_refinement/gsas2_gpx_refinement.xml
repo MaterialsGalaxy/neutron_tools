@@ -1,4 +1,4 @@
-<tool id="gpx_gsas2" name="GSASII Refinement: Interactive executor" profile="22.05" version="0.1.0">
+<tool id="gpx_gsas2" name="GSASII Refinement: Refinement Executor" profile="22.05" version="0.1.0">
     <description>Tool for GSASII Rietveld refinement called from an interactive refinement tool</description>
     <requirements>
         <requirement type="package" version="8.1.1">conda-forge::deepdiff</requirement>

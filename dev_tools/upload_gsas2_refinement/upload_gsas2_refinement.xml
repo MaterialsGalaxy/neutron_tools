@@ -1,4 +1,4 @@
-<tool id="upload_gsas2" name="GSASII Refinement Stage 1" profile="22.05" version="0">
+<tool id="upload_gsas2" name="GSASII Refinement: Initialise Project" profile="22.05" version="0">
     <description>Tool to upload files for neutron powder diffraction analysis in GSASII and perform an initial Rietveld refinement</description>
     <requirements>
         <requirement type="package" version="8.1.1">conda-forge::deepdiff</requirement>
