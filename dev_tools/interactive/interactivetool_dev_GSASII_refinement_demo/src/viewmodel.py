@@ -899,7 +899,7 @@ def set_hist_limits(hist_name: str, limits: list) -> None:
 
 def plot_powder(hist_name: str, limits: list):
     """generates a plotly express figure for the histogram data
-    with the powder data, the fit, the background and the limit lines.
+    with the powder data, the Fit, the background and the limit lines.
     The figure is used to output a plot to the UI.
 
     Args:
@@ -915,21 +915,21 @@ def plot_powder(hist_name: str, limits: list):
     if instrument_type == "PNT":
         x_label = "TOF"
     else:
-        x_label = "2 Theta"
+        x_label = u"2 \u03F4"
 
     pwdr_data = {
         "x": x,
-        "intensity": y,
-        "fit": ycalc,
-        "background": bkg,
+        "Intensity": y,
+        "Fit": ycalc,
+        "Background": bkg,
     }
     pwdr_data_df = pd.DataFrame(pwdr_data)
-    place_holder_df = pd.DataFrame([[0, 0]], columns=["x", "intensity"])
+    place_holder_df = pd.DataFrame([[0, 0]], columns=["x", "Intensity"])
 
     fig = px.scatter(
         place_holder_df,
         x="x",
-        y="intensity",
+        y="Intensity",
         opacity=0,
         title=hist_name,
         labels={"x": x_label},
@@ -937,10 +937,10 @@ def plot_powder(hist_name: str, limits: list):
 
     fig.add_scatter(
         x=pwdr_data_df["x"],
-        y=pwdr_data_df["intensity"],
+        y=pwdr_data_df["Intensity"],
         mode="markers",
         opacity=0.8,
-        name="powder data",
+        name="Powder data",
         zorder=0,
     )
     fig.update_traces(
@@ -958,19 +958,19 @@ def plot_powder(hist_name: str, limits: list):
 
     fig.add_scatter(
         x=pwdr_data_df["x"],
-        y=pwdr_data_df["fit"],
+        y=pwdr_data_df["Fit"],
         mode="lines",
         opacity=1,
-        name="fit",
+        name="Fit",
         zorder=2,
     )
 
     fig.add_scatter(
         x=pwdr_data_df["x"],
-        y=pwdr_data_df["background"],
+        y=pwdr_data_df["Background"],
         mode="lines",
         opacity=1,
-        name="background",
+        name="Background",
         zorder=1,
     )
 
@@ -987,6 +987,8 @@ def plot_powder(hist_name: str, limits: list):
         line_dash="dash",
         line_color="green",
     )
+
+    fig.update_layout(height=1000, font_size=18)
 
     return fig
 
