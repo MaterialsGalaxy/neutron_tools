@@ -2,7 +2,7 @@ from bioblend.galaxy import GalaxyInstance
 import logging
 import os
 import typing
-
+import pandas as pd
 
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 if DEBUG:
@@ -134,3 +134,18 @@ def wait_for_dataset(dataset_id: str) -> None:
 
     gi = get_galaxy_connection()
     gi.datasets.wait_for_dataset(dataset_id)
+
+
+def get_update_history() -> pd.DataFrame:
+    """gets the galaxy history from the galaxy instance and
+    creates a dataframe of the history entries with
+    History ids, names and Galaxy API ids.
+
+    Returns:
+        pd.DataFrame: dataframe of active entries in the galaxy history.
+    """
+    history = gx_update_history()
+    history_df: pd.DataFrame = pd.DataFrame(history)
+    history_table = history_df[["hid", "name", "id"]]
+
+    return history_table

@@ -1014,7 +1014,7 @@ def get_gpx_choices() -> dict:
         with keys of their Galaxy API IDs and values of
         "history IDs: filename"
     """
-    history_table = get_update_history()
+    history_table = gxhistory.get_update_history()
     gpx_df = history_table[history_table["name"].str.endswith("gpx")]
     gpx_choice_dict = dict(
         [
@@ -1030,19 +1030,7 @@ def get_gpx_choices() -> dict:
     return gpx_choices
 
 
-def get_update_history() -> pd.DataFrame:
-    """gets the galaxy history from the galaxy instance and
-    creates a dataframe of the history entries with
-    History ids, names and Galaxy API ids.
 
-    Returns:
-        pd.DataFrame: dataframe of active entries in the galaxy history.
-    """
-    history = gxhistory.gx_update_history()
-    history_df: pd.DataFrame = pd.DataFrame(history)
-    history_table = history_df[["hid", "name", "id"]]
-
-    return history_table
 
 
 def update_history() -> None:
@@ -1114,7 +1102,7 @@ def submit_out(current_gpx_id: str) -> None:
     gpx().save()
     file_path: str = gpx().filename
     file_name = os.path.basename(file_path)
-    history_table = get_update_history()
+    history_table = gxhistory.get_update_history()
     current_gpx_history_entry = history_table.loc[history_table["id"] == current_gpx_id]
     history_id = str(
         current_gpx_history_entry["hid"].loc[current_gpx_history_entry.index[0]]
@@ -1148,7 +1136,7 @@ def refresh_latest_history_entry_id() -> str:
         str: Galaxy API ID for the most recent entry in the history.
     """
     time.sleep(2)
-    hist_table = get_update_history()
+    hist_table = gxhistory.get_update_history()
     row_id: int = hist_table["hid"].idxmax()
     id: str = hist_table.loc[row_id, "id"]
     return id
