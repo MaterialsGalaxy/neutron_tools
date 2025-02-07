@@ -5,9 +5,9 @@ import pandas as pd
 import gxhistory
 import os
 import numpy as np
+import GSASIIscriptable as G2sc  # type: ignore
 from gsasIImodel import (
     hist_export,
-    gsas_load_gpx,
     GSAS2Project,
 )
 import plotly.express as px
@@ -1071,9 +1071,10 @@ def load_project(id: str) -> None:
         location: str = "/var/shiny-server/shiny_test/work/"
         fp = os.path.join(location, fn)
         gxhistory.get_project(id, fp)
-        tgpx: GSAS2Project = gsas_load_gpx(fp, fn)
+        tgpx: GSAS2Project = G2sc.G2Project(gpxfile=fp, newgpx=fn)
+        tgpx.save()
 
-        og_gpx: GSAS2Project = gsas_load_gpx(fp, "og_" + fn)
+        og_gpx: GSAS2Project = G2sc.G2Project(gpxfile=fp, newgpx="og_" + fn)
         og_gpx.save()
         # load the phase names for the sidebar selection
         phase_names = {}
@@ -1162,7 +1163,7 @@ def save_delta(file_name: str, history_id: str) -> str:
         str: Delta file name to be output to the galaxy history
     """
     og_project_file = "og_" + file_name
-    og_gpx = gsas_load_gpx(og_project_file, og_project_file)
+    og_gpx = G2sc.G2Project(gpxfile=og_project_file )
 
     # ensure phase atom names are loaded
     og_gpx.index_ids()

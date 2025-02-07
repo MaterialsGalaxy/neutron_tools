@@ -27,20 +27,3 @@ def hist_export(gpx: GSAS2Project, histogram_name: str) -> tuple:
     bkg = np.array(h.getdata("Background"))
 
     return x, y, ycalc, dy, bkg
-
-
-def gsas_load_gpx(input_gpx_file: str, fn: str) -> GSAS2Project:
-    """loads a GSASII project from input file and saves it to a new file with name "fn".
-    This is so any changes can be compared to the original later.
-
-    Args:
-        input_gpx_file (str): file path of the GSASII .gpx file to be loaded
-        fn (str): The name of the new file where changes will be saved.
-
-    Returns:
-        GSAS2Project: GSASII project object containing all data about the project.
-    """
-
-    gpx = G2sc.G2Project(gpxfile=input_gpx_file, newgpx=fn)
-    gpx.save()
-    return gpx
