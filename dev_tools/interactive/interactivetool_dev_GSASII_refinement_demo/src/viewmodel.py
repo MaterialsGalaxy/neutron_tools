@@ -1030,9 +1030,6 @@ def get_gpx_choices() -> dict:
     return gpx_choices
 
 
-
-
-
 def update_history() -> None:
     """gets the galaxy history from the galaxy instance and
     updates the UI choices for projects to load from the galaxy history.
@@ -1112,12 +1109,12 @@ def submit_out(current_gpx_id: str) -> None:
     gxhistory.put(delta_file_name)
 
     # wait for the delta file to save in galaxy and run refinement
-    id = refresh_latest_history_entry_id()
+    id = gxhistory.refresh_latest_history_entry_id()
     gxhistory.run_refinement(current_gpx_id, id)
     # current_gpx_id.set(id)
 
     # wait for refinement to complete
-    id = refresh_latest_history_entry_id()
+    id = gxhistory.refresh_latest_history_entry_id()
     gxhistory.wait_for_dataset(id)
 
     # load the history with the new refinement output gpx file
@@ -1127,19 +1124,6 @@ def submit_out(current_gpx_id: str) -> None:
     update_history()
     load_project(id)
     ui.update_select("select_gpx", selected=id)
-
-
-def refresh_latest_history_entry_id() -> str:
-    """Finds the API id of the latest files in the galaxy history.
-
-    Returns:
-        str: Galaxy API ID for the most recent entry in the history.
-    """
-    time.sleep(2)
-    hist_table = gxhistory.get_update_history()
-    row_id: int = hist_table["hid"].idxmax()
-    id: str = hist_table.loc[row_id, "id"]
-    return id
 
 
 def save_delta(file_name: str, history_id: str) -> str:
@@ -1175,6 +1159,6 @@ def generate_outputs(current_gpx_id: str) -> None:
         current_gpx_id (str): galaxy API id of the current GSASII project used to generate the files.
     """
     gxhistory.run_generate_outputs(current_gpx_id)
-    id = refresh_latest_history_entry_id()
+    id = gxhistory.refresh_latest_history_entry_id()
     gxhistory.wait_for_dataset(id)
     update_history()

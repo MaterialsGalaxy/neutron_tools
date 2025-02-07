@@ -3,6 +3,7 @@ import logging
 import os
 import typing
 import pandas as pd
+import time
 
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 if DEBUG:
@@ -149,3 +150,16 @@ def get_update_history() -> pd.DataFrame:
     history_table = history_df[["hid", "name", "id"]]
 
     return history_table
+
+
+def refresh_latest_history_entry_id() -> str:
+    """Finds the API id of the latest files in the galaxy history.
+
+    Returns:
+        str: Galaxy API ID for the most recent entry in the history.
+    """
+    time.sleep(2)
+    hist_table = get_update_history()
+    row_id: int = hist_table["hid"].idxmax()
+    id: str = hist_table.loc[row_id, "id"]
+    return id
