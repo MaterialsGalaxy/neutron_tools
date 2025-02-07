@@ -8,7 +8,6 @@ import numpy as np
 from gsasIImodel import (
     hist_export,
     gsas_load_gpx,
-    load_phase_constraints,
     GSAS2Project,
 )
 import plotly.express as px
@@ -228,7 +227,7 @@ def generate_new_random_ids(constr_vars: list) -> None:
         gpx().data["Phases"][phase_name]["Atoms"][atom_num][17] = new_atom_rid
 
     # loop through constraints and edit the relevant ids
-    phase_constraints = load_phase_constraints(gpx())
+    phase_constraints = gpx().get_Constraints("Phase")
     for constraint in phase_constraints:
         vars = constraint[:-3]
         for var in vars:
@@ -289,7 +288,7 @@ def remove_constraint(id: int) -> None:
         from the list containing all phase constraints
         in the GSASII project object.
     """
-    constraints = load_phase_constraints(gpx())
+    constraints = gpx().get_Constraints("Phase")
     if isinstance(id, int) and id < len(constraints):
         constraints.pop(id)
 
@@ -302,7 +301,7 @@ def show_phase_constr() -> pd.DataFrame:
         pd.DataFrame: A table of current phase constraints in the project
     """
     gpx().index_ids()
-    constraints = load_phase_constraints(gpx())
+    constraints = gpx().get_Constraints("Phase")
     current_constraints = pd.DataFrame(columns=["Current constraints"])
     # rearrange the data for visualisation
     for constraint in constraints:

@@ -7,20 +7,6 @@ from typing import (
 GSAS2Project = NewType("GSAS2Project", type[G2sc.G2Project])
 
 
-def load_phase_constraints(gpx: GSAS2Project) -> list:
-    """loads a list of phase constraints from a GSASII Project object
-
-    Args:
-        gpx (GSAS2Project): GSASII project object containing all data about the project
-
-    Returns:
-        list: a list of all the phase constraints in the project. Each constraint is itself a list
-        containing the constraint type, parameters, coefficients and refinement flag.
-    """
-    phase_constraint_list = gpx.get_Constraints("Phase")
-    return phase_constraint_list
-
-
 def hist_export(gpx: GSAS2Project, histogram_name: str) -> tuple:
     """gathers the data required for plotting a histogram from the powder data
     in the GSASII Project under histogram_name
