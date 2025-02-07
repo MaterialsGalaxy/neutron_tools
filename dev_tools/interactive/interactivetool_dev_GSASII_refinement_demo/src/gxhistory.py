@@ -10,6 +10,20 @@ if DEBUG:
 logging.getLogger("bioblend").setLevel(logging.CRITICAL)
 log = logging.getLogger()
 
+class HistoryModel:
+    def __init__(self, history_id, galaxy_url, api_key):
+        self.name = history_id
+        self.galaxy_url = galaxy_url
+        self.api_key = api_key
+        self.galaxy_instance = GalaxyInstance(url=galaxy_url, key=api_key)
+        self.history = self.galaxy_instance.histories.show_history(
+            history_id=history_id,
+            contents=True,
+            deleted=False,
+            visible=True,
+            types=["dataset"],
+            keys=["Id", "Hid", "Name"],
+        )
 
 def get_galaxy_connection():
     """connects to a galaxy isntance using the API Key and URL provided in the environment.

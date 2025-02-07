@@ -10,6 +10,7 @@ from gsasIImodel import (
     hist_export,
     GSAS2Project,
 )
+from gxhistory import HistoryModel
 import plotly.express as px
 import typing
 import time
@@ -25,6 +26,8 @@ these have to be passed as inputs to the function."""
 # edited as a side effect by all reactive functions.
 gpx = reactive.value()
 
+galaxy_history = HistoryModel(os.environ["HISTORY_ID"], os.environ["GALAXY_URL"], os.environ["API_KEY"])
+history = reactive.value(galaxy_history)
 # initial values for sidebar selections when no project is loaded
 # reactive values for when projects are loaded
 gpx_choices = {"init": "update the history before loading a new project"}
