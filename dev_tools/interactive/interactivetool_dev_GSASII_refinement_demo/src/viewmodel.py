@@ -77,7 +77,9 @@ background_functions = {
     "inv interpolate": "inv interpolate",
     "log interpolate": "log interpolate",
 }
+
 Pwrm1 = chr(0x207b)+chr(0x0b9)
+
 parameter_keys_to_labels = {
     "Absorption": u'Sample absorption (\xb5\xb7r)',
     "Constrast": "Constrast",
@@ -666,6 +668,14 @@ def update_instrument_refinements(hist_name: str) -> None:
 
 
 def build_sample_notes_df(hist_name: str) -> pd.DataFrame:
+    """Builds a dataframe of sample note parameters for the selected histogram to be output to the UI. These parameters do not affect Rietveld refinement calculations.
+
+    Args:
+        hist_name (str): name of the selected histogram
+
+    Returns:
+        pd.DataFrame: dataframe containing the sample note parameters and their values.
+    """
     h = gpx().histogram(hist_name)
     sample_parameters: dict = h.getHistEntryValue(["Sample Parameters"])
     sample_notes_df = pd.DataFrame(columns=["Parameter", "Value"])
