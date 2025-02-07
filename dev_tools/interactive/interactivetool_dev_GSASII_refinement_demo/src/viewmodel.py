@@ -1005,38 +1005,13 @@ def plot_powder(hist_name: str, limits: list):
     return fig
 
 
-def get_gpx_choices() -> dict:
-    """creates a dictionary of GSASII projects in the galaxy history
-    which can be loaded into the interactive tool.
-
-    Returns:
-        dict: dictionary of GSASII project files in the galaxy history
-        with keys of their Galaxy API IDs and values of
-        "history IDs: filename"
-    """
-    history_table = gxhistory.get_update_history()
-    gpx_df = history_table[history_table["name"].str.endswith("gpx")]
-    gpx_choice_dict = dict(
-        [
-            (i, str(h) + ": " + fn)
-            for i, h, fn in zip(gpx_df["id"], gpx_df["hid"], gpx_df["name"])
-        ]
-    )
-
-    gpx_choices = dict(reversed(gpx_choice_dict.items()))
-    # gpx_choice_dict = {}
-    # for row in history_table.itertuples():
-    #    gpx_choice_dict[row.id] = row.hid + ": " + row.name
-    return gpx_choices
-
-
 def update_history() -> None:
     """gets the galaxy history from the galaxy instance and
     updates the UI choices for projects to load from the galaxy history.
     """
     print("update_history triggered")
 
-    gpx_choices = get_gpx_choices()
+    gpx_choices = gxhistory.get_gpx_choices()
     ui.update_select("select_gpx", choices=gpx_choices)
 
 
@@ -1053,7 +1028,7 @@ def load_project(id: str) -> None:
     if id != "init":
 
         # get the file from galaxy and load the gsas project
-        hid_and_fn: str = get_gpx_choices()[id]
+        hid_and_fn: str = gxhistory.get_gpx_choices()[id]
         fn: str = hid_and_fn.split(": ")[1]
 
         location: str = "/var/shiny-server/shiny_test/work/"
@@ -1118,7 +1093,7 @@ def submit_out(current_gpx_id: str) -> None:
     gxhistory.wait_for_dataset(id)
 
     # load the history with the new refinement output gpx file
-    id: str = list(get_gpx_choices())[0]
+    id: str = list(gxhistory.get_gpx_choices())[0]
 
     # load the refined output project and update the UI
     update_history()
@@ -1159,6 +1134,4 @@ def generate_outputs(current_gpx_id: str) -> None:
         current_gpx_id (str): galaxy API id of the current GSASII project used to generate the files.
     """
     gxhistory.run_generate_outputs(current_gpx_id)
-    id = gxhistory.refresh_latest_history_entry_id()
-    gxhistory.wait_for_dataset(id)
     update_history()

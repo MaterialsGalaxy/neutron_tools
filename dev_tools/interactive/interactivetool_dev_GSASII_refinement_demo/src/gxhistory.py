@@ -106,6 +106,8 @@ def run_generate_outputs(dataset_id: str) -> None:
     input_data = {}
     input_data["project"] = {"values": [{"src": "hda", "id": dataset_id}]}
     gi.tools.run_tool(history_id, "gpx_gsas2_output", input_data)
+    id = refresh_latest_history_entry_id()
+    wait_for_dataset(id)
 
 
 def run_refinement(dataset_id: str, delta_id: str) -> None:
@@ -163,3 +165,28 @@ def refresh_latest_history_entry_id() -> str:
     row_id: int = hist_table["hid"].idxmax()
     id: str = hist_table.loc[row_id, "id"]
     return id
+
+
+def get_gpx_choices() -> dict:
+    """creates a dictionary of GSASII projects in the galaxy history
+    which can be loaded into the interactive tool.
+
+    Returns:
+        dict: dictionary of GSASII project files in the galaxy history
+        with keys of their Galaxy API IDs and values of
+        "history IDs: filename"
+    """
+    history_table = get_update_history()
+    gpx_df = history_table[history_table["name"].str.endswith("gpx")]
+    gpx_choice_dict = dict(
+        [
+            (i, str(h) + ": " + fn)
+            for i, h, fn in zip(gpx_df["id"], gpx_df["hid"], gpx_df["name"])
+        ]
+    )
+
+    gpx_choices = dict(reversed(gpx_choice_dict.items()))
+    # gpx_choice_dict = {}
+    # for row in history_table.itertuples():
+    #    gpx_choice_dict[row.id] = row.hid + ": " + row.name
+    return gpx_choices
