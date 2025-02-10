@@ -2,8 +2,9 @@
 from shiny.express import ui, input
 from shiny import reactive, render
 from shinywidgets import render_plotly
-import gxhistory
+
 from viewmodel import (
+    history,
     gpx_choices,
     phase_choices,
     hist_choices,
@@ -408,10 +409,9 @@ with ui.navset_pill(id="plot"):
     with ui.nav_panel("History", value="hist"):
 
         @render.data_frame
-        @reactive.event(input.update_history, input.load_gpx)
+        @reactive.event(input.update_history, input.load_gpx, input.submit, input.generate_outputs)
         def render_update_history():
-            hist_table = gxhistory.get_update_history()
-            return render.DataTable(hist_table)
+            return render.DataTable(history().table)
 
 
 with ui.sidebar(bg="#f8f8f8", position="left"):

@@ -13,7 +13,7 @@ log = logging.getLogger()
 
 class HistoryModel:
     def __init__(self, history_id, galaxy_url, api_key):
-        self.name = history_id
+        self.history_id = history_id
         self.galaxy_url = galaxy_url
         self.api_key = api_key
         self.galaxy_instance = GalaxyInstance(url=galaxy_url, key=api_key)
@@ -39,7 +39,8 @@ class HistoryModel:
 
     def put(self, file_name: str, file_type: str = "auto"):
         self.galaxy_instance.tools.upload_file(file_name, self.history_id)
-
+        self.update()
+        self.galaxy_instance.datasets.wait_for_dataset(self.latest_entry_id)
 
     def get_project(self, dataset_id: str, filep: str) -> None:
         self.galaxy_instance.datasets.download_dataset(
@@ -57,11 +58,15 @@ class HistoryModel:
             the delta contains all parameter changes made in the interactive tool.
         """
 
-        self.galaxy_instance.datasets.wait_for_dataset(delta_id)
+        # self.galaxy_instance.datasets.wait_for_dataset(delta_id)
         input_data = {}
         input_data["project"] = {"values": [{"src": "hda", "id": dataset_id}]}
         input_data["delta"] = {"values": [{"src": "hda", "id": delta_id}]}
         self.galaxy_instance.tools.run_tool(self.history_id, "gpx_gsas2", input_data)
+
+        self.update()
+        self.galaxy_instance.datasets.wait_for_dataset(self.latest_entry_id)
+        self.update()
 
     def update_table(self) -> pd.DataFrame:
         """gets the galaxy history from the galaxy instance and
@@ -88,7 +93,7 @@ class HistoryModel:
             with keys of their Galaxy API IDs and values of
             "history IDs: filename"
         """
-        gpx_df = self.history_table[self.history_table["name"].str.endswith("gpx")]
+        gpx_df = self.table[self.table["name"].str.endswith("gpx")]
         gpx_choice_dict = dict(
             [
                 (i, str(h) + ": " + fn)

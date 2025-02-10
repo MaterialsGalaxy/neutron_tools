@@ -1011,8 +1011,9 @@ def update_history() -> None:
     """
     print("update_history triggered")
 
-    gpx_choices = gxhistory.get_gpx_choices()
-    ui.update_select("select_gpx", choices=gpx_choices)
+    # gpx_choices = gxhistory.get_gpx_choices()
+    history().update()
+    ui.update_select("select_gpx", choices=history().gpx_choices)
 
 
 def load_project(id: str) -> None:
@@ -1028,12 +1029,12 @@ def load_project(id: str) -> None:
     if id != "init":
 
         # get the file from galaxy and load the gsas project
-        hid_and_fn: str = gxhistory.get_gpx_choices()[id]
+        hid_and_fn: str = history().gpx_choices[id]
         fn: str = hid_and_fn.split(": ")[1]
 
         location: str = "/var/shiny-server/shiny_test/work/"
         fp = os.path.join(location, fn)
-        gxhistory.get_project(id, fp)
+        history().get_project(id, fp)
         tgpx: GSAS2Project = G2sc.G2Project(gpxfile=fp, newgpx=fn)
         tgpx.save()
 
@@ -1074,26 +1075,27 @@ def submit_out(current_gpx_id: str) -> None:
     gpx().save()
     file_path: str = gpx().filename
     file_name = os.path.basename(file_path)
-    history_table = gxhistory.get_update_history()
+    history_table = history().table
     current_gpx_history_entry = history_table.loc[history_table["id"] == current_gpx_id]
     history_id = str(
         current_gpx_history_entry["hid"].loc[current_gpx_history_entry.index[0]]
     )
 
     delta_file_name = save_delta(file_name, history_id)
-    gxhistory.put(delta_file_name)
+    history().put(delta_file_name)
 
     # wait for the delta file to save in galaxy and run refinement
-    id = gxhistory.refresh_latest_history_entry_id()
-    gxhistory.run_refinement(current_gpx_id, id)
+    #history().update() 
+    history().run_refinement(current_gpx_id, history().latest_entry_id)
     # current_gpx_id.set(id)
 
     # wait for refinement to complete
-    id = gxhistory.refresh_latest_history_entry_id()
-    gxhistory.wait_for_dataset(id)
+    #history().update()
+    #id = history().latest_entry_id()
+    #history().wait_for_dataset(id)
 
     # load the history with the new refinement output gpx file
-    id: str = list(gxhistory.get_gpx_choices())[0]
+    id: str = list(history().gpx_choices.keys())[0]
 
     # load the refined output project and update the UI
     update_history()
@@ -1133,5 +1135,5 @@ def generate_outputs(current_gpx_id: str) -> None:
     Args:
         current_gpx_id (str): galaxy API id of the current GSASII project used to generate the files.
     """
-    gxhistory.run_generate_outputs(current_gpx_id)
+    history().run_generate_outputs(current_gpx_id)
     update_history()
