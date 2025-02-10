@@ -21,6 +21,7 @@ class HistoryModel:
         self.table = None
         self.latest_entry_id = None
         self.gpx_choices = None
+        self.current_gpx_id = None
         self.update()
 
 
@@ -116,6 +117,12 @@ class HistoryModel:
         time.sleep(2)
         self.update()
         self.galaxy_instance.datasets.wait_for_dataset(self.latest_entry_id)
+
+
+    def get_file_hid(self, id):
+        history_entry = self.table.loc[self.table["id"] == id]
+        history_id = str(history_entry["hid"].loc[history_entry.index[0]])
+        return history_id
 
 
 def get_galaxy_connection():

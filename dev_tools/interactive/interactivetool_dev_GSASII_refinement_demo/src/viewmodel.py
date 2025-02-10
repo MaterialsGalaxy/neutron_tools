@@ -1011,7 +1011,6 @@ def update_history() -> None:
     """
     print("update_history triggered")
 
-    # gpx_choices = gxhistory.get_gpx_choices()
     history().update()
     ui.update_select("select_gpx", choices=history().gpx_choices)
 
@@ -1060,9 +1059,9 @@ def load_project(id: str) -> None:
 
         # load data for a histogram/clear previous histogram data
         load_histogram(list(hist_names.keys())[0])
+        history().current_gpx_id = id
 
-
-def submit_out(current_gpx_id: str) -> None:
+def submit_out() -> None:
     """saves project changes to the .gpx file
     and submits them as a delta file to the galaxy history.
     The static tool GSAS2_refinement_executor then runs in galaxy.
@@ -1075,24 +1074,14 @@ def submit_out(current_gpx_id: str) -> None:
     gpx().save()
     file_path: str = gpx().filename
     file_name = os.path.basename(file_path)
-    history_table = history().table
-    current_gpx_history_entry = history_table.loc[history_table["id"] == current_gpx_id]
-    history_id = str(
-        current_gpx_history_entry["hid"].loc[current_gpx_history_entry.index[0]]
-    )
-
-    delta_file_name = save_delta(file_name, history_id)
+ 
+    delta_file_name = save_delta(file_name)
     history().put(delta_file_name)
 
     # wait for the delta file to save in galaxy and run refinement
-    #history().update() 
-    history().run_refinement(current_gpx_id, history().latest_entry_id)
-    # current_gpx_id.set(id)
+ 
+    history().run_refinement(history().current_gpx_id, history().latest_entry_id)
 
-    # wait for refinement to complete
-    #history().update()
-    #id = history().latest_entry_id()
-    #history().wait_for_dataset(id)
 
     # load the history with the new refinement output gpx file
     id: str = list(history().gpx_choices.keys())[0]
@@ -1103,13 +1092,12 @@ def submit_out(current_gpx_id: str) -> None:
     ui.update_select("select_gpx", selected=id)
 
 
-def save_delta(file_name: str, history_id: str) -> str:
+def save_delta(file_name: str) -> str:
     """saves the difference between the current project file being edited
     and its original from the galaxy history as a "delta" binary file.
 
     Args:
         file_name (str): name of the GSASII project file
-        history_id (str): galaxy history id of the current GSASII project file which the Delta is taken from.
 
     Returns:
         str: Delta file name to be output to the galaxy history
@@ -1123,17 +1111,20 @@ def save_delta(file_name: str, history_id: str) -> str:
 
     diff = DeepDiff(og_gpx, gpx(), exclude_paths="filename")
     delta = Delta(diff)
+
+    history_id = history().get_file_hid(history().current_gpx_id)
+
     delta_file_name = "Delta_on_" + history_id
     with open(delta_file_name, "wb") as dump_file:
         delta.dump(dump_file)
     return delta_file_name
 
 
-def generate_outputs(current_gpx_id: str) -> None:
+def generate_outputs() -> None:
     """Runs static output generator tool in galaxy to generate CIF files and histogram csv files from a GSASII project. Files will be generated in the Galaxy history.
 
     Args:
         current_gpx_id (str): galaxy API id of the current GSASII project used to generate the files.
     """
-    history().run_generate_outputs(current_gpx_id)
+    history().run_generate_outputs(history().current_gpx_id)
     update_history()

@@ -472,9 +472,9 @@ with ui.sidebar(bg="#f8f8f8", position="left"):
     @reactive.effect
     @reactive.event(input.submit)
     def ui_submit_out():
-        submit_out(input.select_gpx())
+        submit_out()
 
     @reactive.effect
     @reactive.event(input.generate_outputs)
     def ui_generate_cifs():
-        generate_outputs(input.select_gpx())
+        generate_outputs()
