@@ -1011,7 +1011,10 @@ def update_history() -> None:
     """
     print("update_history triggered")
 
+    # get the latest history from galaxy
     history().update()
+
+    # update the UI
     ui.update_select("select_gpx", choices=history().gpx_choices)
 
 
@@ -1033,12 +1036,18 @@ def load_project(id: str) -> None:
 
         location: str = "/var/shiny-server/shiny_test/work/"
         fp = os.path.join(location, fn)
+
+        # load the project file from galaxy and save to the file path
         history().get_project(id, fp)
+
+        # load the project object from file and save a new file in the working directory
         tgpx: GSAS2Project = G2sc.G2Project(gpxfile=fp, newgpx=fn)
         tgpx.save()
 
+        # save an original unchanged version of the file
         og_gpx: GSAS2Project = G2sc.G2Project(gpxfile=fp, newgpx="og_" + fn)
         og_gpx.save()
+
         # load the phase names for the sidebar selection
         phase_names = {}
         for phase in tgpx.phases():
@@ -1070,11 +1079,12 @@ def submit_out() -> None:
     Args:
         current_gpx_id (str): Galaxy API ID for the GSASII project file.
     """
-    # refresh history get history id add the HID to the name of the delta
+    # save the file
     gpx().save()
     file_path: str = gpx().filename
     file_name = os.path.basename(file_path)
  
+    # save the changes as a delta file and submit to galaxy history
     delta_file_name = save_delta(file_name)
     history().put(delta_file_name)
 
@@ -1083,7 +1093,7 @@ def submit_out() -> None:
     history().run_refinement(history().current_gpx_id, history().latest_entry_id)
 
 
-    # load the history with the new refinement output gpx file
+    # get the id of the latest project file in the history
     id: str = list(history().gpx_choices.keys())[0]
 
     # load the refined output project and update the UI
@@ -1103,17 +1113,21 @@ def save_delta(file_name: str) -> str:
         str: Delta file name to be output to the galaxy history
     """
     og_project_file = "og_" + file_name
+    # the og_project_file was saved with this name when the project was loaded
+
     og_gpx = G2sc.G2Project(gpxfile=og_project_file )
 
     # ensure phase atom names are loaded
     og_gpx.index_ids()
     gpx().index_ids()
 
+    # calculate the delta
     diff = DeepDiff(og_gpx, gpx(), exclude_paths="filename")
     delta = Delta(diff)
 
     history_id = history().get_file_hid(history().current_gpx_id)
 
+    # save the delta to a pickled file
     delta_file_name = "Delta_on_" + history_id
     with open(delta_file_name, "wb") as dump_file:
         delta.dump(dump_file)

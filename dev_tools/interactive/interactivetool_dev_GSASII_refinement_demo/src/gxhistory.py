@@ -26,6 +26,8 @@ class HistoryModel:
 
 
     def update(self):
+
+        # get the latest history data from galaxy
         self.history = self.galaxy_instance.histories.show_history(
             history_id=self.history_id,
             contents=True,
@@ -34,16 +36,24 @@ class HistoryModel:
             types=["dataset"],
             keys=["Id", "Hid", "Name"],
         )
+
+        # update the new history as a pandas dataframe
         self.update_table()
+
+        # update the selection of gpx files which can be loaded from history
         self.update_gpx_choices()
 
 
     def put(self, file_name: str, file_type: str = "auto"):
+        # upload file to glaaxy history
         self.galaxy_instance.tools.upload_file(file_name, self.history_id)
+        # update the local history 
         self.update()
+        # wait for the dataset to be ready to use in galaxy
         self.galaxy_instance.datasets.wait_for_dataset(self.latest_entry_id)
 
     def get_project(self, dataset_id: str, filep: str) -> None:
+        # download dataset from galaxy
         self.galaxy_instance.datasets.download_dataset(
             dataset_id=dataset_id, file_path=filep, use_default_filename=False
         )
@@ -58,13 +68,15 @@ class HistoryModel:
             delta_id (str): the galaxy api id of the delta to apply to the gsas project, before running the refinement.
             the delta contains all parameter changes made in the interactive tool.
         """
-
-        # self.galaxy_instance.datasets.wait_for_dataset(delta_id)
+        # format the datasets as inputs to the execution tool
         input_data = {}
         input_data["project"] = {"values": [{"src": "hda", "id": dataset_id}]}
         input_data["delta"] = {"values": [{"src": "hda", "id": delta_id}]}
+
+        # run the refinement execution static tool in galaxy
         self.galaxy_instance.tools.run_tool(self.history_id, "gpx_gsas2", input_data)
 
+        # wait for the refinement to complete and update the local history
         self.update()
         self.galaxy_instance.datasets.wait_for_dataset(self.latest_entry_id)
         self.update()
@@ -77,6 +89,8 @@ class HistoryModel:
         Returns:
             pd.DataFrame: dataframe of active entries in the galaxy history.
         """
+
+        # create a pandas dataframe for the datasets in the history
         history_df: pd.DataFrame = pd.DataFrame(self.history)
         self.table = history_df[["hid", "name", "id"]]
 
@@ -94,7 +108,10 @@ class HistoryModel:
             with keys of their Galaxy API IDs and values of
             "history IDs: filename"
         """
+        # filter the hsitory dataframe for gpx files
         gpx_df = self.table[self.table["name"].str.endswith("gpx")]
+
+        # create a dictionary of the gpx choices
         gpx_choice_dict = dict(
             [
                 (i, str(h) + ": " + fn)
@@ -102,6 +119,7 @@ class HistoryModel:
             ]
         )
 
+        # sort the gpx_choices dictionary by history id descending
         self.gpx_choices = dict(reversed(gpx_choice_dict.items()))
 
     def run_generate_outputs(self, dataset_id: str) -> None:
@@ -111,16 +129,25 @@ class HistoryModel:
             dataset_id (str): galaxy API id of the current GSASII project used to generate the files.
         """
 
+        # format the datasets as inputs to for the static output tool in galaxy
         input_data = {}
         input_data["project"] = {"values": [{"src": "hda", "id": dataset_id}]}
+
+        # run the static output tool in galaxy
         self.galaxy_instance.tools.run_tool(self.history_id, "gpx_gsas2_output", input_data)
+
+        # wait for the output tool to finish adn update the local history
         time.sleep(2)
         self.update()
         self.galaxy_instance.datasets.wait_for_dataset(self.latest_entry_id)
-
+        self.update()
 
     def get_file_hid(self, id):
+
+        # get the relevent record in the history table
         history_entry = self.table.loc[self.table["id"] == id]
+
+        # return the history id of the file in galaxy
         history_id = str(history_entry["hid"].loc[history_entry.index[0]])
         return history_id
 
